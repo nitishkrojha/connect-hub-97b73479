@@ -28,8 +28,8 @@ const ProjectConfigPage = () => (
           <CardHeader><CardTitle className="text-base">Project Details</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div><Label className="text-foreground text-sm">Project Name</Label><Input defaultValue="Project Alpha" className="mt-1.5" /></div>
-              <div><Label className="text-foreground text-sm">Project Code</Label><Input defaultValue="ALPHA" disabled className="mt-1.5" /></div>
+              <div><Label className="text-foreground text-sm">Project Name</Label><Input defaultValue="My Bharat" className="mt-1.5" /></div>
+              <div><Label className="text-foreground text-sm">Project Code</Label><Input defaultValue="MYBRT" disabled className="mt-1.5" /></div>
               <div><Label className="text-foreground text-sm">Contact Person</Label><Input defaultValue="Ravi Kumar" className="mt-1.5" /></div>
               <div><Label className="text-foreground text-sm">Contact Email</Label><Input defaultValue="ravi@alpha.com" className="mt-1.5" /></div>
               <div><Label className="text-foreground text-sm">Contact Mobile</Label><Input defaultValue="+91 98765 43210" className="mt-1.5" /></div>

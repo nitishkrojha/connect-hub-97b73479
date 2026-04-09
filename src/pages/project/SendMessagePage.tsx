@@ -52,10 +52,10 @@ const dbSegments = [
 const states = ["Madhya Pradesh", "Uttar Pradesh", "Rajasthan", "Maharashtra", "Bihar", "Gujarat"];
 const districts = ["Bhopal", "Indore", "Jabalpur", "Gwalior", "Ujjain", "Sagar"];
 const urbanRural = ["Urban", "Rural"];
-const blocks = ["Block A", "Block B", "Block C", "Block D"];
-const gramPanchayats = ["GP Ramnagar", "GP Shivpur", "GP Lakshmipur", "GP Govindpur"];
-const villages = ["Village 1", "Village 2", "Village 3", "Village 4", "Village 5"];
-const userTypes = ["Student", "Teacher", "Admin", "Volunteer", "Mentor"];
+const blocks = ["Huzur", "Berasia", "Phanda", "Sehore", "Nasrullaganj"];
+const gramPanchayats = ["Ratua Khurd", "Bairagarh Chichli", "Khajuri Sadak", "Misrod", "Awadhpuri"];
+const villages = ["Lambakheda", "Neelbad", "Kolar", "Ratibad", "Bagroda"];
+const userTypes = ["Youth", "Organization"];
 const categories = ["Education", "Health", "Agriculture", "Finance", "Technology"];
 const subCategories: Record<string, string[]> = {
   Education: ["Primary", "Secondary", "Higher", "Vocational"],

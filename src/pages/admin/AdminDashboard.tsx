@@ -23,11 +23,11 @@ const channelPie = [
 ];
 
 const topProjects = [
-  { name: "Project Alpha", sent: 28400, success: 97.2 },
-  { name: "FinServe", sent: 24100, success: 95.8 },
-  { name: "HealthLink", sent: 19800, success: 98.1 },
-  { name: "EduConnect", sent: 16200, success: 96.5 },
-  { name: "RetailPro", sent: 12500, success: 94.3 },
+  { name: "My Bharat", sent: 28400, success: 97.2 },
+  { name: "Kisan Sarathi", sent: 24100, success: 95.8 },
+  { name: "Manas", sent: 19800, success: 98.1 },
+  { name: "E Saras", sent: 16200, success: 96.5 },
+  { name: "India Handmade", sent: 12500, success: 94.3 },
 ];
 
 const deliveryTrend = [

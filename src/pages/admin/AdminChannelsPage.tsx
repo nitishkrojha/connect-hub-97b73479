@@ -64,7 +64,7 @@ const AdminChannelsPage = () => {
                 <div><Label className="text-foreground text-sm">API Endpoint</Label><Input defaultValue="https://api.twilio.com/2010-04-01" className="mt-1.5" /></div>
                 <div><Label className="text-foreground text-sm">Account SID</Label><Input defaultValue="AC••••••••••••e4f2" type="password" className="mt-1.5" /></div>
                 <div><Label className="text-foreground text-sm">Auth Token</Label><Input defaultValue="••••••••••••" type="password" className="mt-1.5" /></div>
-                <div><Label className="text-foreground text-sm">Default Sender ID</Label><Input defaultValue="COMMHUB" className="mt-1.5" /></div>
+                <div><Label className="text-foreground text-sm">Default Sender ID</Label><Input defaultValue="DICNTFY" className="mt-1.5" /></div>
                 <div><Label className="text-foreground text-sm">DLT Entity ID</Label><Input defaultValue="1101456780000012345" className="mt-1.5" /></div>
               </div>
               <div className="flex items-center gap-3">
@@ -108,7 +108,7 @@ const AdminChannelsPage = () => {
                 <div><Label className="text-foreground text-sm">SMTP Port</Label><Input defaultValue="587" className="mt-1.5" /></div>
                 <div><Label className="text-foreground text-sm">Username</Label><Input defaultValue="AKIA••••••••Q3F" type="password" className="mt-1.5" /></div>
                 <div><Label className="text-foreground text-sm">Password</Label><Input defaultValue="••••••••" type="password" className="mt-1.5" /></div>
-                <div><Label className="text-foreground text-sm">Default From Address</Label><Input defaultValue="noreply@commhub.io" className="mt-1.5" /></div>
+                <div><Label className="text-foreground text-sm">Default From Address</Label><Input defaultValue="noreply@dicnotifier.io" className="mt-1.5" /></div>
               </div>
               <div className="flex items-center gap-3">
                 <Switch defaultChecked /><Label className="text-foreground text-sm">Enable TLS Encryption</Label>
@@ -127,9 +127,9 @@ const AdminChannelsPage = () => {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div><Label className="text-foreground text-sm">Provider</Label><Input defaultValue="Google RBM" className="mt-1.5" /></div>
-                <div><Label className="text-foreground text-sm">Agent ID</Label><Input defaultValue="commhub-agent-prod" className="mt-1.5" /></div>
+                <div><Label className="text-foreground text-sm">Agent ID</Label><Input defaultValue="dicnotifier-agent-prod" className="mt-1.5" /></div>
                 <div><Label className="text-foreground text-sm">API Key</Label><Input defaultValue="••••••••••••" type="password" className="mt-1.5" /></div>
-                <div><Label className="text-foreground text-sm">Brand Name</Label><Input defaultValue="CommHub" className="mt-1.5" /></div>
+                <div><Label className="text-foreground text-sm">Brand Name</Label><Input defaultValue="DIC Notifier" className="mt-1.5" /></div>
               </div>
               <div className="flex items-center gap-3">
                 <Switch defaultChecked /><Label className="text-foreground text-sm">Enable Rich Media</Label>

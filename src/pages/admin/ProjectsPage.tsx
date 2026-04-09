@@ -32,12 +32,11 @@ interface Project {
 }
 
 const initialProjects: Project[] = [
-  { id: 1, name: "Project Alpha", code: "ALPHA", contact: "Ravi Kumar", dept: "Marketing", channels: ["SMS", "WhatsApp", "Email"], quota: 25000, used: 17300, status: "Active" },
-  { id: 2, name: "FinServe", code: "FINSV", contact: "Priya S.", dept: "Finance", channels: ["SMS", "Email"], quota: 30000, used: 24100, status: "Active" },
-  { id: 3, name: "HealthLink", code: "HLNK", contact: "Dr. Mehta", dept: "Healthcare", channels: ["SMS", "WhatsApp", "Email", "RCS"], quota: 20000, used: 19800, status: "Active" },
-  { id: 4, name: "EduConnect", code: "EDUC", contact: "Anita R.", dept: "Education", channels: ["Email", "WhatsApp"], quota: 15000, used: 16200, status: "Active" },
-  { id: 5, name: "RetailPro", code: "RTLP", contact: "Vikram J.", dept: "Retail", channels: ["SMS", "RCS"], quota: 10000, used: 3500, status: "Active" },
-  { id: 6, name: "Legacy App", code: "LGCY", contact: "Suresh P.", dept: "IT", channels: ["SMS"], quota: 5000, used: 0, status: "Inactive" },
+  { id: 1, name: "My Bharat", code: "MYBRT", contact: "Ravi Kumar", dept: "Youth Affairs", channels: ["SMS", "WhatsApp", "Email"], quota: 25000, used: 17300, status: "Active" },
+  { id: 2, name: "Kisan Sarathi", code: "KSRTH", contact: "Priya S.", dept: "Agriculture", channels: ["SMS", "Email"], quota: 30000, used: 24100, status: "Active" },
+  { id: 3, name: "Manas", code: "MANAS", contact: "Dr. Mehta", dept: "Healthcare", channels: ["SMS", "WhatsApp", "Email", "RCS"], quota: 20000, used: 19800, status: "Active" },
+  { id: 4, name: "E Saras", code: "ESARS", contact: "Anita R.", dept: "Rural Development", channels: ["Email", "WhatsApp"], quota: 15000, used: 16200, status: "Active" },
+  { id: 5, name: "India Handmade", code: "IHDMD", contact: "Vikram J.", dept: "Handicrafts", channels: ["SMS", "RCS"], quota: 10000, used: 3500, status: "Active" },
 ];
 
 const channelColor: Record<string, string> = {
@@ -365,7 +364,7 @@ const ProjectsPage = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <Label className="text-foreground">Login Email <span className="text-destructive">*</span></Label>
-                    <Input type="email" placeholder="project@commhub.io" value={form.loginEmail} onChange={(e) => setForm({ ...form, loginEmail: e.target.value })} />
+                    <Input type="email" placeholder="project@dicnotifier.io" value={form.loginEmail} onChange={(e) => setForm({ ...form, loginEmail: e.target.value })} />
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-foreground">Password <span className="text-destructive">*</span></Label>

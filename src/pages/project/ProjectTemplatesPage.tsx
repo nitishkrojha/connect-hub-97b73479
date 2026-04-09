@@ -11,8 +11,8 @@ import { Plus, Search, FileText } from "lucide-react";
 
 const templates = [
   { id: 1, name: "OTP Verification", channel: "SMS", status: "Approved", body: "Your OTP is {{otp}}. Valid for 5 minutes." },
-  { id: 2, name: "Welcome Message", channel: "WhatsApp", status: "Approved", body: "Hello {{name}}! Welcome to Project Alpha." },
-  { id: 3, name: "Welcome Email", channel: "Email", status: "Approved", body: "Dear {{name}},\n\nWelcome to Project Alpha!" },
+  { id: 2, name: "Welcome Message", channel: "WhatsApp", status: "Approved", body: "Hello {{name}}! Welcome to My Bharat." },
+  { id: 3, name: "Welcome Email", channel: "Email", status: "Approved", body: "Dear {{name}},\n\nWelcome to My Bharat!" },
   { id: 4, name: "Invoice Draft", channel: "Email", status: "Pending", body: "Dear {{name}},\n\nInvoice #{{invoice_id}} for {{amount}}" },
 ];
 

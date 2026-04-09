@@ -28,11 +28,11 @@ const deliveryStatus = [
 ];
 
 const projectUsage = [
-  { project: "Project Alpha", sms: 12400, whatsapp: 8900, email: 22100, rcs: 3200, total: 46600, success: 97.2 },
-  { project: "FinServe", sms: 14200, whatsapp: 0, email: 28500, rcs: 0, total: 42700, success: 95.8 },
-  { project: "HealthLink", sms: 8100, whatsapp: 6500, email: 18200, rcs: 4800, total: 37600, success: 98.1 },
-  { project: "EduConnect", sms: 0, whatsapp: 9200, email: 16800, rcs: 0, total: 26000, success: 96.5 },
-  { project: "RetailPro", sms: 5800, whatsapp: 0, email: 0, rcs: 4100, total: 9900, success: 94.3 },
+  { project: "My Bharat", sms: 12400, whatsapp: 8900, email: 22100, rcs: 3200, total: 46600, success: 97.2 },
+  { project: "Kisan Sarathi", sms: 14200, whatsapp: 0, email: 28500, rcs: 0, total: 42700, success: 95.8 },
+  { project: "Manas", sms: 8100, whatsapp: 6500, email: 18200, rcs: 4800, total: 37600, success: 98.1 },
+  { project: "E Saras", sms: 0, whatsapp: 9200, email: 16800, rcs: 0, total: 26000, success: 96.5 },
+  { project: "India Handmade", sms: 5800, whatsapp: 0, email: 0, rcs: 4100, total: 9900, success: 94.3 },
 ];
 
 const templateUsage = [
@@ -54,14 +54,14 @@ const dailyTrend = [
 ];
 
 const campaignReports = [
-  { id: 1, name: "Welcome Onboarding June", project: "Project Alpha", channel: "Email", status: "Completed", sent: 2400, delivered: 2352, failed: 48, opened: 1820, clicked: 640, rate: 98.0, date: "Jun 8, 2025" },
-  { id: 2, name: "OTP Verification Batch", project: "FinServe", channel: "SMS", status: "Completed", sent: 8900, delivered: 8722, failed: 178, opened: 0, clicked: 0, rate: 98.0, date: "Jun 8, 2025" },
-  { id: 3, name: "Order Confirmation Q2", project: "HealthLink", channel: "WhatsApp", status: "Completed", sent: 3400, delivered: 3318, failed: 82, opened: 3100, clicked: 1250, rate: 97.6, date: "Jun 7, 2025" },
-  { id: 4, name: "Monthly Newsletter June", project: "EduConnect", channel: "Email", status: "Completed", sent: 5200, delivered: 4940, failed: 260, opened: 3200, clicked: 980, rate: 95.0, date: "Jun 6, 2025" },
-  { id: 5, name: "Summer Promo RCS", project: "RetailPro", channel: "RCS", status: "Partially Failed", sent: 5000, delivered: 3800, failed: 1200, opened: 2800, clicked: 1100, rate: 76.0, date: "Jun 5, 2025" },
-  { id: 6, name: "Appointment Reminders", project: "HealthLink", channel: "SMS", status: "Completed", sent: 1200, delivered: 1176, failed: 24, opened: 0, clicked: 0, rate: 98.0, date: "Jun 4, 2025" },
-  { id: 7, name: "Account Alerts Batch", project: "FinServe", channel: "SMS", status: "Failed", sent: 800, delivered: 0, failed: 800, opened: 0, clicked: 0, rate: 0, date: "Jun 3, 2025" },
-  { id: 8, name: "Password Reset Batch", project: "Project Alpha", channel: "Email", status: "Completed", sent: 340, delivered: 338, failed: 2, opened: 310, clicked: 290, rate: 99.4, date: "Jun 2, 2025" },
+  { id: 1, name: "Welcome Onboarding June", project: "My Bharat", channel: "Email", status: "Completed", sent: 2400, delivered: 2352, failed: 48, opened: 1820, clicked: 640, rate: 98.0, date: "Jun 8, 2025" },
+  { id: 2, name: "OTP Verification Batch", project: "Kisan Sarathi", channel: "SMS", status: "Completed", sent: 8900, delivered: 8722, failed: 178, opened: 0, clicked: 0, rate: 98.0, date: "Jun 8, 2025" },
+  { id: 3, name: "Order Confirmation Q2", project: "Manas", channel: "WhatsApp", status: "Completed", sent: 3400, delivered: 3318, failed: 82, opened: 3100, clicked: 1250, rate: 97.6, date: "Jun 7, 2025" },
+  { id: 4, name: "Monthly Newsletter June", project: "E Saras", channel: "Email", status: "Completed", sent: 5200, delivered: 4940, failed: 260, opened: 3200, clicked: 980, rate: 95.0, date: "Jun 6, 2025" },
+  { id: 5, name: "Summer Promo RCS", project: "India Handmade", channel: "RCS", status: "Partially Failed", sent: 5000, delivered: 3800, failed: 1200, opened: 2800, clicked: 1100, rate: 76.0, date: "Jun 5, 2025" },
+  { id: 6, name: "Appointment Reminders", project: "Manas", channel: "SMS", status: "Completed", sent: 1200, delivered: 1176, failed: 24, opened: 0, clicked: 0, rate: 98.0, date: "Jun 4, 2025" },
+  { id: 7, name: "Account Alerts Batch", project: "Kisan Sarathi", channel: "SMS", status: "Failed", sent: 800, delivered: 0, failed: 800, opened: 0, clicked: 0, rate: 0, date: "Jun 3, 2025" },
+  { id: 8, name: "Password Reset Batch", project: "My Bharat", channel: "Email", status: "Completed", sent: 340, delivered: 338, failed: 2, opened: 310, clicked: 290, rate: 99.4, date: "Jun 2, 2025" },
 ];
 
 const statusStyle: Record<string, string> = {

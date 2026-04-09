@@ -10,13 +10,12 @@ import { toast } from "sonner";
 import { Plus, Search, MoreHorizontal, Shield, Building2, Pencil, Trash2 } from "lucide-react";
 
 const users = [
-  { id: 1, name: "Admin User", email: "admin@commhub.io", role: "Admin", status: "Active", lastLogin: "2 hours ago" },
-  { id: 2, name: "Ravi Kumar", email: "ravi@alpha.com", role: "Project", project: "Project Alpha", status: "Active", lastLogin: "1 day ago" },
-  { id: 3, name: "Priya S.", email: "priya@finserve.com", role: "Project", project: "FinServe", status: "Active", lastLogin: "3 hours ago" },
-  { id: 4, name: "Dr. Mehta", email: "mehta@healthlink.com", role: "Project", project: "HealthLink", status: "Active", lastLogin: "5 hours ago" },
-  { id: 5, name: "Anita R.", email: "anita@educonnect.com", role: "Project", project: "EduConnect", status: "Active", lastLogin: "2 days ago" },
-  { id: 6, name: "Vikram J.", email: "vikram@retailpro.com", role: "Project", project: "RetailPro", status: "Inactive", lastLogin: "30 days ago" },
-  { id: 7, name: "Suresh P.", email: "suresh@legacy.com", role: "Project", project: "Legacy App", status: "Inactive", lastLogin: "60 days ago" },
+  { id: 1, name: "Admin User", email: "admin@dicnotifier.io", role: "Admin", status: "Active", lastLogin: "2 hours ago" },
+  { id: 2, name: "Ravi Kumar", email: "ravi@mybharat.gov.in", role: "Project", project: "My Bharat", status: "Active", lastLogin: "1 day ago" },
+  { id: 3, name: "Priya S.", email: "priya@kisansarathi.gov.in", role: "Project", project: "Kisan Sarathi", status: "Active", lastLogin: "3 hours ago" },
+  { id: 4, name: "Dr. Mehta", email: "mehta@manas.gov.in", role: "Project", project: "Manas", status: "Active", lastLogin: "5 hours ago" },
+  { id: 5, name: "Anita R.", email: "anita@esaras.gov.in", role: "Project", project: "E Saras", status: "Active", lastLogin: "2 days ago" },
+  { id: 6, name: "Vikram J.", email: "vikram@indiahandmade.gov.in", role: "Project", project: "India Handmade", status: "Inactive", lastLogin: "30 days ago" },
 ];
 
 const AdminUsersPage = () => {
@@ -54,11 +53,11 @@ const AdminUsersPage = () => {
                 <Select>
                   <SelectTrigger className="mt-1.5"><SelectValue placeholder="Select project..." /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="alpha">Project Alpha</SelectItem>
-                    <SelectItem value="finsv">FinServe</SelectItem>
-                    <SelectItem value="hlnk">HealthLink</SelectItem>
-                    <SelectItem value="educ">EduConnect</SelectItem>
-                    <SelectItem value="rtlp">RetailPro</SelectItem>
+                    <SelectItem value="mybrt">My Bharat</SelectItem>
+                    <SelectItem value="ksrth">Kisan Sarathi</SelectItem>
+                    <SelectItem value="manas">Manas</SelectItem>
+                    <SelectItem value="esars">E Saras</SelectItem>
+                    <SelectItem value="ihdmd">India Handmade</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

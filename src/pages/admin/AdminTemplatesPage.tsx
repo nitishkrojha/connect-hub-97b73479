@@ -71,7 +71,7 @@ const AdminTemplatesPage = () => {
               <div>
                 <Label className="text-foreground">Assign to Projects</Label>
                 <div className="mt-2 space-y-2">
-                  {["Project Alpha", "FinServe", "HealthLink", "EduConnect", "RetailPro"].map((p) => (
+                  {["My Bharat", "Kisan Sarathi", "Manas", "E Saras", "India Handmade"].map((p) => (
                     <div key={p} className="flex items-center gap-2">
                       <Checkbox id={p} /><Label htmlFor={p} className="text-sm text-foreground font-normal">{p}</Label>
                     </div>

@@ -21,20 +21,20 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const DEMO_USERS: Record<string, User & { password: string }> = {
-  "admin@commhub.io": {
+  "admin@dicnotifier.io": {
     id: "admin-1",
     name: "Admin User",
-    email: "admin@commhub.io",
+    email: "admin@dicnotifier.io",
     role: "admin",
     password: "admin123",
   },
-  "project@commhub.io": {
+  "project@dicnotifier.io": {
     id: "proj-1",
-    name: "Project Alpha",
-    email: "project@commhub.io",
+    name: "My Bharat",
+    email: "project@dicnotifier.io",
     role: "project",
-    projectId: "proj-alpha",
-    projectName: "Project Alpha",
+    projectId: "proj-mybharat",
+    projectName: "My Bharat",
     password: "project123",
   },
 };

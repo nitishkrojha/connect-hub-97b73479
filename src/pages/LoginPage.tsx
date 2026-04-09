@@ -46,7 +46,7 @@ const LoginPage = () => {
             <div className="w-14 h-14 rounded-xl bg-primary-foreground/20 flex items-center justify-center backdrop-blur-sm">
               <Send className="w-7 h-7 text-primary-foreground" />
             </div>
-            <h1 className="text-4xl font-bold text-primary-foreground tracking-tight">CommHub</h1>
+            <h1 className="text-4xl font-bold text-primary-foreground tracking-tight">DIC Notifier</h1>
           </div>
           <p className="text-xl text-primary-foreground/90 mb-4 font-medium">
             Unified Communication Platform
@@ -75,7 +75,7 @@ const LoginPage = () => {
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-2 mb-8 justify-center">
             <Send className="w-6 h-6 text-primary" />
-            <h1 className="text-2xl font-bold text-foreground">CommHub</h1>
+            <h1 className="text-2xl font-bold text-foreground">DIC Notifier</h1>
           </div>
 
           <Card className="shadow-card border-border/50">
@@ -129,8 +129,8 @@ const LoginPage = () => {
 
               <div className="mt-6 p-3 rounded-lg bg-muted text-xs text-muted-foreground space-y-1">
                 <p className="font-medium text-foreground text-sm mb-2">Demo Credentials</p>
-                <p><span className="font-medium">Admin:</span> admin@commhub.io / admin123</p>
-                <p><span className="font-medium">Project:</span> project@commhub.io / project123</p>
+                <p><span className="font-medium">Admin:</span> admin@dicnotifier.io / admin123</p>
+                <p><span className="font-medium">Project:</span> project@dicnotifier.io / project123</p>
               </div>
             </CardContent>
           </Card>

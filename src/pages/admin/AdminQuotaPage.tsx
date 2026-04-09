@@ -10,11 +10,11 @@ import { toast } from "sonner";
 import { Save, AlertTriangle } from "lucide-react";
 
 const projects = [
-  { id: "alpha", name: "Project Alpha", monthly: 25000, daily: 2000, sms: 10000, whatsapp: 8000, email: 15000, rcs: 5000, used: 17300, alert: 80 },
-  { id: "finsv", name: "FinServe", monthly: 30000, daily: 3000, sms: 15000, whatsapp: 0, email: 25000, rcs: 0, used: 24100, alert: 75 },
-  { id: "hlnk", name: "HealthLink", monthly: 20000, daily: 1500, sms: 8000, whatsapp: 6000, email: 15000, rcs: 5000, used: 19800, alert: 90 },
-  { id: "educ", name: "EduConnect", monthly: 15000, daily: 1200, sms: 0, whatsapp: 8000, email: 12000, rcs: 0, used: 16200, alert: 80 },
-  { id: "rtlp", name: "RetailPro", monthly: 10000, daily: 800, sms: 5000, whatsapp: 0, email: 0, rcs: 5000, used: 3500, alert: 85 },
+  { id: "mybrt", name: "My Bharat", monthly: 25000, daily: 2000, sms: 10000, whatsapp: 8000, email: 15000, rcs: 5000, used: 17300, alert: 80 },
+  { id: "ksrth", name: "Kisan Sarathi", monthly: 30000, daily: 3000, sms: 15000, whatsapp: 0, email: 25000, rcs: 0, used: 24100, alert: 75 },
+  { id: "manas", name: "Manas", monthly: 20000, daily: 1500, sms: 8000, whatsapp: 6000, email: 15000, rcs: 5000, used: 19800, alert: 90 },
+  { id: "esars", name: "E Saras", monthly: 15000, daily: 1200, sms: 0, whatsapp: 8000, email: 12000, rcs: 0, used: 16200, alert: 80 },
+  { id: "ihdmd", name: "India Handmade", monthly: 10000, daily: 800, sms: 5000, whatsapp: 0, email: 0, rcs: 5000, used: 3500, alert: 85 },
 ];
 
 const AdminQuotaPage = () => {

@@ -36,7 +36,7 @@ const AdminLayout = () => {
         <div className="w-9 h-9 rounded-lg gradient-primary flex items-center justify-center flex-shrink-0">
           <Send className="w-5 h-5 text-primary-foreground" />
         </div>
-        {!collapsed && <span className="text-lg font-bold text-sidebar-foreground tracking-tight">CommHub</span>}
+        {!collapsed && <span className="text-lg font-bold text-sidebar-foreground tracking-tight">DIC Notifier</span>}
       </div>
 
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">

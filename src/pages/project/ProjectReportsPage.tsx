@@ -1,12 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Download, Search, Megaphone, Eye, MousePointerClick } from "lucide-react";
 import { useState } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  LineChart, Line, PieChart, Pie, Cell,
+  PieChart, Pie, Cell,
 } from "recharts";
 
 const weeklyData = [
@@ -19,19 +21,20 @@ const weeklyData = [
   { day: "Sun", sms: 110, whatsapp: 150, email: 240, rcs: 35 },
 ];
 
-const campaignPerformance = [
-  { name: "Welcome Onboarding", sent: 2400, delivered: 2352, failed: 48, rate: 98 },
-  { name: "OTP Verification", sent: 890, delivered: 872, failed: 18, rate: 98 },
-  { name: "Order Confirmation", sent: 1200, delivered: 1158, failed: 42, rate: 96.5 },
-  { name: "Password Reset", sent: 340, delivered: 338, failed: 2, rate: 99.4 },
-  { name: "Monthly Newsletter", sent: 5200, delivered: 4940, failed: 260, rate: 95 },
-];
-
 const channelPie = [
   { name: "SMS", value: 3200, color: "hsl(262, 83%, 58%)" },
   { name: "WhatsApp", value: 4800, color: "hsl(142, 70%, 45%)" },
   { name: "Email", value: 8200, color: "hsl(217, 91%, 50%)" },
   { name: "RCS", value: 1100, color: "hsl(38, 92%, 50%)" },
+];
+
+const campaignReports = [
+  { id: 1, name: "Welcome Onboarding", channel: "Email", status: "Completed", sent: 2400, delivered: 2352, failed: 48, opened: 1820, clicked: 640, rate: 98.0, date: "Jun 8, 2025" },
+  { id: 2, name: "OTP Verification Batch", channel: "SMS", status: "Completed", sent: 1200, delivered: 1176, failed: 24, opened: 0, clicked: 0, rate: 98.0, date: "Jun 7, 2025" },
+  { id: 3, name: "Order Confirmation", channel: "WhatsApp", status: "Completed", sent: 3400, delivered: 3318, failed: 82, opened: 3100, clicked: 1250, rate: 97.6, date: "Jun 6, 2025" },
+  { id: 4, name: "Monthly Newsletter", channel: "Email", status: "Completed", sent: 5200, delivered: 4940, failed: 260, opened: 3200, clicked: 980, rate: 95.0, date: "Jun 5, 2025" },
+  { id: 5, name: "Promo Campaign Q2", channel: "RCS", status: "Partially Failed", sent: 5000, delivered: 3800, failed: 1200, opened: 2800, clicked: 1100, rate: 76.0, date: "Jun 4, 2025" },
+  { id: 6, name: "Password Reset Batch", channel: "Email", status: "Completed", sent: 340, delivered: 338, failed: 2, opened: 310, clicked: 290, rate: 99.4, date: "Jun 3, 2025" },
 ];
 
 const csvUploads = [
@@ -40,8 +43,15 @@ const csvUploads = [
   { file: "otp_numbers.csv", date: "Jun 3", total: 890, valid: 878, invalid: 8, duplicates: 4 },
 ];
 
+const statusStyle: Record<string, string> = {
+  Completed: "bg-success/10 text-success",
+  "Partially Failed": "bg-warning/10 text-warning",
+  Failed: "bg-destructive/10 text-destructive",
+};
+
 const ProjectReportsPage = () => {
   const [period, setPeriod] = useState("weekly");
+  const [tab, setTab] = useState("overview");
 
   return (
     <div className="space-y-6">
@@ -63,119 +73,167 @@ const ProjectReportsPage = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { label: "Total Sent", value: "17,300" },
-          { label: "Delivered", value: "16,820" },
-          { label: "Failed", value: "480" },
-          { label: "Success Rate", value: "97.2%" },
-        ].map((s) => (
-          <Card key={s.label} className="shadow-card">
-            <CardContent className="pt-4 pb-3">
-              <p className="text-xs text-muted-foreground">{s.label}</p>
-              <p className="text-xl font-bold text-foreground mt-1">{s.value}</p>
+      <Tabs value={tab} onValueChange={setTab}>
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="campaigns">Campaign-wise</TabsTrigger>
+          <TabsTrigger value="uploads">CSV Uploads</TabsTrigger>
+        </TabsList>
+
+        {/* Overview */}
+        <TabsContent value="overview" className="space-y-6 mt-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { label: "Total Sent", value: "17,300" },
+              { label: "Delivered", value: "16,820" },
+              { label: "Failed", value: "480" },
+              { label: "Success Rate", value: "97.2%" },
+            ].map((s) => (
+              <Card key={s.label} className="shadow-card">
+                <CardContent className="pt-4 pb-3">
+                  <p className="text-xs text-muted-foreground">{s.label}</p>
+                  <p className="text-xl font-bold text-foreground mt-1">{s.value}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <Card className="lg:col-span-2 shadow-card">
+              <CardHeader><CardTitle className="text-base">Weekly Channel Activity</CardTitle></CardHeader>
+              <CardContent>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={weeklyData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="day" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
+                      <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
+                      <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid hsl(var(--border))", fontSize: "13px" }} />
+                      <Bar dataKey="sms" name="SMS" fill="hsl(262, 83%, 58%)" radius={[2,2,0,0]} />
+                      <Bar dataKey="whatsapp" name="WhatsApp" fill="hsl(142, 70%, 45%)" radius={[2,2,0,0]} />
+                      <Bar dataKey="email" name="Email" fill="hsl(217, 91%, 50%)" radius={[2,2,0,0]} />
+                      <Bar dataKey="rcs" name="RCS" fill="hsl(38, 92%, 50%)" radius={[2,2,0,0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="shadow-card">
+              <CardHeader><CardTitle className="text-base">Channel Split</CardTitle></CardHeader>
+              <CardContent>
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={channelPie} cx="50%" cy="50%" innerRadius={50} outerRadius={75} dataKey="value" strokeWidth={2} stroke="hsl(var(--card))">
+                        {channelPie.map((e) => <Cell key={e.name} fill={e.color} />)}
+                      </Pie>
+                      <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid hsl(var(--border))", fontSize: "13px" }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  {channelPie.map((d) => (
+                    <div key={d.name} className="flex items-center gap-2 text-xs">
+                      <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: d.color }} />
+                      <span className="text-muted-foreground">{d.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Campaign-wise */}
+        <TabsContent value="campaigns" className="space-y-6 mt-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { label: "Total Campaigns", value: "47", icon: Megaphone },
+              { label: "Avg. Delivery Rate", value: "96.8%" },
+              { label: "Avg. Open Rate", value: "72.1%", icon: Eye },
+              { label: "Avg. Click Rate", value: "28.4%", icon: MousePointerClick },
+            ].map((s) => (
+              <Card key={s.label} className="shadow-card">
+                <CardContent className="pt-4 pb-3">
+                  <p className="text-xs text-muted-foreground font-medium">{s.label}</p>
+                  <p className="text-xl font-bold text-foreground mt-1">{s.value}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <Card className="shadow-card">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base">Campaign Performance</CardTitle>
+                <div className="relative w-56">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input placeholder="Search..." className="pl-9 h-9" />
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead><tr className="border-b border-border">
+                    {["Campaign", "Channel", "Status", "Sent", "Delivered", "Failed", "Opened", "Clicked", "Rate", "Date"].map((h) => (
+                      <th key={h} className="text-left font-medium text-muted-foreground p-3 text-xs whitespace-nowrap">{h}</th>
+                    ))}
+                  </tr></thead>
+                  <tbody>
+                    {campaignReports.map((c) => (
+                      <tr key={c.id} className="border-b border-border/50 last:border-0 hover:bg-muted/30">
+                        <td className="p-3 font-medium text-foreground whitespace-nowrap">{c.name}</td>
+                        <td className="p-3"><Badge variant="secondary" className="text-xs">{c.channel}</Badge></td>
+                        <td className="p-3">
+                          <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${statusStyle[c.status]}`}>{c.status}</span>
+                        </td>
+                        <td className="p-3 text-foreground">{c.sent.toLocaleString()}</td>
+                        <td className="p-3 text-success">{c.delivered.toLocaleString()}</td>
+                        <td className="p-3 text-destructive">{c.failed.toLocaleString()}</td>
+                        <td className="p-3 text-foreground">{c.opened > 0 ? c.opened.toLocaleString() : "—"}</td>
+                        <td className="p-3 text-foreground">{c.clicked > 0 ? c.clicked.toLocaleString() : "—"}</td>
+                        <td className="p-3"><Badge variant="secondary">{c.rate}%</Badge></td>
+                        <td className="p-3 text-muted-foreground text-xs whitespace-nowrap">{c.date}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </CardContent>
           </Card>
-        ))}
-      </div>
+        </TabsContent>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2 shadow-card">
-          <CardHeader><CardTitle className="text-base">Weekly Channel Activity</CardTitle></CardHeader>
-          <CardContent>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={weeklyData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="day" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
-                  <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
-                  <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid hsl(var(--border))", fontSize: "13px" }} />
-                  <Bar dataKey="sms" name="SMS" fill="hsl(262, 83%, 58%)" radius={[2,2,0,0]} />
-                  <Bar dataKey="whatsapp" name="WhatsApp" fill="hsl(142, 70%, 45%)" radius={[2,2,0,0]} />
-                  <Bar dataKey="email" name="Email" fill="hsl(217, 91%, 50%)" radius={[2,2,0,0]} />
-                  <Bar dataKey="rcs" name="RCS" fill="hsl(38, 92%, 50%)" radius={[2,2,0,0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="shadow-card">
-          <CardHeader><CardTitle className="text-base">Channel Split</CardTitle></CardHeader>
-          <CardContent>
-            <div className="h-48">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={channelPie} cx="50%" cy="50%" innerRadius={50} outerRadius={75} dataKey="value" strokeWidth={2} stroke="hsl(var(--card))">
-                    {channelPie.map((e) => <Cell key={e.name} fill={e.color} />)}
-                  </Pie>
-                  <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid hsl(var(--border))", fontSize: "13px" }} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="grid grid-cols-2 gap-2 mt-2">
-              {channelPie.map((d) => (
-                <div key={d.name} className="flex items-center gap-2 text-xs">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: d.color }} />
-                  <span className="text-muted-foreground">{d.name}</span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card className="shadow-card">
-        <CardHeader><CardTitle className="text-base">Campaign Performance</CardTitle></CardHeader>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead><tr className="border-b border-border">
-                {["Campaign", "Sent", "Delivered", "Failed", "Success Rate"].map((h) => (
-                  <th key={h} className="text-left font-medium text-muted-foreground p-4 text-xs">{h}</th>
-                ))}
-              </tr></thead>
-              <tbody>
-                {campaignPerformance.map((c) => (
-                  <tr key={c.name} className="border-b border-border/50 last:border-0 hover:bg-muted/30">
-                    <td className="p-4 font-medium text-foreground">{c.name}</td>
-                    <td className="p-4 text-foreground">{c.sent.toLocaleString()}</td>
-                    <td className="p-4 text-success">{c.delivered.toLocaleString()}</td>
-                    <td className="p-4 text-destructive">{c.failed}</td>
-                    <td className="p-4"><Badge variant="secondary">{c.rate}%</Badge></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="shadow-card">
-        <CardHeader><CardTitle className="text-base">CSV Upload Summary</CardTitle></CardHeader>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead><tr className="border-b border-border">
-                {["File", "Date", "Total", "Valid", "Invalid", "Duplicates"].map((h) => (
-                  <th key={h} className="text-left font-medium text-muted-foreground p-4 text-xs">{h}</th>
-                ))}
-              </tr></thead>
-              <tbody>
-                {csvUploads.map((c) => (
-                  <tr key={c.file} className="border-b border-border/50 last:border-0">
-                    <td className="p-4 font-medium text-foreground">{c.file}</td>
-                    <td className="p-4 text-muted-foreground">{c.date}</td>
-                    <td className="p-4 text-foreground">{c.total.toLocaleString()}</td>
-                    <td className="p-4 text-success">{c.valid.toLocaleString()}</td>
-                    <td className="p-4 text-destructive">{c.invalid}</td>
-                    <td className="p-4 text-warning">{c.duplicates}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+        {/* CSV Uploads */}
+        <TabsContent value="uploads" className="space-y-6 mt-4">
+          <Card className="shadow-card">
+            <CardHeader><CardTitle className="text-base">CSV Upload Summary</CardTitle></CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead><tr className="border-b border-border">
+                    {["File", "Date", "Total", "Valid", "Invalid", "Duplicates"].map((h) => (
+                      <th key={h} className="text-left font-medium text-muted-foreground p-4 text-xs">{h}</th>
+                    ))}
+                  </tr></thead>
+                  <tbody>
+                    {csvUploads.map((c) => (
+                      <tr key={c.file} className="border-b border-border/50 last:border-0">
+                        <td className="p-4 font-medium text-foreground">{c.file}</td>
+                        <td className="p-4 text-muted-foreground">{c.date}</td>
+                        <td className="p-4 text-foreground">{c.total.toLocaleString()}</td>
+                        <td className="p-4 text-success">{c.valid.toLocaleString()}</td>
+                        <td className="p-4 text-destructive">{c.invalid}</td>
+                        <td className="p-4 text-warning">{c.duplicates}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

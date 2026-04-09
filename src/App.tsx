@@ -9,9 +9,21 @@ import AdminLayout from "./layouts/AdminLayout";
 import ProjectLayout from "./layouts/ProjectLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ProjectsPage from "./pages/admin/ProjectsPage";
+import AdminChannelsPage from "./pages/admin/AdminChannelsPage";
+import AdminTemplatesPage from "./pages/admin/AdminTemplatesPage";
+import AdminReportsPage from "./pages/admin/AdminReportsPage";
+import AdminQuotaPage from "./pages/admin/AdminQuotaPage";
+import AdminAuditPage from "./pages/admin/AdminAuditPage";
+import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import ProjectDashboard from "./pages/project/ProjectDashboard";
 import CampaignsPage from "./pages/project/CampaignsPage";
-import PlaceholderPage from "./components/PlaceholderPage";
+import SendMessagePage from "./pages/project/SendMessagePage";
+import ProjectTemplatesPage from "./pages/project/ProjectTemplatesPage";
+import UploadRecipientsPage from "./pages/project/UploadRecipientsPage";
+import ProjectReportsPage from "./pages/project/ProjectReportsPage";
+import ProjectConfigPage from "./pages/project/ProjectConfigPage";
+import ProjectQuotaPage from "./pages/project/ProjectQuotaPage";
+import CampaignHistoryPage from "./pages/project/CampaignHistoryPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,29 +51,27 @@ const App = () => (
           <Routes>
             <Route path="/" element={<RootRedirect />} />
 
-            {/* Admin Routes */}
             <Route path="/admin" element={<ProtectedRoute role="admin"><AdminLayout /></ProtectedRoute>}>
               <Route index element={<AdminDashboard />} />
               <Route path="projects" element={<ProjectsPage />} />
-              <Route path="channels" element={<PlaceholderPage title="Channel Configuration" description="Configure SMS, WhatsApp, Email & RCS providers" />} />
-              <Route path="templates" element={<PlaceholderPage title="Template Management" description="Manage and approve message templates" />} />
-              <Route path="reports" element={<PlaceholderPage title="Reports & Analytics" description="View overall communication analytics" />} />
-              <Route path="quota" element={<PlaceholderPage title="Quota Management" description="Set and manage project quotas" />} />
-              <Route path="audit" element={<PlaceholderPage title="Audit Logs" description="View system activity and change logs" />} />
-              <Route path="users" element={<PlaceholderPage title="User Management" description="Manage admin and project users" />} />
+              <Route path="channels" element={<AdminChannelsPage />} />
+              <Route path="templates" element={<AdminTemplatesPage />} />
+              <Route path="reports" element={<AdminReportsPage />} />
+              <Route path="quota" element={<AdminQuotaPage />} />
+              <Route path="audit" element={<AdminAuditPage />} />
+              <Route path="users" element={<AdminUsersPage />} />
             </Route>
 
-            {/* Project Routes */}
             <Route path="/project" element={<ProtectedRoute role="project"><ProjectLayout /></ProtectedRoute>}>
               <Route index element={<ProjectDashboard />} />
               <Route path="campaigns" element={<CampaignsPage />} />
-              <Route path="send" element={<PlaceholderPage title="Send Message" description="Send messages via SMS, WhatsApp, Email or RCS" />} />
-              <Route path="templates" element={<PlaceholderPage title="Templates" description="Manage your project message templates" />} />
-              <Route path="upload" element={<PlaceholderPage title="Upload Recipients" description="Upload CSV files with recipient data" />} />
-              <Route path="reports" element={<PlaceholderPage title="Reports" description="View your project communication reports" />} />
-              <Route path="config" element={<PlaceholderPage title="Configuration" description="Configure project-level communication settings" />} />
-              <Route path="quota" element={<PlaceholderPage title="Quota Usage" description="Monitor your quota consumption" />} />
-              <Route path="history" element={<PlaceholderPage title="Campaign History" description="View past campaign activity" />} />
+              <Route path="send" element={<SendMessagePage />} />
+              <Route path="templates" element={<ProjectTemplatesPage />} />
+              <Route path="upload" element={<UploadRecipientsPage />} />
+              <Route path="reports" element={<ProjectReportsPage />} />
+              <Route path="config" element={<ProjectConfigPage />} />
+              <Route path="quota" element={<ProjectQuotaPage />} />
+              <Route path="history" element={<CampaignHistoryPage />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />

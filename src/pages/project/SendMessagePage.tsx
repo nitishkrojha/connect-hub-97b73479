@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import {
   Send, Upload, Database, Phone, MessageSquare, Mail, Sparkles,
   FileText, X, Check, AlertCircle, Users, Plus, Trash2, Calendar,
-  Filter, MapPin, UserCheck, FolderTree, Activity,
+  Filter, MapPin, UserCheck, FolderTree, Activity, Server,
 } from "lucide-react";
 
 const templates: Record<string, { id: string; name: string; body: string; variables: string[] }[]> = {
@@ -49,23 +49,46 @@ const dbSegments = [
   { id: "db4", name: "Inactive Users (30+ Days)", count: 5600 },
 ];
 
-const states = ["Madhya Pradesh", "Uttar Pradesh", "Rajasthan", "Maharashtra", "Bihar", "Gujarat"];
-const districts = ["Bhopal", "Indore", "Jabalpur", "Gwalior", "Ujjain", "Sagar"];
-const urbanRural = ["Urban", "Rural"];
-const blocks = ["Huzur", "Berasia", "Phanda", "Sehore", "Nasrullaganj"];
-const gramPanchayats = ["Ratua Khurd", "Bairagarh Chichli", "Khajuri Sadak", "Misrod", "Awadhpuri"];
-const villages = ["Lambakheda", "Neelbad", "Kolar", "Ratibad", "Bagroda"];
-const userTypes = ["Youth", "Organization"];
-const categories = ["Education", "Health", "Agriculture", "Finance", "Technology"];
-const subCategories: Record<string, string[]> = {
-  Education: ["Primary", "Secondary", "Higher", "Vocational"],
-  Health: ["General", "Maternal", "Child", "Mental"],
-  Agriculture: ["Crop", "Dairy", "Fishery", "Horticulture"],
-  Finance: ["Banking", "Insurance", "Microfinance", "Investment"],
-  Technology: ["IT", "Mobile", "Digital Literacy", "Cybersecurity"],
+// Simulated API-driven dynamic filters (from project's configured API)
+interface ApiFilter {
+  key: string;
+  label: string;
+  options: string[];
+}
+
+const simulatedApiFilters: ApiFilter[] = [
+  { key: "state", label: "State", options: ["Madhya Pradesh", "Uttar Pradesh", "Rajasthan", "Maharashtra", "Bihar"] },
+  { key: "district", label: "District", options: ["Bhopal", "Indore", "Jabalpur", "Gwalior", "Ujjain"] },
+  { key: "urban_rural", label: "Urban/Rural", options: ["Urban", "Rural"] },
+  { key: "block", label: "Block", options: ["Huzur", "Berasia", "Phanda", "Sehore", "Nasrullaganj"] },
+  { key: "gram_panchayat", label: "Gram Panchayat", options: ["Ratua Khurd", "Bairagarh Chichli", "Khajuri Sadak", "Misrod", "Awadhpuri"] },
+  { key: "village", label: "Village", options: ["Lambakheda", "Neelbad", "Kolar", "Ratibad", "Bagroda"] },
+  { key: "user_type", label: "User Type", options: ["Youth", "Organization"] },
+  { key: "category", label: "Category", options: ["Education", "Health", "Agriculture", "Finance", "Technology"] },
+  { key: "activity", label: "Activity", options: ["Quiz", "Events", "ELP", "Essay"] },
+  { key: "activity_status", label: "Activity Status", options: ["Attendee", "Successfully Completed"] },
+];
+
+// Static fallback filters (when no API is configured)
+const staticFilters = {
+  states: ["Madhya Pradesh", "Uttar Pradesh", "Rajasthan", "Maharashtra", "Bihar", "Gujarat"],
+  districts: ["Bhopal", "Indore", "Jabalpur", "Gwalior", "Ujjain", "Sagar"],
+  urbanRural: ["Urban", "Rural"],
+  blocks: ["Huzur", "Berasia", "Phanda", "Sehore", "Nasrullaganj"],
+  gramPanchayats: ["Ratua Khurd", "Bairagarh Chichli", "Khajuri Sadak", "Misrod", "Awadhpuri"],
+  villages: ["Lambakheda", "Neelbad", "Kolar", "Ratibad", "Bagroda"],
+  userTypes: ["Youth", "Organization"],
+  categories: ["Education", "Health", "Agriculture", "Finance", "Technology"],
+  subCategories: {
+    Education: ["Primary", "Secondary", "Higher", "Vocational"],
+    Health: ["General", "Maternal", "Child", "Mental"],
+    Agriculture: ["Crop", "Dairy", "Fishery", "Horticulture"],
+    Finance: ["Banking", "Insurance", "Microfinance", "Investment"],
+    Technology: ["IT", "Mobile", "Digital Literacy", "Cybersecurity"],
+  } as Record<string, string[]>,
+  activityTypes: ["Quiz", "Events", "ELP", "Essay"],
+  activityStatus: ["Attendee", "Successfully Completed"],
 };
-const activityTypes = ["Quiz", "Events", "ELP", "Essay"];
-const activityStatus = ["Attendee", "Successfully Completed"];
 
 const SendMessagePage = () => {
   const [channel, setChannel] = useState("sms");
@@ -80,8 +103,12 @@ const SendMessagePage = () => {
   const [sending, setSending] = useState(false);
   const [scheduleEnabled, setScheduleEnabled] = useState(false);
   const [fetchedCount, setFetchedCount] = useState<number | null>(null);
+  const [dbSource, setDbSource] = useState<"static" | "api">("api");
 
-  // Filter states
+  // Dynamic API filter values
+  const [apiFilterValues, setApiFilterValues] = useState<Record<string, string>>({});
+
+  // Static filter states
   const [filterState, setFilterState] = useState("");
   const [filterDistrict, setFilterDistrict] = useState("");
   const [filterUrbanRural, setFilterUrbanRural] = useState("");
@@ -102,10 +129,7 @@ const SendMessagePage = () => {
     if (tmpl) setMessageBody(tmpl.body);
   };
 
-  const insertVariable = (v: string) => {
-    setMessageBody((prev) => prev + `{{${v}}}`);
-  };
-
+  const insertVariable = (v: string) => setMessageBody((prev) => prev + `{{${v}}}`);
   const addNumber = () => setNumbers([...numbers, ""]);
   const removeNumber = (i: number) => setNumbers(numbers.filter((_, idx) => idx !== i));
   const updateNumber = (i: number, val: string) => {
@@ -131,15 +155,19 @@ const SendMessagePage = () => {
   };
 
   const handleFetchRecipients = () => {
-    const base = selectedSegment ? (dbSegments.find((s) => s.id === selectedSegment)?.count ?? 0) : 12400;
-    let count = base;
-    if (filterState) count = Math.floor(count * 0.4);
-    if (filterDistrict) count = Math.floor(count * 0.3);
-    if (filterUrbanRural) count = Math.floor(count * 0.6);
-    if (filterBlock) count = Math.floor(count * 0.5);
-    if (filterUserType) count = Math.floor(count * 0.35);
-    if (filterCategory) count = Math.floor(count * 0.45);
-    if (filterActivity) count = Math.floor(count * 0.25);
+    let count = 12400;
+    if (dbSource === "api") {
+      const activeFilters = Object.values(apiFilterValues).filter(Boolean).length;
+      count = Math.max(Math.floor(12400 * Math.pow(0.45, activeFilters)), 15);
+    } else {
+      if (filterState) count = Math.floor(count * 0.4);
+      if (filterDistrict) count = Math.floor(count * 0.3);
+      if (filterUrbanRural) count = Math.floor(count * 0.6);
+      if (filterBlock) count = Math.floor(count * 0.5);
+      if (filterUserType) count = Math.floor(count * 0.35);
+      if (filterCategory) count = Math.floor(count * 0.45);
+      if (filterActivity) count = Math.floor(count * 0.25);
+    }
     setFetchedCount(Math.max(count, 12));
     toast.success(`${Math.max(count, 12).toLocaleString()} recipients fetched`);
   };
@@ -167,7 +195,7 @@ const SendMessagePage = () => {
         <p className="text-muted-foreground mt-1">Compose and send via any channel</p>
       </div>
 
-      {/* Channel Selection — card-style like reference */}
+      {/* Channel Selection */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {channelConfig.map((ch) => {
           const isActive = channel === ch.id;
@@ -188,7 +216,7 @@ const SendMessagePage = () => {
         })}
       </div>
 
-      {/* Two-column layout: Recipients + Compose */}
+      {/* Two-column layout */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {/* Left Column — Recipients */}
         <div className="lg:col-span-2">
@@ -209,88 +237,135 @@ const SendMessagePage = () => {
 
                 {/* === Bulk DB Tab === */}
                 <TabsContent value="database" className="space-y-4">
-                  <div>
-                    <Label className="text-foreground text-sm mb-1.5 block">Select Audience Segment</Label>
-                    <Select value={selectedSegment} onValueChange={setSelectedSegment}>
-                      <SelectTrigger><SelectValue placeholder="Choose segment" /></SelectTrigger>
-                      <SelectContent>
-                        {dbSegments.map((s) => <SelectItem key={s.id} value={s.id}>{s.name} ({s.count.toLocaleString()})</SelectItem>)}
-                      </SelectContent>
-                    </Select>
+                  {/* Source Toggle */}
+                  <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
+                    <Button variant={dbSource === "api" ? "default" : "ghost"} size="sm" className="flex-1 h-8 text-xs" onClick={() => setDbSource("api")}>
+                      <Server className="w-3.5 h-3.5 mr-1" /> API Filters
+                    </Button>
+                    <Button variant={dbSource === "static" ? "default" : "ghost"} size="sm" className="flex-1 h-8 text-xs" onClick={() => setDbSource("static")}>
+                      <Database className="w-3.5 h-3.5 mr-1" /> Static Filters
+                    </Button>
                   </div>
 
-                  <hr className="border-border" />
-                  <p className="text-sm font-medium text-foreground flex items-center gap-1.5"><Filter className="w-3.5 h-3.5" /> Or filter by criteria</p>
+                  {dbSource === "api" ? (
+                    /* Dynamic API Filters */
+                    <div className="space-y-3">
+                      <div className="p-2 rounded-lg bg-info/5 border border-info/20">
+                        <p className="text-xs text-muted-foreground"><Server className="w-3 h-3 inline mr-1" />Filters loaded from your configured API endpoint. Manage in <span className="font-medium text-foreground">Configuration → API Endpoints</span>.</p>
+                      </div>
 
-                  {/* Location Filters */}
-                  <div className="space-y-3">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><MapPin className="w-3 h-3" /> Location</p>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Select value={filterState} onValueChange={setFilterState}>
-                        <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="State" /></SelectTrigger>
-                        <SelectContent>{states.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                      </Select>
-                      <Select value={filterDistrict} onValueChange={setFilterDistrict}>
-                        <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="District" /></SelectTrigger>
-                        <SelectContent>{districts.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
-                      </Select>
-                      <Select value={filterUrbanRural} onValueChange={setFilterUrbanRural}>
-                        <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Urban/Rural" /></SelectTrigger>
-                        <SelectContent>{urbanRural.map((u) => <SelectItem key={u} value={u}>{u}</SelectItem>)}</SelectContent>
-                      </Select>
-                      <Select value={filterBlock} onValueChange={setFilterBlock}>
-                        <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Block" /></SelectTrigger>
-                        <SelectContent>{blocks.map((b) => <SelectItem key={b} value={b}>{b}</SelectItem>)}</SelectContent>
-                      </Select>
-                      <Select value={filterGP} onValueChange={setFilterGP}>
-                        <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Gram Panchayat" /></SelectTrigger>
-                        <SelectContent>{gramPanchayats.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent>
-                      </Select>
-                      <Select value={filterVillage} onValueChange={setFilterVillage}>
-                        <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Village" /></SelectTrigger>
-                        <SelectContent>{villages.map((v) => <SelectItem key={v} value={v}>{v}</SelectItem>)}</SelectContent>
-                      </Select>
+                      {/* Location Filters */}
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><MapPin className="w-3 h-3" /> Location</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {simulatedApiFilters.filter(f => ["state", "district", "urban_rural", "block", "gram_panchayat", "village"].includes(f.key)).map(f => (
+                          <Select key={f.key} value={apiFilterValues[f.key] || ""} onValueChange={v => setApiFilterValues(p => ({ ...p, [f.key]: v }))}>
+                            <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={f.label} /></SelectTrigger>
+                            <SelectContent>{f.options.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+                          </Select>
+                        ))}
+                      </div>
+
+                      {/* User Filters */}
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><UserCheck className="w-3 h-3" /> User Filters</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {simulatedApiFilters.filter(f => ["user_type", "category"].includes(f.key)).map(f => (
+                          <Select key={f.key} value={apiFilterValues[f.key] || ""} onValueChange={v => setApiFilterValues(p => ({ ...p, [f.key]: v }))}>
+                            <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={f.label} /></SelectTrigger>
+                            <SelectContent>{f.options.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+                          </Select>
+                        ))}
+                      </div>
+
+                      {/* Activity Filters */}
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><Activity className="w-3 h-3" /> Activity</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {simulatedApiFilters.filter(f => ["activity", "activity_status"].includes(f.key)).map(f => (
+                          <Select key={f.key} value={apiFilterValues[f.key] || ""} onValueChange={v => setApiFilterValues(p => ({ ...p, [f.key]: v }))}>
+                            <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={f.label} /></SelectTrigger>
+                            <SelectContent>{f.options.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+                          </Select>
+                        ))}
+                      </div>
+
+                      {Object.values(apiFilterValues).some(Boolean) && (
+                        <Button variant="ghost" size="sm" className="text-xs" onClick={() => setApiFilterValues({})}>Clear All Filters</Button>
+                      )}
                     </div>
-                  </div>
+                  ) : (
+                    /* Static Filters */
+                    <div className="space-y-3">
+                      <div>
+                        <Label className="text-foreground text-sm mb-1.5 block">Select Audience Segment</Label>
+                        <Select value={selectedSegment} onValueChange={setSelectedSegment}>
+                          <SelectTrigger><SelectValue placeholder="Choose segment" /></SelectTrigger>
+                          <SelectContent>
+                            {dbSegments.map((s) => <SelectItem key={s.id} value={s.id}>{s.name} ({s.count.toLocaleString()})</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-                  {/* User Type Filter */}
-                  <div className="space-y-2">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><UserCheck className="w-3 h-3" /> User Type</p>
-                    <Select value={filterUserType} onValueChange={setFilterUserType}>
-                      <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Select user type" /></SelectTrigger>
-                      <SelectContent>{userTypes.map((u) => <SelectItem key={u} value={u}>{u}</SelectItem>)}</SelectContent>
-                    </Select>
-                  </div>
+                      <hr className="border-border" />
+                      <p className="text-sm font-medium text-foreground flex items-center gap-1.5"><Filter className="w-3.5 h-3.5" /> Or filter by criteria</p>
 
-                  {/* Category Filter */}
-                  <div className="space-y-2">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><FolderTree className="w-3 h-3" /> User Category</p>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Select value={filterCategory} onValueChange={(v) => { setFilterCategory(v); setFilterSubCategory(""); }}>
-                        <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Category" /></SelectTrigger>
-                        <SelectContent>{categories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><MapPin className="w-3 h-3" /> Location</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Select value={filterState} onValueChange={setFilterState}>
+                          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="State" /></SelectTrigger>
+                          <SelectContent>{staticFilters.states.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                        </Select>
+                        <Select value={filterDistrict} onValueChange={setFilterDistrict}>
+                          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="District" /></SelectTrigger>
+                          <SelectContent>{staticFilters.districts.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
+                        </Select>
+                        <Select value={filterUrbanRural} onValueChange={setFilterUrbanRural}>
+                          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Urban/Rural" /></SelectTrigger>
+                          <SelectContent>{staticFilters.urbanRural.map((u) => <SelectItem key={u} value={u}>{u}</SelectItem>)}</SelectContent>
+                        </Select>
+                        <Select value={filterBlock} onValueChange={setFilterBlock}>
+                          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Block" /></SelectTrigger>
+                          <SelectContent>{staticFilters.blocks.map((b) => <SelectItem key={b} value={b}>{b}</SelectItem>)}</SelectContent>
+                        </Select>
+                        <Select value={filterGP} onValueChange={setFilterGP}>
+                          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Gram Panchayat" /></SelectTrigger>
+                          <SelectContent>{staticFilters.gramPanchayats.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent>
+                        </Select>
+                        <Select value={filterVillage} onValueChange={setFilterVillage}>
+                          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Village" /></SelectTrigger>
+                          <SelectContent>{staticFilters.villages.map((v) => <SelectItem key={v} value={v}>{v}</SelectItem>)}</SelectContent>
+                        </Select>
+                      </div>
+
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><UserCheck className="w-3 h-3" /> User Type</p>
+                      <Select value={filterUserType} onValueChange={setFilterUserType}>
+                        <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Select user type" /></SelectTrigger>
+                        <SelectContent>{staticFilters.userTypes.map((u) => <SelectItem key={u} value={u}>{u}</SelectItem>)}</SelectContent>
                       </Select>
-                      <Select value={filterSubCategory} onValueChange={setFilterSubCategory} disabled={!filterCategory}>
-                        <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Sub-category" /></SelectTrigger>
-                        <SelectContent>{(subCategories[filterCategory] || []).map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                      </Select>
+
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><FolderTree className="w-3 h-3" /> User Category</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Select value={filterCategory} onValueChange={(v) => { setFilterCategory(v); setFilterSubCategory(""); }}>
+                          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Category" /></SelectTrigger>
+                          <SelectContent>{staticFilters.categories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                        </Select>
+                        <Select value={filterSubCategory} onValueChange={setFilterSubCategory} disabled={!filterCategory}>
+                          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Sub-category" /></SelectTrigger>
+                          <SelectContent>{(staticFilters.subCategories[filterCategory] || []).map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                        </Select>
+                      </div>
+
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><Activity className="w-3 h-3" /> User Activity</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Select value={filterActivity} onValueChange={setFilterActivity}>
+                          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Activity type" /></SelectTrigger>
+                          <SelectContent>{staticFilters.activityTypes.map((a) => <SelectItem key={a} value={a}>{a}</SelectItem>)}</SelectContent>
+                        </Select>
+                        <Select value={filterActivityStatus} onValueChange={setFilterActivityStatus} disabled={!filterActivity}>
+                          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Status" /></SelectTrigger>
+                          <SelectContent>{staticFilters.activityStatus.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                        </Select>
+                      </div>
                     </div>
-                  </div>
-
-                  {/* Activity Filter */}
-                  <div className="space-y-2">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><Activity className="w-3 h-3" /> User Activity</p>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Select value={filterActivity} onValueChange={setFilterActivity}>
-                        <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Activity type" /></SelectTrigger>
-                        <SelectContent>{activityTypes.map((a) => <SelectItem key={a} value={a}>{a}</SelectItem>)}</SelectContent>
-                      </Select>
-                      <Select value={filterActivityStatus} onValueChange={setFilterActivityStatus} disabled={!filterActivity}>
-                        <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Status" /></SelectTrigger>
-                        <SelectContent>{activityStatus.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                      </Select>
-                    </div>
-                  </div>
+                  )}
 
                   <Button variant="outline" className="w-full" onClick={handleFetchRecipients}>
                     <Users className="w-4 h-4 mr-2" /> Fetch Recipients
@@ -363,7 +438,6 @@ const SendMessagePage = () => {
               <p className="text-sm text-muted-foreground">Select a template or write a custom message</p>
             </CardHeader>
             <CardContent className="space-y-5">
-              {/* Template */}
               <div>
                 <Label className="text-foreground text-sm mb-1.5 block">Template (Optional)</Label>
                 <Select value={selectedTemplate} onValueChange={handleTemplateSelect}>
@@ -374,7 +448,6 @@ const SendMessagePage = () => {
                 </Select>
               </div>
 
-              {/* Subject for Email */}
               {channel === "email" && (
                 <div>
                   <Label className="text-foreground text-sm mb-1.5 block">Subject</Label>
@@ -382,7 +455,6 @@ const SendMessagePage = () => {
                 </div>
               )}
 
-              {/* Message Body */}
               <div>
                 <Label className="text-foreground text-sm mb-1.5 block">Message Body</Label>
                 <Textarea
@@ -398,7 +470,6 @@ const SendMessagePage = () => {
                 </div>
               </div>
 
-              {/* Insert Variable */}
               <div>
                 <Label className="text-foreground text-sm mb-2 block">Insert Variable</Label>
                 <div className="flex flex-wrap gap-2">
@@ -416,7 +487,6 @@ const SendMessagePage = () => {
 
               <hr className="border-border" />
 
-              {/* Schedule */}
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-foreground">Schedule Send</p>
@@ -439,7 +509,6 @@ const SendMessagePage = () => {
 
               <hr className="border-border" />
 
-              {/* Summary + Actions */}
               <div className="bg-muted/50 rounded-lg p-4 space-y-2">
                 <p className="text-sm font-medium text-foreground">Campaign Summary</p>
                 <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
@@ -448,7 +517,7 @@ const SendMessagePage = () => {
                   <span className="text-muted-foreground">Recipients</span>
                   <span className="font-medium text-foreground">{recipientCount.toLocaleString()}</span>
                   <span className="text-muted-foreground">Mode</span>
-                  <span className="font-medium text-foreground capitalize">{sendMode === "csv" ? "CSV Upload" : sendMode === "database" ? "Bulk DB" : "Manual"}</span>
+                  <span className="font-medium text-foreground capitalize">{sendMode === "csv" ? "CSV Upload" : sendMode === "database" ? `Bulk DB (${dbSource === "api" ? "API" : "Static"})` : "Manual"}</span>
                   {selectedTemplate && (
                     <>
                       <span className="text-muted-foreground">Template</span>

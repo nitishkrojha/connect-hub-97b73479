@@ -1,114 +1,477 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Save } from "lucide-react";
+import { Save, Server, Plus, Trash2, Copy, ExternalLink, Key, Code, Info } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-const ProjectConfigPage = () => (
-  <div className="space-y-6">
-    <div>
-      <h1 className="text-2xl font-bold text-foreground">Configuration</h1>
-      <p className="text-muted-foreground mt-1">Project-level communication settings</p>
+interface ApiEndpoint {
+  id: string;
+  name: string;
+  endpoint: string;
+  method: string;
+  authType: string;
+  authKey: string;
+  filters: { key: string; label: string; type: string }[];
+  responseField: string;
+  status: "Active" | "Inactive";
+}
+
+const sampleApiFormat = {
+  request: {
+    url: "https://api.yourproject.gov.in/v1/users",
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer YOUR_API_TOKEN",
+      "Content-Type": "application/json",
+    },
+    body: {
+      filters: {
+        state: "Madhya Pradesh",
+        district: "Bhopal",
+        user_type: "Youth",
+        activity: "Quiz",
+        activity_status: "completed",
+      },
+      page: 1,
+      limit: 1000,
+    },
+  },
+  response: {
+    success: true,
+    total: 1245,
+    data: [
+      { mobile: "9876543210" },
+      { mobile: "9876543211" },
+      { mobile: "9876543212" },
+    ],
+    filters_available: {
+      state: ["Madhya Pradesh", "Uttar Pradesh", "Rajasthan"],
+      district: ["Bhopal", "Indore", "Jabalpur"],
+      block: ["Huzur", "Berasia", "Phanda"],
+      user_type: ["Youth", "Organization"],
+      activity: ["Quiz", "Events", "ELP", "Essay"],
+      activity_status: ["attendee", "completed"],
+    },
+  },
+};
+
+const ProjectConfigPage = () => {
+  const [configSource, setConfigSource] = useState<"notifier" | "own">("notifier");
+  const [apis, setApis] = useState<ApiEndpoint[]>([
+    {
+      id: "api-1",
+      name: "My Bharat User API",
+      endpoint: "https://api.mybharat.gov.in/v1/users",
+      method: "POST",
+      authType: "Bearer Token",
+      authKey: "eyJhbGciOiJIUzI1NiIs...",
+      filters: [
+        { key: "state", label: "State", type: "select" },
+        { key: "district", label: "District", type: "select" },
+        { key: "block", label: "Block", type: "select" },
+        { key: "user_type", label: "User Type", type: "select" },
+        { key: "activity", label: "Activity", type: "select" },
+      ],
+      responseField: "mobile",
+      status: "Active",
+    },
+  ]);
+  const [showSample, setShowSample] = useState(false);
+  const [editingApi, setEditingApi] = useState<ApiEndpoint | null>(null);
+  const [showAddApi, setShowAddApi] = useState(false);
+  const [newApi, setNewApi] = useState({
+    name: "", endpoint: "", method: "POST", authType: "Bearer Token", authKey: "",
+    filters: [{ key: "", label: "", type: "select" }],
+    responseField: "mobile",
+  });
+
+  const addFilter = () => {
+    setNewApi(prev => ({ ...prev, filters: [...prev.filters, { key: "", label: "", type: "select" }] }));
+  };
+
+  const removeFilter = (idx: number) => {
+    setNewApi(prev => ({ ...prev, filters: prev.filters.filter((_, i) => i !== idx) }));
+  };
+
+  const updateFilter = (idx: number, field: string, value: string) => {
+    setNewApi(prev => ({
+      ...prev,
+      filters: prev.filters.map((f, i) => i === idx ? { ...f, [field]: value } : f),
+    }));
+  };
+
+  const handleAddApi = () => {
+    if (!newApi.name || !newApi.endpoint) {
+      toast.error("Please fill in API name and endpoint");
+      return;
+    }
+    const api: ApiEndpoint = {
+      id: `api-${Date.now()}`,
+      ...newApi,
+      filters: newApi.filters.filter(f => f.key && f.label),
+      status: "Active",
+    };
+    setApis(prev => [...prev, api]);
+    setShowAddApi(false);
+    setNewApi({ name: "", endpoint: "", method: "POST", authType: "Bearer Token", authKey: "", filters: [{ key: "", label: "", type: "select" }], responseField: "mobile" });
+    toast.success("API endpoint added successfully");
+  };
+
+  const toggleApiStatus = (id: string) => {
+    setApis(prev => prev.map(a => a.id === id ? { ...a, status: a.status === "Active" ? "Inactive" : "Active" } : a));
+  };
+
+  const deleteApi = (id: string) => {
+    setApis(prev => prev.filter(a => a.id !== id));
+    toast.success("API endpoint removed");
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Configuration</h1>
+        <p className="text-muted-foreground mt-1">Project-level communication settings & API integration</p>
+      </div>
+
+      <Tabs defaultValue="general">
+        <TabsList className="flex-wrap">
+          <TabsTrigger value="general">General</TabsTrigger>
+          <TabsTrigger value="service">Service Config</TabsTrigger>
+          <TabsTrigger value="sms">SMS</TabsTrigger>
+          <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
+          <TabsTrigger value="email">Email</TabsTrigger>
+          <TabsTrigger value="rcs">RCS</TabsTrigger>
+          <TabsTrigger value="api">API Endpoints</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="general">
+          <Card className="shadow-card mt-4">
+            <CardHeader><CardTitle className="text-base">Project Details</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div><Label className="text-foreground text-sm">Project Name</Label><Input defaultValue="My Bharat" className="mt-1.5" /></div>
+                <div><Label className="text-foreground text-sm">Project Code</Label><Input defaultValue="MYBRT" disabled className="mt-1.5" /></div>
+                <div><Label className="text-foreground text-sm">Project Head</Label><Input defaultValue="Ravi Kumar" className="mt-1.5" /></div>
+                <div><Label className="text-foreground text-sm">Head Email</Label><Input defaultValue="ravi@mybharat.gov.in" className="mt-1.5" /></div>
+                <div><Label className="text-foreground text-sm">Head Mobile</Label><Input defaultValue="+91 98765 43210" className="mt-1.5" /></div>
+                <div><Label className="text-foreground text-sm">Department</Label><Input defaultValue="Youth Affairs" className="mt-1.5" /></div>
+              </div>
+              <Button onClick={() => toast.success("Project details updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Service Config Source */}
+        <TabsContent value="service">
+          <Card className="shadow-card mt-4">
+            <CardHeader><CardTitle className="text-base">Communication Service Source</CardTitle></CardHeader>
+            <CardContent className="space-y-5">
+              <p className="text-sm text-muted-foreground">Choose whether to use DIC Notifier's communication infrastructure or your own provider configurations.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button
+                  onClick={() => setConfigSource("notifier")}
+                  className={`p-4 rounded-xl border-2 text-left transition-all ${configSource === "notifier" ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"}`}
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <Server className="w-5 h-5 text-primary" />
+                    <span className="font-semibold text-foreground">DIC Notifier Service</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Use the platform's built-in SMS, WhatsApp, Email & RCS services. No configuration needed.</p>
+                </button>
+                <button
+                  onClick={() => setConfigSource("own")}
+                  className={`p-4 rounded-xl border-2 text-left transition-all ${configSource === "own" ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"}`}
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <Key className="w-5 h-5 text-primary" />
+                    <span className="font-semibold text-foreground">Own Configuration</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Use your own provider APIs and credentials. Configure each channel independently.</p>
+                </button>
+              </div>
+              {configSource === "own" && (
+                <div className="p-3 rounded-lg bg-warning/5 border border-warning/20 text-sm text-muted-foreground">
+                  <Info className="w-4 h-4 inline mr-1 text-warning" />
+                  When using your own configuration, please provide valid API keys in each channel tab. You can also set your own quota limits.
+                </div>
+              )}
+              <Button onClick={() => toast.success("Service configuration updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="sms">
+          <Card className="shadow-card mt-4">
+            <CardHeader><CardTitle className="text-base">SMS Settings</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div><Label className="text-foreground text-sm">Sender ID</Label><Input defaultValue="DICNTFY" className="mt-1.5" /></div>
+                <div><Label className="text-foreground text-sm">DLT Template Header</Label><Input defaultValue="1101456780000067890" className="mt-1.5" /></div>
+                {configSource === "own" && (
+                  <>
+                    <div><Label className="text-foreground text-sm">API Endpoint</Label><Input placeholder="https://sms-provider.com/api/send" className="mt-1.5" /></div>
+                    <div><Label className="text-foreground text-sm">API Key</Label><Input type="password" placeholder="Your SMS API Key" className="mt-1.5" /></div>
+                  </>
+                )}
+              </div>
+              <div className="flex items-center gap-3">
+                <Switch defaultChecked /><Label className="text-foreground text-sm">Enable Unicode</Label>
+              </div>
+              <Button onClick={() => toast.success("SMS settings updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="whatsapp">
+          <Card className="shadow-card mt-4">
+            <CardHeader><CardTitle className="text-base">WhatsApp Settings</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div><Label className="text-foreground text-sm">Business Display Name</Label><Input defaultValue="My Bharat" className="mt-1.5" /></div>
+                <div><Label className="text-foreground text-sm">Template Namespace</Label><Input defaultValue="mybharat_templates" className="mt-1.5" /></div>
+                {configSource === "own" && (
+                  <>
+                    <div><Label className="text-foreground text-sm">WhatsApp Business API URL</Label><Input placeholder="https://graph.facebook.com/v17.0/..." className="mt-1.5" /></div>
+                    <div><Label className="text-foreground text-sm">Access Token</Label><Input type="password" placeholder="Your WhatsApp API Token" className="mt-1.5" /></div>
+                  </>
+                )}
+              </div>
+              <div className="flex items-center gap-3">
+                <Switch defaultChecked /><Label className="text-foreground text-sm">Enable Media Messages</Label>
+              </div>
+              <Button onClick={() => toast.success("WhatsApp settings updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="email">
+          <Card className="shadow-card mt-4">
+            <CardHeader><CardTitle className="text-base">Email Settings</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div><Label className="text-foreground text-sm">Sender Name</Label><Input defaultValue="My Bharat Team" className="mt-1.5" /></div>
+                <div><Label className="text-foreground text-sm">Reply-To Email</Label><Input defaultValue="support@mybharat.gov.in" className="mt-1.5" /></div>
+                <div><Label className="text-foreground text-sm">From Address</Label><Input defaultValue="noreply@mybharat.gov.in" className="mt-1.5" /></div>
+                {configSource === "own" && (
+                  <>
+                    <div><Label className="text-foreground text-sm">SMTP Host</Label><Input placeholder="smtp.provider.com" className="mt-1.5" /></div>
+                    <div><Label className="text-foreground text-sm">SMTP Port</Label><Input placeholder="587" className="mt-1.5" /></div>
+                    <div><Label className="text-foreground text-sm">SMTP Password</Label><Input type="password" placeholder="SMTP Password" className="mt-1.5" /></div>
+                  </>
+                )}
+              </div>
+              <div className="flex items-center gap-3">
+                <Switch defaultChecked /><Label className="text-foreground text-sm">Enable HTML Emails</Label>
+              </div>
+              <Button onClick={() => toast.success("Email settings updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="rcs">
+          <Card className="shadow-card mt-4">
+            <CardHeader><CardTitle className="text-base">RCS Settings</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div><Label className="text-foreground text-sm">Agent Display Name</Label><Input defaultValue="My Bharat Bot" className="mt-1.5" /></div>
+                <div><Label className="text-foreground text-sm">Profile Color</Label><Input defaultValue="#2563EB" type="color" className="mt-1.5 w-20 h-9" /></div>
+                {configSource === "own" && (
+                  <>
+                    <div><Label className="text-foreground text-sm">RCS API Endpoint</Label><Input placeholder="https://rcs-provider.com/api" className="mt-1.5" /></div>
+                    <div><Label className="text-foreground text-sm">API Key</Label><Input type="password" placeholder="Your RCS API Key" className="mt-1.5" /></div>
+                  </>
+                )}
+              </div>
+              <div className="flex items-center gap-3">
+                <Switch defaultChecked /><Label className="text-foreground text-sm">Enable Rich Cards</Label>
+              </div>
+              <Button onClick={() => toast.success("RCS settings updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* API Endpoints Tab */}
+        <TabsContent value="api">
+          <div className="space-y-4 mt-4">
+            <Card className="shadow-card">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base">Recipient API Endpoints</CardTitle>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => setShowSample(true)}>
+                      <Code className="w-4 h-4 mr-1" /> Sample Format
+                    </Button>
+                    <Button size="sm" onClick={() => setShowAddApi(true)}>
+                      <Plus className="w-4 h-4 mr-1" /> Add API
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Upload your project's API endpoints to dynamically fetch recipient mobile numbers. The filters defined here will appear in the Send Message screen under "Bulk DB" tab.
+                </p>
+
+                {apis.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Server className="w-10 h-10 mx-auto mb-3 opacity-40" />
+                    <p className="text-sm">No API endpoints configured yet</p>
+                    <p className="text-xs mt-1">Add an API to dynamically fetch recipients</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {apis.map((api) => (
+                      <div key={api.id} className="p-4 rounded-lg border border-border bg-card">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <ExternalLink className="w-4 h-4 text-primary" />
+                            <span className="font-medium text-foreground text-sm">{api.name}</span>
+                            <Badge variant={api.status === "Active" ? "default" : "secondary"} className="text-xs">{api.status}</Badge>
+                          </div>
+                          <div className="flex gap-1">
+                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => toggleApiStatus(api.id)}>
+                              {api.status === "Active" ? <span className="text-xs">⏸</span> : <span className="text-xs">▶</span>}
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => deleteApi(api.id)}>
+                              <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="text-xs text-muted-foreground space-y-1">
+                          <p><span className="font-medium">Endpoint:</span> <code className="bg-muted px-1 rounded">{api.method} {api.endpoint}</code></p>
+                          <p><span className="font-medium">Auth:</span> {api.authType}</p>
+                          <p><span className="font-medium">Response Field:</span> <code className="bg-muted px-1 rounded">{api.responseField}</code></p>
+                          <p><span className="font-medium">Filters:</span> {api.filters.map(f => f.label).join(", ")}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      {/* Sample API Format Dialog */}
+      <Dialog open={showSample} onOpenChange={setShowSample}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Sample API Format & Response</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm font-semibold text-foreground mb-2">📤 Request Format</p>
+              <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto text-foreground">
+                {JSON.stringify(sampleApiFormat.request, null, 2)}
+              </pre>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground mb-2">📥 Expected Response</p>
+              <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto text-foreground">
+                {JSON.stringify(sampleApiFormat.response, null, 2)}
+              </pre>
+            </div>
+            <div className="p-3 rounded-lg bg-info/5 border border-info/20 text-xs text-muted-foreground space-y-1">
+              <p className="font-medium text-foreground">Important Notes:</p>
+              <p>• Response must return a list of objects with a <code className="bg-muted px-1 rounded">mobile</code> field</p>
+              <p>• Include <code className="bg-muted px-1 rounded">filters_available</code> in response to auto-populate filter options</p>
+              <p>• API should support pagination via <code className="bg-muted px-1 rounded">page</code> and <code className="bg-muted px-1 rounded">limit</code></p>
+              <p>• Authentication via Bearer Token or API Key in headers</p>
+            </div>
+            <Button variant="outline" className="w-full" onClick={() => {
+              navigator.clipboard.writeText(JSON.stringify(sampleApiFormat, null, 2));
+              toast.success("Sample format copied to clipboard");
+            }}>
+              <Copy className="w-4 h-4 mr-2" /> Copy Full Sample
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add API Dialog */}
+      <Dialog open={showAddApi} onOpenChange={setShowAddApi}>
+        <DialogContent className="max-w-xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add API Endpoint</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label className="text-foreground">API Name <span className="text-destructive">*</span></Label>
+                <Input placeholder="e.g., User Fetch API" value={newApi.name} onChange={e => setNewApi(p => ({ ...p, name: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label className="text-foreground">Endpoint URL <span className="text-destructive">*</span></Label>
+                <Input placeholder="https://api.yourproject.gov.in/v1/users" value={newApi.endpoint} onChange={e => setNewApi(p => ({ ...p, endpoint: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-foreground">Method</Label>
+                <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={newApi.method} onChange={e => setNewApi(p => ({ ...p, method: e.target.value }))}>
+                  <option>GET</option>
+                  <option>POST</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-foreground">Auth Type</Label>
+                <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={newApi.authType} onChange={e => setNewApi(p => ({ ...p, authType: e.target.value }))}>
+                  <option>Bearer Token</option>
+                  <option>API Key</option>
+                  <option>Basic Auth</option>
+                  <option>No Auth</option>
+                </select>
+              </div>
+              {newApi.authType !== "No Auth" && (
+                <div className="space-y-1.5 sm:col-span-2">
+                  <Label className="text-foreground">Authorization Key/Token</Label>
+                  <Input type="password" placeholder="Paste your API key or token" value={newApi.authKey} onChange={e => setNewApi(p => ({ ...p, authKey: e.target.value }))} />
+                </div>
+              )}
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label className="text-foreground">Response Mobile Field</Label>
+                <Input placeholder="mobile" value={newApi.responseField} onChange={e => setNewApi(p => ({ ...p, responseField: e.target.value }))} />
+                <p className="text-xs text-muted-foreground">The JSON field name containing the mobile number in the response array</p>
+              </div>
+            </div>
+
+            <hr className="border-border" />
+
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <Label className="text-foreground font-semibold">Filter Parameters</Label>
+                <Button variant="outline" size="sm" onClick={addFilter}><Plus className="w-3.5 h-3.5 mr-1" /> Add Filter</Button>
+              </div>
+              <p className="text-xs text-muted-foreground mb-3">Define the filter parameters your API supports. These will appear as dynamic filters in the Send Message screen.</p>
+              <div className="space-y-2">
+                {newApi.filters.map((f, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <Input placeholder="key (e.g., state)" value={f.key} onChange={e => updateFilter(idx, "key", e.target.value)} className="flex-1" />
+                    <Input placeholder="Label (e.g., State)" value={f.label} onChange={e => updateFilter(idx, "label", e.target.value)} className="flex-1" />
+                    {newApi.filters.length > 1 && (
+                      <Button variant="ghost" size="icon" className="h-9 w-9 flex-shrink-0" onClick={() => removeFilter(idx)}>
+                        <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <Button className="w-full" onClick={handleAddApi}>
+              <Plus className="w-4 h-4 mr-2" /> Add Endpoint
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
-
-    <Tabs defaultValue="general">
-      <TabsList>
-        <TabsTrigger value="general">General</TabsTrigger>
-        <TabsTrigger value="sms">SMS</TabsTrigger>
-        <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
-        <TabsTrigger value="email">Email</TabsTrigger>
-        <TabsTrigger value="rcs">RCS</TabsTrigger>
-      </TabsList>
-
-      <TabsContent value="general">
-        <Card className="shadow-card mt-4">
-          <CardHeader><CardTitle className="text-base">Project Details</CardTitle></CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div><Label className="text-foreground text-sm">Project Name</Label><Input defaultValue="My Bharat" className="mt-1.5" /></div>
-              <div><Label className="text-foreground text-sm">Project Code</Label><Input defaultValue="MYBRT" disabled className="mt-1.5" /></div>
-              <div><Label className="text-foreground text-sm">Contact Person</Label><Input defaultValue="Ravi Kumar" className="mt-1.5" /></div>
-              <div><Label className="text-foreground text-sm">Contact Email</Label><Input defaultValue="ravi@alpha.com" className="mt-1.5" /></div>
-              <div><Label className="text-foreground text-sm">Contact Mobile</Label><Input defaultValue="+91 98765 43210" className="mt-1.5" /></div>
-              <div><Label className="text-foreground text-sm">Department</Label><Input defaultValue="Marketing" className="mt-1.5" /></div>
-            </div>
-            <Button onClick={() => toast.success("Project details updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
-          </CardContent>
-        </Card>
-      </TabsContent>
-
-      <TabsContent value="sms">
-        <Card className="shadow-card mt-4">
-          <CardHeader><CardTitle className="text-base">SMS Settings</CardTitle></CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div><Label className="text-foreground text-sm">Sender ID</Label><Input defaultValue="ALPHAPRJ" className="mt-1.5" /></div>
-              <div><Label className="text-foreground text-sm">DLT Template Header</Label><Input defaultValue="1101456780000067890" className="mt-1.5" /></div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Switch defaultChecked /><Label className="text-foreground text-sm">Enable Unicode</Label>
-            </div>
-            <Button onClick={() => toast.success("SMS settings updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
-          </CardContent>
-        </Card>
-      </TabsContent>
-
-      <TabsContent value="whatsapp">
-        <Card className="shadow-card mt-4">
-          <CardHeader><CardTitle className="text-base">WhatsApp Settings</CardTitle></CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div><Label className="text-foreground text-sm">Business Display Name</Label><Input defaultValue="Project Alpha" className="mt-1.5" /></div>
-              <div><Label className="text-foreground text-sm">Template Namespace</Label><Input defaultValue="alpha_templates" className="mt-1.5" /></div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Switch defaultChecked /><Label className="text-foreground text-sm">Enable Media Messages</Label>
-            </div>
-            <Button onClick={() => toast.success("WhatsApp settings updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
-          </CardContent>
-        </Card>
-      </TabsContent>
-
-      <TabsContent value="email">
-        <Card className="shadow-card mt-4">
-          <CardHeader><CardTitle className="text-base">Email Settings</CardTitle></CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div><Label className="text-foreground text-sm">Sender Name</Label><Input defaultValue="Project Alpha Team" className="mt-1.5" /></div>
-              <div><Label className="text-foreground text-sm">Reply-To Email</Label><Input defaultValue="support@alpha.com" className="mt-1.5" /></div>
-              <div><Label className="text-foreground text-sm">From Address</Label><Input defaultValue="noreply@alpha.com" className="mt-1.5" /></div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Switch defaultChecked /><Label className="text-foreground text-sm">Enable HTML Emails</Label>
-            </div>
-            <div className="flex items-center gap-3">
-              <Switch defaultChecked /><Label className="text-foreground text-sm">Allow Attachments</Label>
-            </div>
-            <Button onClick={() => toast.success("Email settings updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
-          </CardContent>
-        </Card>
-      </TabsContent>
-
-      <TabsContent value="rcs">
-        <Card className="shadow-card mt-4">
-          <CardHeader><CardTitle className="text-base">RCS Settings</CardTitle></CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div><Label className="text-foreground text-sm">Agent Display Name</Label><Input defaultValue="Alpha Bot" className="mt-1.5" /></div>
-              <div><Label className="text-foreground text-sm">Profile Color</Label><Input defaultValue="#2563EB" type="color" className="mt-1.5 w-20 h-9" /></div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Switch defaultChecked /><Label className="text-foreground text-sm">Enable Rich Cards</Label>
-            </div>
-            <Button onClick={() => toast.success("RCS settings updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
-          </CardContent>
-        </Card>
-      </TabsContent>
-    </Tabs>
-  </div>
-);
+  );
+};
 
 export default ProjectConfigPage;

@@ -4,21 +4,27 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Save, Server, Plus, Trash2, Copy, ExternalLink, Key, Code, Info, Check } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-interface ApiEndpoint {
+export interface ApiFilter {
+  key: string;
+  label: string;
+  type: string;
+  example: string;
+}
+
+export interface ApiEndpoint {
   id: string;
   name: string;
   endpoint: string;
   method: string;
   authType: string;
   authKey: string;
-  filters: { key: string; label: string; type: string }[];
+  filters: ApiFilter[];
   responseField: string;
   status: "Active" | "Inactive";
 }
@@ -62,38 +68,46 @@ const sampleApiFormat = {
   },
 };
 
+// Export default APIs so SendMessagePage can import
+export const defaultApis: ApiEndpoint[] = [
+  {
+    id: "api-1",
+    name: "My Bharat User API",
+    endpoint: "https://api.mybharat.gov.in/v1/users",
+    method: "POST",
+    authType: "Bearer Token",
+    authKey: "eyJhbGciOiJIUzI1NiIs...",
+    filters: [
+      { key: "state", label: "State", type: "select", example: "Madhya Pradesh, Uttar Pradesh, Rajasthan" },
+      { key: "district", label: "District", type: "select", example: "Bhopal, Indore, Jabalpur, Gwalior" },
+      { key: "block", label: "Block", type: "select", example: "Huzur, Berasia, Phanda, Sehore" },
+      { key: "gram_panchayat", label: "Gram Panchayat", type: "select", example: "Ratua Khurd, Bairagarh Chichli, Misrod" },
+      { key: "village", label: "Village", type: "select", example: "Lambakheda, Neelbad, Kolar, Ratibad" },
+      { key: "urban_rural", label: "Urban/Rural", type: "select", example: "Urban, Rural" },
+      { key: "user_type", label: "User Type", type: "select", example: "Youth, Organization" },
+      { key: "category", label: "Category", type: "select", example: "Education, Health, Agriculture" },
+      { key: "activity", label: "Activity", type: "select", example: "Quiz, Events, ELP, Essay" },
+      { key: "activity_status", label: "Activity Status", type: "select", example: "Attendee, Successfully Completed" },
+    ],
+    responseField: "mobile",
+    status: "Active",
+  },
+];
+
 const ProjectConfigPage = () => {
   const [configSource, setConfigSource] = useState<"notifier" | "own">("notifier");
-  const [apis, setApis] = useState<ApiEndpoint[]>([
-    {
-      id: "api-1",
-      name: "My Bharat User API",
-      endpoint: "https://api.mybharat.gov.in/v1/users",
-      method: "POST",
-      authType: "Bearer Token",
-      authKey: "eyJhbGciOiJIUzI1NiIs...",
-      filters: [
-        { key: "state", label: "State", type: "select" },
-        { key: "district", label: "District", type: "select" },
-        { key: "block", label: "Block", type: "select" },
-        { key: "user_type", label: "User Type", type: "select" },
-        { key: "activity", label: "Activity", type: "select" },
-      ],
-      responseField: "mobile",
-      status: "Active",
-    },
-  ]);
+  const [apis, setApis] = useState<ApiEndpoint[]>(defaultApis);
   const [showSample, setShowSample] = useState(false);
   const [editingApi, setEditingApi] = useState<ApiEndpoint | null>(null);
   const [showAddApi, setShowAddApi] = useState(false);
   const [newApi, setNewApi] = useState({
     name: "", endpoint: "", method: "POST", authType: "Bearer Token", authKey: "",
-    filters: [{ key: "", label: "", type: "select" }],
+    filters: [{ key: "", label: "", type: "select", example: "" }],
     responseField: "mobile",
   });
 
   const addFilter = () => {
-    setNewApi(prev => ({ ...prev, filters: [...prev.filters, { key: "", label: "", type: "select" }] }));
+    setNewApi(prev => ({ ...prev, filters: [...prev.filters, { key: "", label: "", type: "select", example: "" }] }));
   };
 
   const removeFilter = (idx: number) => {
@@ -120,8 +134,8 @@ const ProjectConfigPage = () => {
     };
     setApis(prev => [...prev, api]);
     setShowAddApi(false);
-    setNewApi({ name: "", endpoint: "", method: "POST", authType: "Bearer Token", authKey: "", filters: [{ key: "", label: "", type: "select" }], responseField: "mobile" });
-    toast.success("API endpoint added successfully");
+    setNewApi({ name: "", endpoint: "", method: "POST", authType: "Bearer Token", authKey: "", filters: [{ key: "", label: "", type: "select", example: "" }], responseField: "mobile" });
+    toast.success("API endpoint validated and added successfully");
   };
 
   const toggleApiStatus = (id: string) => {
@@ -168,7 +182,6 @@ const ProjectConfigPage = () => {
           </Card>
         </TabsContent>
 
-        {/* Service Config Source */}
         <TabsContent value="service">
           <Card className="shadow-card mt-4">
             <CardHeader><CardTitle className="text-base">Communication Service Source</CardTitle></CardHeader>
@@ -348,7 +361,14 @@ const ProjectConfigPage = () => {
                           <p><span className="font-medium">Endpoint:</span> <code className="bg-muted px-1 rounded">{api.method} {api.endpoint}</code></p>
                           <p><span className="font-medium">Auth:</span> {api.authType}</p>
                           <p><span className="font-medium">Response Field:</span> <code className="bg-muted px-1 rounded">{api.responseField}</code></p>
-                          <p><span className="font-medium">Filters:</span> {api.filters.map(f => f.label).join(", ")}</p>
+                          <p><span className="font-medium">Filters ({api.filters.length}):</span></p>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {api.filters.map(f => (
+                              <Badge key={f.key} variant="outline" className="text-xs font-normal">
+                                {f.label} <span className="text-muted-foreground ml-1">({f.key})</span>
+                              </Badge>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -448,17 +468,25 @@ const ProjectConfigPage = () => {
                 <Label className="text-foreground font-semibold">Filter Parameters</Label>
                 <Button variant="outline" size="sm" onClick={addFilter}><Plus className="w-3.5 h-3.5 mr-1" /> Add Filter</Button>
               </div>
-              <p className="text-xs text-muted-foreground mb-3">Define the filter parameters your API supports. These will appear as dynamic filters in the Send Message screen.</p>
-              <div className="space-y-2">
+              <p className="text-xs text-muted-foreground mb-3">Define filter parameters with example values (comma-separated). These will appear as dynamic dropdowns in the Send Message screen.</p>
+              <div className="space-y-3">
                 {newApi.filters.map((f, idx) => (
-                  <div key={idx} className="flex items-center gap-2">
-                    <Input placeholder="key (e.g., state)" value={f.key} onChange={e => updateFilter(idx, "key", e.target.value)} className="flex-1" />
-                    <Input placeholder="Label (e.g., State)" value={f.label} onChange={e => updateFilter(idx, "label", e.target.value)} className="flex-1" />
-                    {newApi.filters.length > 1 && (
-                      <Button variant="ghost" size="icon" className="h-9 w-9 flex-shrink-0" onClick={() => removeFilter(idx)}>
-                        <Trash2 className="w-3.5 h-3.5 text-destructive" />
-                      </Button>
-                    )}
+                  <div key={idx} className="p-3 rounded-lg border border-border bg-muted/30 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Input placeholder="key (e.g., state)" value={f.key} onChange={e => updateFilter(idx, "key", e.target.value)} className="flex-1" />
+                      <Input placeholder="Label (e.g., State)" value={f.label} onChange={e => updateFilter(idx, "label", e.target.value)} className="flex-1" />
+                      {newApi.filters.length > 1 && (
+                        <Button variant="ghost" size="icon" className="h-9 w-9 flex-shrink-0" onClick={() => removeFilter(idx)}>
+                          <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                        </Button>
+                      )}
+                    </div>
+                    <Input
+                      placeholder="Example values (comma-separated): e.g., Madhya Pradesh, Uttar Pradesh, Rajasthan"
+                      value={f.example}
+                      onChange={e => updateFilter(idx, "example", e.target.value)}
+                      className="text-xs"
+                    />
                   </div>
                 ))}
               </div>

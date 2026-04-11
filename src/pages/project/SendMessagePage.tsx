@@ -12,8 +12,9 @@ import { toast } from "sonner";
 import {
   Send, Upload, Database, Phone, MessageSquare, Mail, Sparkles,
   FileText, X, Check, AlertCircle, Users, Plus, Trash2, Calendar,
-  Filter, MapPin, UserCheck, FolderTree, Activity, Server,
+  Filter, Server,
 } from "lucide-react";
+import { defaultApis, type ApiEndpoint, type ApiFilter } from "./ProjectConfigPage";
 
 const templates: Record<string, { id: string; name: string; body: string; variables: string[] }[]> = {
   sms: [
@@ -42,42 +43,6 @@ const channelConfig = [
 
 const allVariables = ["name", "otp", "project_name", "date", "amount", "link"];
 
-// Simulated configured API endpoints (same shape as ProjectConfigPage's ApiEndpoint)
-const configuredApis = [
-  {
-    id: "api-1",
-    name: "My Bharat User API",
-    endpoint: "https://api.mybharat.gov.in/v1/users",
-    status: "Active" as const,
-    filters: [
-      { key: "state", label: "State", type: "select" },
-      { key: "district", label: "District", type: "select" },
-      { key: "block", label: "Block", type: "select" },
-      { key: "gram_panchayat", label: "Gram Panchayat", type: "select" },
-      { key: "village", label: "Village", type: "select" },
-      { key: "urban_rural", label: "Urban/Rural", type: "select" },
-      { key: "user_type", label: "User Type", type: "select" },
-      { key: "category", label: "Category", type: "select" },
-      { key: "activity", label: "Activity", type: "select" },
-      { key: "activity_status", label: "Activity Status", type: "select" },
-    ],
-  },
-];
-
-// Simulated API response with filter options (would come from the API's filters_available)
-const apiFilterOptions: Record<string, string[]> = {
-  state: ["Madhya Pradesh", "Uttar Pradesh", "Rajasthan", "Maharashtra", "Bihar"],
-  district: ["Bhopal", "Indore", "Jabalpur", "Gwalior", "Ujjain"],
-  urban_rural: ["Urban", "Rural"],
-  block: ["Huzur", "Berasia", "Phanda", "Sehore", "Nasrullaganj"],
-  gram_panchayat: ["Ratua Khurd", "Bairagarh Chichli", "Khajuri Sadak", "Misrod", "Awadhpuri"],
-  village: ["Lambakheda", "Neelbad", "Kolar", "Ratibad", "Bagroda"],
-  user_type: ["Youth", "Organization"],
-  category: ["Education", "Health", "Agriculture", "Finance", "Technology"],
-  activity: ["Quiz", "Events", "ELP", "Essay"],
-  activity_status: ["Attendee", "Successfully Completed"],
-};
-
 const SendMessagePage = () => {
   const [channel, setChannel] = useState("sms");
   const [sendMode, setSendMode] = useState("database");
@@ -90,18 +55,20 @@ const SendMessagePage = () => {
   const [sending, setSending] = useState(false);
   const [scheduleEnabled, setScheduleEnabled] = useState(false);
   const [fetchedCount, setFetchedCount] = useState<number | null>(null);
-  const [selectedApiId, setSelectedApiId] = useState(configuredApis[0]?.id || "");
+  const [selectedApiId, setSelectedApiId] = useState(defaultApis[0]?.id || "");
 
   // Dynamic API filter values
   const [apiFilterValues, setApiFilterValues] = useState<Record<string, string>>({});
 
   // Get the active API's filters dynamically
-  const activeApi = configuredApis.find(a => a.id === selectedApiId && a.status === "Active");
+  const activeApi = defaultApis.find(a => a.id === selectedApiId && a.status === "Active");
+
+  // Build dynamic filters with options parsed from the "example" field
   const dynamicFilters = useMemo(() => {
     if (!activeApi) return [];
     return activeApi.filters.map(f => ({
       ...f,
-      options: apiFilterOptions[f.key] || [],
+      options: f.example ? f.example.split(",").map(s => s.trim()).filter(Boolean) : [],
     }));
   }, [activeApi]);
 
@@ -162,16 +129,6 @@ const SendMessagePage = () => {
 
   const smsParts = Math.max(1, Math.ceil(messageBody.length / 160));
 
-  // Group filters for display
-  const locationKeys = ["state", "district", "urban_rural", "block", "gram_panchayat", "village"];
-  const userKeys = ["user_type", "category"];
-  const activityKeys = ["activity", "activity_status"];
-
-  const locationFilters = dynamicFilters.filter(f => locationKeys.includes(f.key));
-  const userFilters = dynamicFilters.filter(f => userKeys.includes(f.key));
-  const activityFilters = dynamicFilters.filter(f => activityKeys.includes(f.key));
-  const otherFilters = dynamicFilters.filter(f => ![...locationKeys, ...userKeys, ...activityKeys].includes(f.key));
-
   return (
     <div className="space-y-6">
       <div>
@@ -222,12 +179,12 @@ const SendMessagePage = () => {
                 {/* === Bulk DB Tab === */}
                 <TabsContent value="database" className="space-y-4">
                   {/* API Selection (if multiple APIs configured) */}
-                  {configuredApis.length > 1 && (
+                  {defaultApis.filter(a => a.status === "Active").length > 1 && (
                     <div>
                       <Label className="text-foreground text-xs mb-1.5 block">Select API Source</Label>
                       <Select value={selectedApiId} onValueChange={v => { setSelectedApiId(v); setApiFilterValues({}); setFetchedCount(null); }}>
                         <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Select API" /></SelectTrigger>
-                        <SelectContent>{configuredApis.filter(a => a.status === "Active").map(a => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent>
+                        <SelectContent>{defaultApis.filter(a => a.status === "Active").map(a => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
                   )}
@@ -241,75 +198,46 @@ const SendMessagePage = () => {
                   ) : (
                     <div className="space-y-3">
                       <div className="p-2 rounded-lg bg-info/5 border border-info/20">
-                        <p className="text-xs text-muted-foreground"><Server className="w-3 h-3 inline mr-1" />Filters from <span className="font-medium text-foreground">{activeApi.name}</span>. Manage in <span className="font-medium text-foreground">Configuration → API Endpoints</span>.</p>
+                        <p className="text-xs text-muted-foreground"><Server className="w-3 h-3 inline mr-1" />Dynamic filters from <span className="font-medium text-foreground">{activeApi.name}</span>. All filters are optional — leave empty to fetch all data.</p>
                       </div>
 
-                      {dynamicFilters.length === 0 && (
+                      {dynamicFilters.length === 0 ? (
                         <p className="text-xs text-muted-foreground">No filters configured for this API. All recipients will be fetched.</p>
-                      )}
-
-                      {/* Location Filters */}
-                      {locationFilters.length > 0 && (
-                        <>
-                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><MapPin className="w-3 h-3" /> Location</p>
-                          <div className="grid grid-cols-2 gap-2">
-                            {locationFilters.map(f => (
-                              <Select key={f.key} value={apiFilterValues[f.key] || ""} onValueChange={v => setApiFilterValues(p => ({ ...p, [f.key]: v }))}>
-                                <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={f.label} /></SelectTrigger>
-                                <SelectContent>{f.options.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
-                              </Select>
-                            ))}
-                          </div>
-                        </>
-                      )}
-
-                      {/* User Filters */}
-                      {userFilters.length > 0 && (
-                        <>
-                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><UserCheck className="w-3 h-3" /> User Filters</p>
-                          <div className="grid grid-cols-2 gap-2">
-                            {userFilters.map(f => (
-                              <Select key={f.key} value={apiFilterValues[f.key] || ""} onValueChange={v => setApiFilterValues(p => ({ ...p, [f.key]: v }))}>
-                                <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={f.label} /></SelectTrigger>
-                                <SelectContent>{f.options.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
-                              </Select>
-                            ))}
-                          </div>
-                        </>
-                      )}
-
-                      {/* Activity Filters */}
-                      {activityFilters.length > 0 && (
-                        <>
-                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><Activity className="w-3 h-3" /> Activity</p>
-                          <div className="grid grid-cols-2 gap-2">
-                            {activityFilters.map(f => (
-                              <Select key={f.key} value={apiFilterValues[f.key] || ""} onValueChange={v => setApiFilterValues(p => ({ ...p, [f.key]: v }))}>
-                                <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={f.label} /></SelectTrigger>
-                                <SelectContent>{f.options.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
-                              </Select>
-                            ))}
-                          </div>
-                        </>
-                      )}
-
-                      {/* Other Filters (custom ones not in known groups) */}
-                      {otherFilters.length > 0 && (
-                        <>
-                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><Filter className="w-3 h-3" /> Other</p>
-                          <div className="grid grid-cols-2 gap-2">
-                            {otherFilters.map(f => (
-                              <Select key={f.key} value={apiFilterValues[f.key] || ""} onValueChange={v => setApiFilterValues(p => ({ ...p, [f.key]: v }))}>
-                                <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={f.label} /></SelectTrigger>
-                                <SelectContent>{f.options.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
-                              </Select>
-                            ))}
-                          </div>
-                        </>
+                      ) : (
+                        <div className="space-y-2">
+                          {dynamicFilters.map(f => (
+                            <div key={f.key}>
+                              <Label className="text-foreground text-xs mb-1 block">{f.label}</Label>
+                              {f.options.length > 0 ? (
+                                <Select
+                                  value={apiFilterValues[f.key] || ""}
+                                  onValueChange={v => setApiFilterValues(p => ({ ...p, [f.key]: v === "__all__" ? "" : v }))}
+                                >
+                                  <SelectTrigger className="h-9 text-xs">
+                                    <SelectValue placeholder={`All ${f.label}`} />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="__all__">All {f.label}</SelectItem>
+                                    {f.options.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+                                  </SelectContent>
+                                </Select>
+                              ) : (
+                                <Input
+                                  placeholder={`Enter ${f.label}`}
+                                  value={apiFilterValues[f.key] || ""}
+                                  onChange={e => setApiFilterValues(p => ({ ...p, [f.key]: e.target.value }))}
+                                  className="h-9 text-xs"
+                                />
+                              )}
+                            </div>
+                          ))}
+                        </div>
                       )}
 
                       {Object.values(apiFilterValues).some(Boolean) && (
-                        <Button variant="ghost" size="sm" className="text-xs" onClick={() => setApiFilterValues({})}>Clear All Filters</Button>
+                        <Button variant="ghost" size="sm" className="text-xs" onClick={() => setApiFilterValues({})}>
+                          <X className="w-3 h-3 mr-1" /> Clear All Filters
+                        </Button>
                       )}
                     </div>
                   )}
@@ -334,36 +262,49 @@ const SendMessagePage = () => {
                         placeholder={channel === "email" ? "recipient@example.com" : "+91 XXXXX XXXXX"}
                         value={num}
                         onChange={(e) => updateNumber(i, e.target.value)}
-                        className="flex-1"
                       />
                       {numbers.length > 1 && (
-                        <Button variant="ghost" size="icon" onClick={() => removeNumber(i)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
+                        <Button variant="ghost" size="icon" onClick={() => removeNumber(i)}>
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
                       )}
                     </div>
                   ))}
-                  <Button variant="outline" size="sm" onClick={addNumber}><Plus className="w-3.5 h-3.5 mr-1" /> Add Recipient</Button>
+                  <Button variant="outline" size="sm" onClick={addNumber} className="w-full">
+                    <Plus className="w-4 h-4 mr-1" /> Add Recipient
+                  </Button>
                 </TabsContent>
 
-                {/* === CSV Tab === */}
+                {/* === CSV Upload Tab === */}
                 <TabsContent value="csv" className="space-y-4">
-                  <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/40 transition-colors">
-                    <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-sm text-muted-foreground mb-2">Drop CSV file or click to browse</p>
+                  <div className="border-2 border-dashed border-border rounded-xl p-6 text-center hover:border-primary/40 transition-colors">
+                    <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground mb-2">Upload CSV with recipient data</p>
                     <input type="file" accept=".csv" onChange={handleCsvUpload} className="hidden" id="csv-upload" />
-                    <Button variant="outline" size="sm" onClick={() => document.getElementById("csv-upload")?.click()}>Choose File</Button>
-                    {csvFile && <p className="text-xs text-muted-foreground mt-2">{csvFile.name}</p>}
+                    <Button variant="outline" size="sm" onClick={() => document.getElementById("csv-upload")?.click()}>
+                      Choose File
+                    </Button>
+                    {csvFile && <p className="text-xs text-foreground mt-2">{csvFile.name}</p>}
                   </div>
                   {csvPreview && (
                     <div className="space-y-3">
-                      <div className="flex items-center gap-4 text-sm">
-                        <span className="flex items-center gap-1 text-success"><Check className="w-3.5 h-3.5" /> {csvPreview.valid} valid</span>
-                        <span className="flex items-center gap-1 text-destructive"><X className="w-3.5 h-3.5" /> {csvPreview.invalid} invalid</span>
-                        <span className="flex items-center gap-1 text-warning"><AlertCircle className="w-3.5 h-3.5" /> {csvPreview.duplicates} dup</span>
+                      <div className="flex gap-3 text-xs">
+                        <Badge variant="default" className="bg-success/10 text-success border-success/20">{csvPreview.valid} Valid</Badge>
+                        <Badge variant="destructive" className="bg-destructive/10 text-destructive border-destructive/20">{csvPreview.invalid} Invalid</Badge>
+                        <Badge variant="secondary">{csvPreview.duplicates} Duplicates</Badge>
                       </div>
-                      <div className="overflow-x-auto rounded-lg border border-border">
+                      <div className="overflow-auto max-h-40 rounded-lg border border-border">
                         <table className="w-full text-xs">
-                          <thead><tr className="bg-muted">{csvPreview.headers.map((h) => <th key={h} className="p-2 text-left font-medium text-muted-foreground">{h}</th>)}</tr></thead>
-                          <tbody>{csvPreview.rows.map((row, i) => <tr key={i} className="border-t border-border">{row.map((c, j) => <td key={j} className="p-2 text-foreground">{c}</td>)}</tr>)}</tbody>
+                          <thead className="bg-muted">
+                            <tr>{csvPreview.headers.map((h, i) => <th key={i} className="px-3 py-2 text-left text-foreground font-medium">{h}</th>)}</tr>
+                          </thead>
+                          <tbody>
+                            {csvPreview.rows.map((row, i) => (
+                              <tr key={i} className="border-t border-border">
+                                {row.map((c, j) => <td key={j} className="px-3 py-1.5 text-muted-foreground">{c}</td>)}
+                              </tr>
+                            ))}
+                          </tbody>
                         </table>
                       </div>
                     </div>
@@ -374,72 +315,67 @@ const SendMessagePage = () => {
           </Card>
         </div>
 
-        {/* Right Column — Compose Message */}
-        <div className="lg:col-span-3">
+        {/* Right Column — Message Compose */}
+        <div className="lg:col-span-3 space-y-6">
           <Card className="shadow-card">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <FileText className="w-4 h-4 text-muted-foreground" />
                 Compose Message
               </CardTitle>
-              <p className="text-sm text-muted-foreground">Select a template or write a custom message</p>
             </CardHeader>
-            <CardContent className="space-y-5">
+            <CardContent className="space-y-4">
+              {/* Template Selection */}
               <div>
-                <Label className="text-foreground text-sm mb-1.5 block">Template (Optional)</Label>
+                <Label className="text-foreground text-sm">Template</Label>
                 <Select value={selectedTemplate} onValueChange={handleTemplateSelect}>
-                  <SelectTrigger><SelectValue placeholder="Choose a template" /></SelectTrigger>
+                  <SelectTrigger className="mt-1.5"><SelectValue placeholder="Choose a template or write custom" /></SelectTrigger>
                   <SelectContent>
-                    {currentTemplates.map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+                    {currentTemplates.map((t) => (
+                      <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
 
+              {/* Subject (email only) */}
               {channel === "email" && (
                 <div>
-                  <Label className="text-foreground text-sm mb-1.5 block">Subject</Label>
-                  <Input placeholder="Email subject line" value={subject} onChange={(e) => setSubject(e.target.value)} />
+                  <Label className="text-foreground text-sm">Subject</Label>
+                  <Input placeholder="Email subject" value={subject} onChange={e => setSubject(e.target.value)} className="mt-1.5" />
                 </div>
               )}
 
+              {/* Message Body */}
               <div>
-                <Label className="text-foreground text-sm mb-1.5 block">Message Body</Label>
+                <Label className="text-foreground text-sm">Message Body</Label>
                 <Textarea
-                  placeholder="Type your message here... Use {{variable}} for dynamic content"
+                  placeholder="Type your message..."
                   value={messageBody}
                   onChange={(e) => setMessageBody(e.target.value)}
-                  rows={channel === "email" ? 8 : 5}
-                  className="resize-none"
+                  className="mt-1.5 min-h-[140px]"
                 />
-                <div className="flex items-center justify-between mt-1.5">
-                  <span className="text-xs text-muted-foreground">{messageBody.length} characters</span>
-                  {channel === "sms" && <span className="text-xs text-muted-foreground">{smsParts} SMS part(s)</span>}
-                </div>
+                {channel === "sms" && (
+                  <p className="text-xs text-muted-foreground mt-1">{messageBody.length} chars · {smsParts} SMS part{smsParts > 1 ? "s" : ""}</p>
+                )}
               </div>
 
+              {/* Variables */}
               <div>
-                <Label className="text-foreground text-sm mb-2 block">Insert Variable</Label>
-                <div className="flex flex-wrap gap-2">
+                <Label className="text-foreground text-xs mb-2 block">Insert Variable</Label>
+                <div className="flex flex-wrap gap-1.5">
                   {allVariables.map((v) => (
-                    <button
-                      key={v}
-                      onClick={() => insertVariable(v)}
-                      className="px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-mono text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                    >
+                    <Button key={v} variant="outline" size="sm" className="text-xs h-7" onClick={() => insertVariable(v)}>
                       {`{{${v}}}`}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
 
-              <hr className="border-border" />
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-foreground">Schedule Send</p>
-                  <p className="text-xs text-muted-foreground">Send at a specific date and time</p>
-                </div>
+              {/* Schedule */}
+              <div className="flex items-center gap-3 pt-2 border-t border-border">
                 <Switch checked={scheduleEnabled} onCheckedChange={setScheduleEnabled} />
+                <Label className="text-foreground text-sm">Schedule for later</Label>
               </div>
               {scheduleEnabled && (
                 <div className="grid grid-cols-2 gap-3">
@@ -453,38 +389,41 @@ const SendMessagePage = () => {
                   </div>
                 </div>
               )}
+            </CardContent>
+          </Card>
 
-              <hr className="border-border" />
-
-              <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-                <p className="text-sm font-medium text-foreground">Campaign Summary</p>
-                <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
-                  <span className="text-muted-foreground">Channel</span>
-                  <span className="font-medium text-foreground">{channelConfig.find((c) => c.id === channel)?.label}</span>
-                  <span className="text-muted-foreground">Recipients</span>
-                  <span className="font-medium text-foreground">{recipientCount.toLocaleString()}</span>
-                  <span className="text-muted-foreground">Mode</span>
-                  <span className="font-medium text-foreground capitalize">{sendMode === "csv" ? "CSV Upload" : sendMode === "database" ? "Bulk DB (API)" : "Manual"}</span>
-                  {selectedTemplate && (
-                    <>
-                      <span className="text-muted-foreground">Template</span>
-                      <span className="font-medium text-foreground truncate">{currentTemplates.find((t) => t.id === selectedTemplate)?.name}</span>
-                    </>
-                  )}
+          {/* Summary & Send */}
+          <Card className="shadow-card">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-foreground">Campaign Summary</p>
+                  <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                    <span>Channel: <strong className="text-foreground">{channel.toUpperCase()}</strong></span>
+                    <span>·</span>
+                    <span>Recipients: <strong className="text-foreground">{recipientCount.toLocaleString()}</strong></span>
+                    <span>·</span>
+                    <span>Mode: <strong className="text-foreground">{sendMode === "database" ? "Bulk DB" : sendMode === "csv" ? "CSV" : "Manual"}</strong></span>
+                  </div>
                 </div>
-              </div>
-
-              <div className="flex gap-3">
-                <Button variant="outline" className="flex-1">Save Draft</Button>
                 <Button
-                  className="flex-1"
                   onClick={handleSend}
-                  disabled={sending || !messageBody || recipientCount === 0}
+                  disabled={sending || !messageBody.trim() || recipientCount === 0}
+                  className="min-w-[140px]"
                 >
-                  <Send className="w-4 h-4 mr-2" />
-                  {sending ? "Sending..." : scheduleEnabled ? "Schedule" : "Send Now"}
+                  {sending ? (
+                    <span className="flex items-center gap-2"><span className="animate-spin">⏳</span> Sending...</span>
+                  ) : (
+                    <span className="flex items-center gap-2"><Send className="w-4 h-4" /> Send Campaign</span>
+                  )}
                 </Button>
               </div>
+              {recipientCount === 0 && messageBody.trim() && (
+                <div className="flex items-center gap-2 text-xs text-warning">
+                  <AlertCircle className="w-3.5 h-3.5" />
+                  <span>No recipients selected. Add recipients before sending.</span>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

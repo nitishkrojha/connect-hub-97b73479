@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Megaphone, MessageSquare, CheckCircle2, XCircle, TrendingUp,
-  Smartphone, Mail, Sparkles, Clock, CalendarDays,
+  Smartphone, Mail, Sparkles, Clock, CalendarDays, FileText,
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
 
@@ -29,6 +29,13 @@ const recentCampaigns = [
   { name: "Order Confirmation", channel: "WhatsApp", status: "Completed", sent: 1200, date: "5 hours ago" },
   { name: "Promo Blast June", channel: "RCS", status: "Scheduled", sent: 0, date: "Tomorrow 9AM" },
   { name: "Password Reset", channel: "Email", status: "Completed", sent: 340, date: "1 day ago" },
+];
+
+const templateUsage = [
+  { name: "OTP Verification", id: "TPL-SMS-00001", channel: "SMS", sent: 8420, rate: 98.0 },
+  { name: "Welcome Message", id: "TPL-WA-00002", channel: "WhatsApp", sent: 5640, rate: 98.0 },
+  { name: "Welcome Email", id: "TPL-EML-00003", channel: "Email", sent: 4200, rate: 97.0 },
+  { name: "Appointment Reminder", id: "TPL-SMS-00006", channel: "SMS", sent: 2180, rate: 98.0 },
 ];
 
 const statusColors: Record<string, string> = {
@@ -167,6 +174,50 @@ const ProjectDashboard = () => {
                     </td>
                     <td className="py-3 pr-4 text-sm text-foreground text-right">{c.sent.toLocaleString()}</td>
                     <td className="py-3 text-xs text-muted-foreground text-right">{c.date}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Template Usage */}
+      <Card className="shadow-card">
+        <CardHeader>
+          <CardTitle className="text-base">Template Usage</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left text-xs font-medium text-muted-foreground pb-3 pr-4">Template</th>
+                  <th className="text-left text-xs font-medium text-muted-foreground pb-3 pr-4">Template ID</th>
+                  <th className="text-left text-xs font-medium text-muted-foreground pb-3 pr-4">Channel</th>
+                  <th className="text-right text-xs font-medium text-muted-foreground pb-3 pr-4">Sent</th>
+                  <th className="text-right text-xs font-medium text-muted-foreground pb-3">Success Rate</th>
+                </tr>
+              </thead>
+              <tbody>
+                {templateUsage.map((t) => (
+                  <tr key={t.id} className="border-b border-border/50 last:border-0">
+                    <td className="py-3 pr-4">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm font-medium text-foreground">{t.name}</span>
+                      </div>
+                    </td>
+                    <td className="py-3 pr-4">
+                      <span className="font-mono text-xs text-primary bg-primary/10 px-2 py-0.5 rounded">{t.id}</span>
+                    </td>
+                    <td className="py-3 pr-4">
+                      <Badge variant="secondary" className="text-xs">{t.channel}</Badge>
+                    </td>
+                    <td className="py-3 pr-4 text-sm text-foreground text-right">{t.sent.toLocaleString()}</td>
+                    <td className="py-3 text-right">
+                      <Badge variant="secondary" className="text-xs">{t.rate}%</Badge>
+                    </td>
                   </tr>
                 ))}
               </tbody>

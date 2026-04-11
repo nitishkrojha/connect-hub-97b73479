@@ -54,6 +54,8 @@ const SendMessagePage = () => {
   const [csvPreview, setCsvPreview] = useState<{ headers: string[]; rows: string[][]; valid: number; invalid: number; duplicates: number } | null>(null);
   const [sending, setSending] = useState(false);
   const [scheduleEnabled, setScheduleEnabled] = useState(false);
+  const [selectedSenderId, setSelectedSenderId] = useState("DICNTFY");
+  const senderIds = ["DICNTFY", "MYBHRT"];
   const [fetchedCount, setFetchedCount] = useState<number | null>(null);
   const [selectedApiId, setSelectedApiId] = useState(defaultApis[0]?.id || "");
 
@@ -325,6 +327,19 @@ const SendMessagePage = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Sender ID Selection */}
+              {(channel === "sms" || channel === "whatsapp") && (
+                <div>
+                  <Label className="text-foreground text-sm">Sender ID / Header</Label>
+                  <Select value={selectedSenderId} onValueChange={setSelectedSenderId}>
+                    <SelectTrigger className="mt-1.5"><SelectValue placeholder="Select Sender ID" /></SelectTrigger>
+                    <SelectContent>
+                      {senderIds.map(sid => <SelectItem key={sid} value={sid}>{sid}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
               {/* Template Selection */}
               <div>
                 <Label className="text-foreground text-sm">Template</Label>

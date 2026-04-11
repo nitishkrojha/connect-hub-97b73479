@@ -224,16 +224,23 @@ const ProjectConfigPage = () => {
           <Card className="shadow-card mt-4">
             <CardHeader><CardTitle className="text-base">SMS Settings</CardTitle></CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div><Label className="text-foreground text-sm">Sender ID</Label><Input defaultValue="DICNTFY" className="mt-1.5" /></div>
-                <div><Label className="text-foreground text-sm">DLT Template Header</Label><Input defaultValue="1101456780000067890" className="mt-1.5" /></div>
-                {configSource === "own" && (
-                  <>
-                    <div><Label className="text-foreground text-sm">API Endpoint</Label><Input placeholder="https://sms-provider.com/api/send" className="mt-1.5" /></div>
-                    <div><Label className="text-foreground text-sm">API Key</Label><Input type="password" placeholder="Your SMS API Key" className="mt-1.5" /></div>
-                  </>
-                )}
+              <div>
+                <Label className="text-foreground text-sm font-semibold">Sender IDs (Headers)</Label>
+                <p className="text-xs text-muted-foreground mb-2">Add multiple sender IDs. These will be available for selection while sending messages.</p>
+                {["DICNTFY", "MYBHRT"].map((sid, i) => (
+                  <div key={i} className="flex items-center gap-2 mb-2">
+                    <Input defaultValue={sid} className="flex-1" />
+                    <Badge variant="outline" className="text-xs">Active</Badge>
+                  </div>
+                ))}
+                <Button variant="outline" size="sm" className="mt-1"><Plus className="w-3.5 h-3.5 mr-1" /> Add Sender ID</Button>
               </div>
+              {configSource === "own" && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div><Label className="text-foreground text-sm">API Endpoint</Label><Input placeholder="https://sms-provider.com/api/send" className="mt-1.5" /></div>
+                  <div><Label className="text-foreground text-sm">API Key</Label><Input type="password" placeholder="Your SMS API Key" className="mt-1.5" /></div>
+                </div>
+              )}
               <div className="flex items-center gap-3">
                 <Switch defaultChecked /><Label className="text-foreground text-sm">Enable Unicode</Label>
               </div>
@@ -248,7 +255,7 @@ const ProjectConfigPage = () => {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div><Label className="text-foreground text-sm">Business Display Name</Label><Input defaultValue="My Bharat" className="mt-1.5" /></div>
-                <div><Label className="text-foreground text-sm">Template Namespace</Label><Input defaultValue="mybharat_templates" className="mt-1.5" /></div>
+                <div><Label className="text-foreground text-sm">WhatsApp Business Number</Label><Input defaultValue="+91 98765 00001" className="mt-1.5" /></div>
                 {configSource === "own" && (
                   <>
                     <div><Label className="text-foreground text-sm">WhatsApp Business API URL</Label><Input placeholder="https://graph.facebook.com/v17.0/..." className="mt-1.5" /></div>

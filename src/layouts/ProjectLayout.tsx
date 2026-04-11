@@ -64,17 +64,20 @@ const ProjectLayout = () => {
       </nav>
 
       <div className="p-3 border-t border-sidebar-border">
-        <div className={cn("flex items-center gap-3 px-3 py-2 mb-2", collapsed && "justify-center")}>
+        <button
+          onClick={() => { navigate("/project/profile"); setMobileOpen(false); }}
+          className={cn("flex items-center gap-3 px-3 py-2 mb-2 w-full rounded-lg hover:bg-sidebar-accent/50 transition-colors", collapsed && "justify-center")}
+        >
           <div className="w-8 h-8 rounded-full bg-channel-whatsapp flex items-center justify-center text-xs font-bold text-primary-foreground flex-shrink-0">
             {user?.projectName?.charAt(0) ?? "P"}
           </div>
           {!collapsed && (
-            <div className="min-w-0">
+            <div className="min-w-0 text-left">
               <p className="text-sm font-medium text-sidebar-foreground truncate">{user?.projectName}</p>
               <p className="text-xs text-sidebar-muted truncate">{user?.email}</p>
             </div>
           )}
-        </div>
+        </button>
         <Button
           variant="ghost"
           size="sm"

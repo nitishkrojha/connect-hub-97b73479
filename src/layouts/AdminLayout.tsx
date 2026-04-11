@@ -62,17 +62,20 @@ const AdminLayout = () => {
       </nav>
 
       <div className="p-3 border-t border-sidebar-border">
-        <div className={cn("flex items-center gap-3 px-3 py-2 mb-2", collapsed && "justify-center")}>
+        <button
+          onClick={() => { navigate("/admin/profile"); setMobileOpen(false); }}
+          className={cn("flex items-center gap-3 px-3 py-2 mb-2 w-full rounded-lg hover:bg-sidebar-accent/50 transition-colors", collapsed && "justify-center")}
+        >
           <div className="w-8 h-8 rounded-full gradient-primary flex items-center justify-center text-xs font-bold text-primary-foreground flex-shrink-0">
             {user?.name?.charAt(0) ?? "A"}
           </div>
           {!collapsed && (
-            <div className="min-w-0">
+            <div className="min-w-0 text-left">
               <p className="text-sm font-medium text-sidebar-foreground truncate">{user?.name}</p>
               <p className="text-xs text-sidebar-muted truncate">{user?.email}</p>
             </div>
           )}
-        </div>
+        </button>
         <Button
           variant="ghost"
           size="sm"

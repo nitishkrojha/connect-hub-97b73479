@@ -5,7 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageSquare, Shield, Building2, Send } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Shield, Building2, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -16,9 +18,16 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!termsAccepted) {
+      toast.error("Please accept the Terms & Conditions to continue.");
+      return;
+    }
     setLoading(true);
     setTimeout(() => {
       const success = login(email, password, role);
@@ -30,6 +39,17 @@ const LoginPage = () => {
       }
       setLoading(false);
     }, 600);
+  };
+
+  const handleForgotPassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!forgotEmail.trim()) {
+      toast.error("Please enter your email address.");
+      return;
+    }
+    toast.success("Password reset link sent to " + forgotEmail);
+    setShowForgotPassword(false);
+    setForgotEmail("");
   };
 
   return (
@@ -112,7 +132,16 @@ const LoginPage = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-foreground">Password</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password" className="text-foreground">Password</Label>
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotPassword(true)}
+                      className="text-xs text-primary hover:text-primary/80 hover:underline transition-colors"
+                    >
+                      Forgot Password?
+                    </button>
+                  </div>
                   <Input
                     id="password"
                     type="password"
@@ -122,7 +151,24 @@ const LoginPage = () => {
                     required
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+
+                {/* Terms & Conditions */}
+                <div className="flex items-start gap-2">
+                  <Checkbox
+                    id="terms"
+                    checked={termsAccepted}
+                    onCheckedChange={(checked) => setTermsAccepted(checked === true)}
+                    className="mt-0.5"
+                  />
+                  <label htmlFor="terms" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
+                    I agree to the{" "}
+                    <span className="text-primary hover:underline cursor-pointer font-medium">Terms & Conditions</span>{" "}
+                    and{" "}
+                    <span className="text-primary hover:underline cursor-pointer font-medium">Privacy Policy</span>
+                  </label>
+                </div>
+
+                <Button type="submit" className="w-full" disabled={loading || !termsAccepted}>
                   {loading ? "Signing in..." : "Sign In"}
                 </Button>
               </form>
@@ -136,6 +182,32 @@ const LoginPage = () => {
           </Card>
         </div>
       </div>
+
+      {/* Forgot Password Dialog */}
+      <Dialog open={showForgotPassword} onOpenChange={setShowForgotPassword}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Reset Password</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleForgotPassword} className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Enter your registered email address and we'll send you a password reset link.
+            </p>
+            <div className="space-y-2">
+              <Label htmlFor="forgot-email" className="text-foreground">Email Address</Label>
+              <Input
+                id="forgot-email"
+                type="email"
+                placeholder="Enter your email"
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full">Send Reset Link</Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

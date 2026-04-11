@@ -465,7 +465,7 @@ const ProjectConfigPage = () => {
             </div>
 
             <Button className="w-full" onClick={handleAddApi}>
-              <Plus className="w-4 h-4 mr-2" /> Add Endpoint
+              <Check className="w-4 h-4 mr-2" /> Validate & Add API
             </Button>
           </div>
         </DialogContent>

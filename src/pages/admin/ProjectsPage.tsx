@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import {
   Plus, Search, MoreHorizontal, Building2, ArrowRight, ArrowLeft,
   Check, Phone, MessageSquare, Mail, Sparkles, User, Gauge, Eye,
-  Upload, FileText, Shield, Power, PowerOff,
+  Upload, FileText, Shield, Power, PowerOff, Server, Key,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -37,14 +37,15 @@ interface Project {
   approvalNote?: string;
   approvalFileName?: string;
   smsApproved?: boolean;
+  commPartner?: "notifier" | "own";
 }
 
 const initialProjects: Project[] = [
-  { id: 1, name: "My Bharat", code: "MYBRT", contact: "Ravi Kumar", dept: "Youth Affairs", channels: ["SMS", "WhatsApp", "Email"], quota: 25000, used: 17300, status: "Active", headName: "Ravi Kumar", headEmail: "ravi@mybharat.gov.in", headMobile: "+91 98765 43210", headDesignation: "Project Director", smsApproved: true },
-  { id: 2, name: "Kisan Sarathi", code: "KSRTH", contact: "Priya S.", dept: "Agriculture", channels: ["SMS", "Email"], quota: 30000, used: 24100, status: "Active", headName: "Priya Sharma", headEmail: "priya@kisansarathi.gov.in", headMobile: "+91 87654 32109", headDesignation: "Program Manager", smsApproved: true },
-  { id: 3, name: "Manas", code: "MANAS", contact: "Dr. Mehta", dept: "Healthcare", channels: ["SMS", "WhatsApp", "Email", "RCS"], quota: 20000, used: 19800, status: "Active", headName: "Dr. Arun Mehta", headEmail: "mehta@manas.gov.in", headMobile: "+91 76543 21098", headDesignation: "Chief Medical Officer", smsApproved: true },
-  { id: 4, name: "E Saras", code: "ESARS", contact: "Anita R.", dept: "Rural Development", channels: ["Email", "WhatsApp"], quota: 15000, used: 16200, status: "Active", headName: "Anita Rao", headEmail: "anita@esaras.gov.in", headMobile: "+91 65432 10987", headDesignation: "District Coordinator", smsApproved: false },
-  { id: 5, name: "India Handmade", code: "IHDMD", contact: "Vikram J.", dept: "Handicrafts", channels: ["SMS", "RCS"], quota: 10000, used: 3500, status: "Inactive", headName: "Vikram Joshi", headEmail: "vikram@indiahandmade.gov.in", headMobile: "+91 54321 09876", headDesignation: "Head of Operations", smsApproved: true },
+  { id: 1, name: "My Bharat", code: "MYBRT", contact: "Ravi Kumar", dept: "Youth Affairs", channels: ["SMS", "WhatsApp", "Email"], quota: 25000, used: 17300, status: "Active", headName: "Ravi Kumar", headEmail: "ravi@mybharat.gov.in", headMobile: "+91 98765 43210", headDesignation: "Project Director", smsApproved: true, commPartner: "notifier" },
+  { id: 2, name: "Kisan Sarathi", code: "KSRTH", contact: "Priya S.", dept: "Agriculture", channels: ["SMS", "Email"], quota: 30000, used: 24100, status: "Active", headName: "Priya Sharma", headEmail: "priya@kisansarathi.gov.in", headMobile: "+91 87654 32109", headDesignation: "Program Manager", smsApproved: true, commPartner: "notifier" },
+  { id: 3, name: "Manas", code: "MANAS", contact: "Dr. Mehta", dept: "Healthcare", channels: ["SMS", "WhatsApp", "Email", "RCS"], quota: 20000, used: 19800, status: "Active", headName: "Dr. Arun Mehta", headEmail: "mehta@manas.gov.in", headMobile: "+91 76543 21098", headDesignation: "Chief Medical Officer", smsApproved: true, commPartner: "own" },
+  { id: 4, name: "E Saras", code: "ESARS", contact: "Anita R.", dept: "Rural Development", channels: ["Email", "WhatsApp"], quota: 15000, used: 16200, status: "Active", headName: "Anita Rao", headEmail: "anita@esaras.gov.in", headMobile: "+91 65432 10987", headDesignation: "District Coordinator", smsApproved: false, commPartner: "notifier" },
+  { id: 5, name: "India Handmade", code: "IHDMD", contact: "Vikram J.", dept: "Handicrafts", channels: ["SMS", "RCS"], quota: 10000, used: 3500, status: "Inactive", headName: "Vikram Joshi", headEmail: "vikram@indiahandmade.gov.in", headMobile: "+91 54321 09876", headDesignation: "Head of Operations", smsApproved: true, commPartner: "own" },
 ];
 
 const channelColor: Record<string, string> = {
@@ -55,19 +56,19 @@ const channelColor: Record<string, string> = {
 };
 
 const channelOptions = [
-  { id: "SMS", icon: Phone, color: "text-channel-sms", bg: "bg-channel-sms/10", needsApproval: true },
-  { id: "WhatsApp", icon: MessageSquare, color: "text-channel-whatsapp", bg: "bg-channel-whatsapp/10", needsApproval: false },
-  { id: "Email", icon: Mail, color: "text-channel-email", bg: "bg-channel-email/10", needsApproval: false },
-  { id: "RCS", icon: Sparkles, color: "text-channel-rcs", bg: "bg-channel-rcs/10", needsApproval: false },
+  { id: "SMS", icon: Phone, color: "text-channel-sms", bg: "bg-channel-sms/10" },
+  { id: "WhatsApp", icon: MessageSquare, color: "text-channel-whatsapp", bg: "bg-channel-whatsapp/10" },
+  { id: "Email", icon: Mail, color: "text-channel-email", bg: "bg-channel-email/10" },
+  { id: "RCS", icon: Sparkles, color: "text-channel-rcs", bg: "bg-channel-rcs/10" },
 ];
 
 const departments = ["Youth Affairs", "Agriculture", "Healthcare", "Education", "Rural Development", "Handicrafts", "IT", "Finance", "Marketing", "Operations"];
 
 const steps = [
-  { label: "Project Details", icon: Building2 },
-  { label: "Project Head", icon: User },
-  { label: "Approval & Channels", icon: Shield },
-  { label: "Quota Settings", icon: Gauge },
+  { label: "Details", icon: Building2 },
+  { label: "Head", icon: User },
+  { label: "Channels", icon: Shield },
+  { label: "Partner", icon: Server },
   { label: "Review", icon: Eye },
 ];
 
@@ -81,16 +82,13 @@ const ProjectsPage = () => {
 
   const [form, setForm] = useState({
     name: "", code: "", dept: "", description: "",
-    // Project Head
     headName: "", headEmail: "", headMobile: "", headDesignation: "",
-    // Approval
     approvalFile: null as File | null,
     approvalFileName: "",
-    smsApproved: false,
-    // Channels
     channels: [] as string[],
-    // Quota
+    commPartner: "notifier" as "notifier" | "own",
     monthlyQuota: "10000",
+    dailyQuota: "1000",
     smsQuota: "", whatsappQuota: "", emailQuota: "", rcsQuota: "",
     status: "Active" as "Active" | "Inactive",
   });
@@ -99,8 +97,8 @@ const ProjectsPage = () => {
     setForm({
       name: "", code: "", dept: "", description: "",
       headName: "", headEmail: "", headMobile: "", headDesignation: "",
-      approvalFile: null, approvalFileName: "", smsApproved: false,
-      channels: [], monthlyQuota: "10000",
+      approvalFile: null, approvalFileName: "",
+      channels: [], commPartner: "notifier", monthlyQuota: "10000", dailyQuota: "1000",
       smsQuota: "", whatsappQuota: "", emailQuota: "", rcsQuota: "",
       status: "Active",
     });
@@ -108,10 +106,6 @@ const ProjectsPage = () => {
   };
 
   const toggleChannel = (ch: string) => {
-    if (ch === "SMS" && !form.smsApproved) {
-      toast.error("SMS requires an approved Approval Note. Please upload in Step 3.");
-      return;
-    }
     setForm((prev) => ({
       ...prev,
       channels: prev.channels.includes(ch) ? prev.channels.filter((c) => c !== ch) : [...prev.channels, ch],
@@ -129,12 +123,10 @@ const ProjectsPage = () => {
     if (step === 0) return form.name && form.code && form.dept;
     if (step === 1) return form.headName && form.headEmail && form.headDesignation;
     if (step === 2) return form.channels.length > 0;
-    if (step === 3) return Number(form.monthlyQuota) > 0;
     return true;
   };
 
   const handleSubmit = () => {
-    const generatedPassword = `DIC${form.code}${Math.random().toString(36).slice(-6)}!`;
     const newProject: Project = {
       id: projects.length + 1,
       name: form.name,
@@ -142,7 +134,7 @@ const ProjectsPage = () => {
       contact: form.headName,
       dept: form.dept,
       channels: form.channels,
-      quota: Number(form.monthlyQuota),
+      quota: form.commPartner === "notifier" ? Number(form.monthlyQuota) : 0,
       used: 0,
       status: form.status,
       email: form.headEmail,
@@ -153,7 +145,7 @@ const ProjectsPage = () => {
       headMobile: form.headMobile,
       headDesignation: form.headDesignation,
       approvalFileName: form.approvalFileName,
-      smsApproved: form.smsApproved,
+      commPartner: form.commPartner,
     };
     setProjects([newProject, ...projects]);
     setDialogOpen(false);
@@ -266,7 +258,7 @@ const ProjectsPage = () => {
                 <div><p className="text-muted-foreground text-xs">Project Code</p><p className="font-medium text-foreground">{viewProject.code}</p></div>
                 <div><p className="text-muted-foreground text-xs">Department</p><p className="font-medium text-foreground">{viewProject.dept}</p></div>
                 <div><p className="text-muted-foreground text-xs">Status</p><Badge variant={viewProject.status === "Active" ? "default" : "secondary"}>{viewProject.status}</Badge></div>
-                <div><p className="text-muted-foreground text-xs">SMS Approved</p><Badge variant={viewProject.smsApproved ? "default" : "secondary"}>{viewProject.smsApproved ? "Yes" : "No"}</Badge></div>
+                <div><p className="text-muted-foreground text-xs">Comm. Partner</p><Badge variant="secondary">{viewProject.commPartner === "own" ? "Own" : "DIC Notifier"}</Badge></div>
               </div>
               <hr className="border-border" />
               <div>
@@ -292,13 +284,15 @@ const ProjectsPage = () => {
                   </div>
                 </div>
               )}
-              <div>
-                <p className="text-muted-foreground text-xs mb-1">Quota Usage</p>
-                <p className="text-sm font-medium text-foreground">{viewProject.used.toLocaleString()} / {viewProject.quota.toLocaleString()} messages</p>
-                <div className="w-full bg-muted rounded-full h-2 mt-1.5">
-                  <div className="bg-primary rounded-full h-2 transition-all" style={{ width: `${Math.min((viewProject.used / viewProject.quota) * 100, 100)}%` }} />
+              {viewProject.commPartner !== "own" && (
+                <div>
+                  <p className="text-muted-foreground text-xs mb-1">Quota Usage</p>
+                  <p className="text-sm font-medium text-foreground">{viewProject.used.toLocaleString()} / {viewProject.quota.toLocaleString()} messages</p>
+                  <div className="w-full bg-muted rounded-full h-2 mt-1.5">
+                    <div className="bg-primary rounded-full h-2 transition-all" style={{ width: `${Math.min((viewProject.used / viewProject.quota) * 100, 100)}%` }} />
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
         </DialogContent>
@@ -306,18 +300,18 @@ const ProjectsPage = () => {
 
       {/* === Add Project Wizard Dialog === */}
       <Dialog open={dialogOpen} onOpenChange={(o) => { setDialogOpen(o); if (!o) resetForm(); }}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden">
           <DialogHeader>
             <DialogTitle>Onboard New Project</DialogTitle>
-            <DialogDescription>Complete all steps to add a new project to the platform</DialogDescription>
+            <DialogDescription>Complete all steps to add a new project</DialogDescription>
           </DialogHeader>
 
           {/* Step indicator */}
-          <div className="flex items-center gap-1 mb-2">
+          <div className="flex items-center gap-1 mb-2 overflow-hidden">
             {steps.map((s, i) => (
-              <div key={i} className="flex items-center flex-1">
+              <div key={i} className="flex items-center flex-1 min-w-0">
                 <div className={cn(
-                  "flex items-center gap-2 px-2 py-2 rounded-lg text-xs font-medium transition-all w-full",
+                  "flex items-center gap-1.5 px-2 py-2 rounded-lg text-xs font-medium transition-all w-full min-w-0",
                   i === step ? "bg-primary/10 text-primary" : i < step ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"
                 )}>
                   <div className={cn(
@@ -328,7 +322,7 @@ const ProjectsPage = () => {
                   </div>
                   <span className="hidden lg:inline truncate text-[11px]">{s.label}</span>
                 </div>
-                {i < steps.length - 1 && <div className={cn("w-3 h-0.5 flex-shrink-0 mx-0.5", i < step ? "bg-success" : "bg-border")} />}
+                {i < steps.length - 1 && <div className={cn("w-2 h-0.5 flex-shrink-0 mx-0.5", i < step ? "bg-success" : "bg-border")} />}
               </div>
             ))}
           </div>
@@ -372,7 +366,7 @@ const ProjectsPage = () => {
             <div className="space-y-4">
               <div className="p-3 rounded-lg bg-info/5 border border-info/20 text-sm text-foreground">
                 <p className="font-medium mb-1">📧 Auto-generated Login Credentials</p>
-                <p className="text-muted-foreground text-xs">A welcome onboarding email with auto-generated password will be sent to the Project Head's email. No need to set a password manually.</p>
+                <p className="text-muted-foreground text-xs">A welcome onboarding email with auto-generated password will be sent to the Project Head's email.</p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
@@ -396,80 +390,59 @@ const ProjectsPage = () => {
             </div>
           )}
 
-          {/* Step 2: Approval & Channels */}
+          {/* Step 2: Approval (optional) & Channels */}
           {step === 2 && (
             <div className="space-y-5">
-              {/* Approval Note Upload */}
+              {/* Approval Note Upload - Optional */}
               <div>
-                <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2"><Shield className="w-4 h-4 text-muted-foreground" /> Service Approval Note</h3>
-                <p className="text-xs text-muted-foreground mb-3">Upload the PDF/document of service approval from the authority. SMS service will only be enabled if approved.</p>
-                <div className="border-2 border-dashed border-border rounded-lg p-5 text-center hover:border-primary/40 transition-colors">
-                  <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground mb-2">Upload Approval Note (PDF, DOC, JPG)</p>
+                <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2"><Shield className="w-4 h-4 text-muted-foreground" /> Service Approval Note <span className="text-xs font-normal text-muted-foreground">(Optional)</span></h3>
+                <p className="text-xs text-muted-foreground mb-3">Upload the PDF/document of service approval from the authority, if available.</p>
+                <div className="border-2 border-dashed border-border rounded-lg p-4 text-center hover:border-primary/40 transition-colors">
+                  <Upload className="w-6 h-6 text-muted-foreground mx-auto mb-2" />
+                  <p className="text-xs text-muted-foreground mb-2">Upload Approval Note (PDF, DOC, JPG)</p>
                   <input type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onChange={handleApprovalUpload} className="hidden" id="approval-upload" />
                   <Button variant="outline" size="sm" onClick={() => document.getElementById("approval-upload")?.click()}>Choose File</Button>
                   {form.approvalFileName && (
-                    <div className="mt-3 flex items-center justify-center gap-2 text-sm text-foreground">
+                    <div className="mt-2 flex items-center justify-center gap-2 text-sm text-foreground">
                       <FileText className="w-4 h-4 text-primary" />
-                      <span>{form.approvalFileName}</span>
-                      <Check className="w-4 h-4 text-success" />
+                      <span className="text-xs">{form.approvalFileName}</span>
+                      <Check className="w-3 h-3 text-success" />
                     </div>
                   )}
                 </div>
-                {form.approvalFileName && (
-                  <div className="flex items-center gap-3 mt-3 p-3 rounded-lg bg-muted/50">
-                    <Switch checked={form.smsApproved} onCheckedChange={(v) => {
-                      setForm(prev => ({
-                        ...prev,
-                        smsApproved: v,
-                        channels: v ? prev.channels : prev.channels.filter(c => c !== "SMS"),
-                      }));
-                    }} />
-                    <div>
-                      <p className="text-sm font-medium text-foreground">SMS Service Approved</p>
-                      <p className="text-xs text-muted-foreground">Enable SMS based on the uploaded approval note</p>
-                    </div>
-                  </div>
-                )}
               </div>
 
               <hr className="border-border" />
 
-              {/* Channel Selection */}
+              {/* Channel Selection - SMS is NOT locked */}
               <div>
                 <h3 className="text-sm font-semibold text-foreground mb-3">Select Communication Channels</h3>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   {channelOptions.map((ch) => {
                     const selected = form.channels.includes(ch.id);
-                    const smsLocked = ch.id === "SMS" && !form.smsApproved;
                     return (
                       <button
                         key={ch.id}
                         onClick={() => toggleChannel(ch.id)}
-                        disabled={smsLocked}
                         className={cn(
-                          "flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left",
-                          smsLocked ? "border-border bg-muted/30 opacity-50 cursor-not-allowed" :
+                          "flex items-center gap-3 p-3 rounded-xl border-2 transition-all text-left",
                           selected ? `${ch.bg} border-current ${ch.color}` : "border-border bg-card hover:bg-muted/50"
                         )}
                       >
-                        <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center", selected ? ch.bg : "bg-muted")}>
-                          <ch.icon className={cn("w-6 h-6", selected ? ch.color : "text-muted-foreground")} />
+                        <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0", selected ? ch.bg : "bg-muted")}>
+                          <ch.icon className={cn("w-5 h-5", selected ? ch.color : "text-muted-foreground")} />
                         </div>
-                        <div className="flex-1">
-                          <p className={cn("font-semibold", selected ? "text-foreground" : "text-muted-foreground")}>
-                            {ch.id}
-                            {smsLocked && <span className="text-xs font-normal ml-1">(Needs Approval)</span>}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
+                        <div className="flex-1 min-w-0">
+                          <p className={cn("font-semibold text-sm", selected ? "text-foreground" : "text-muted-foreground")}>{ch.id}</p>
+                          <p className="text-xs text-muted-foreground truncate">
                             {ch.id === "SMS" && "Text messages & OTP"}
                             {ch.id === "WhatsApp" && "Template messages"}
-                            {ch.id === "Email" && "HTML emails & attachments"}
-                            {ch.id === "RCS" && "Rich media messages"}
+                            {ch.id === "Email" && "HTML emails"}
+                            {ch.id === "RCS" && "Rich media"}
                           </p>
                         </div>
                         <div className={cn(
-                          "w-6 h-6 rounded-full border-2 flex items-center justify-center",
+                          "w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0",
                           selected ? "border-primary bg-primary" : "border-border"
                         )}>
                           {selected && <Check className="w-3 h-3 text-primary-foreground" />}
@@ -482,27 +455,74 @@ const ProjectsPage = () => {
             </div>
           )}
 
-          {/* Step 3: Quota */}
+          {/* Step 3: Communication Partner & Quota */}
           {step === 3 && (
-            <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-foreground flex items-center gap-2"><Gauge className="w-4 h-4 text-muted-foreground" /> Quota Settings</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5 sm:col-span-2">
-                  <Label className="text-foreground">Monthly Message Quota <span className="text-destructive">*</span></Label>
-                  <Input type="number" placeholder="e.g., 50000" value={form.monthlyQuota} onChange={(e) => setForm({ ...form, monthlyQuota: e.target.value })} />
-                </div>
-                {form.channels.map((ch) => (
-                  <div key={ch} className="space-y-1.5">
-                    <Label className="text-foreground">{ch} Limit <span className="text-muted-foreground text-xs">(optional)</span></Label>
-                    <Input
-                      type="number"
-                      placeholder="No limit"
-                      value={(form as any)[`${ch.toLowerCase()}Quota`] || ""}
-                      onChange={(e) => setForm({ ...form, [`${ch.toLowerCase()}Quota`]: e.target.value })}
-                    />
+            <div className="space-y-5">
+              <h3 className="text-sm font-semibold text-foreground flex items-center gap-2"><Server className="w-4 h-4 text-muted-foreground" /> Communication Partner</h3>
+              <p className="text-xs text-muted-foreground">Will this project use DIC Notifier's communication infrastructure, or their own provider?</p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button
+                  onClick={() => setForm(p => ({ ...p, commPartner: "notifier" }))}
+                  className={cn(
+                    "p-4 rounded-xl border-2 text-left transition-all",
+                    form.commPartner === "notifier" ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"
+                  )}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <Server className="w-4 h-4 text-primary" />
+                    <span className="font-semibold text-foreground text-sm">DIC Notifier Service</span>
                   </div>
-                ))}
+                  <p className="text-xs text-muted-foreground">Use platform's built-in services. Quota managed by admin.</p>
+                </button>
+                <button
+                  onClick={() => setForm(p => ({ ...p, commPartner: "own" }))}
+                  className={cn(
+                    "p-4 rounded-xl border-2 text-left transition-all",
+                    form.commPartner === "own" ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"
+                  )}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <Key className="w-4 h-4 text-primary" />
+                    <span className="font-semibold text-foreground text-sm">Own Configuration</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Project uses their own provider APIs. Quota set by project head.</p>
+                </button>
               </div>
+
+              {form.commPartner === "notifier" && (
+                <>
+                  <hr className="border-border" />
+                  <h3 className="text-sm font-semibold text-foreground flex items-center gap-2"><Gauge className="w-4 h-4 text-muted-foreground" /> Quota Settings</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label className="text-foreground">Monthly Quota <span className="text-destructive">*</span></Label>
+                      <Input type="number" placeholder="e.g., 50000" value={form.monthlyQuota} onChange={(e) => setForm({ ...form, monthlyQuota: e.target.value })} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-foreground">Daily Quota</Label>
+                      <Input type="number" placeholder="e.g., 2000" value={form.dailyQuota} onChange={(e) => setForm({ ...form, dailyQuota: e.target.value })} />
+                    </div>
+                    {form.channels.map((ch) => (
+                      <div key={ch} className="space-y-1.5">
+                        <Label className="text-foreground">{ch} Daily Limit <span className="text-muted-foreground text-xs">(optional)</span></Label>
+                        <Input
+                          type="number"
+                          placeholder="No limit"
+                          value={(form as any)[`${ch.toLowerCase()}Quota`] || ""}
+                          onChange={(e) => setForm({ ...form, [`${ch.toLowerCase()}Quota`]: e.target.value })}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {form.commPartner === "own" && (
+                <div className="p-3 rounded-lg bg-warning/5 border border-warning/20 text-sm text-muted-foreground">
+                  <p className="text-xs">The project head can configure their own communication provider APIs and set quota limits from their project panel after onboarding.</p>
+                </div>
+              )}
             </div>
           )}
 
@@ -531,15 +551,17 @@ const ProjectsPage = () => {
                   </div>
                   <hr className="border-border" />
                   <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div><p className="text-muted-foreground text-xs">Monthly Quota</p><p className="text-foreground font-medium">{Number(form.monthlyQuota).toLocaleString()}</p></div>
-                    <div><p className="text-muted-foreground text-xs">SMS Approved</p><Badge variant={form.smsApproved ? "default" : "secondary"}>{form.smsApproved ? "Yes" : "No"}</Badge></div>
+                    <div><p className="text-muted-foreground text-xs">Comm. Partner</p><Badge variant="secondary">{form.commPartner === "notifier" ? "DIC Notifier" : "Own Provider"}</Badge></div>
+                    {form.commPartner === "notifier" && (
+                      <div><p className="text-muted-foreground text-xs">Monthly Quota</p><p className="text-foreground font-medium">{Number(form.monthlyQuota).toLocaleString()}</p></div>
+                    )}
                   </div>
                   {form.approvalFileName && (
                     <div><p className="text-muted-foreground text-xs mb-1">Approval Note</p><p className="text-sm text-foreground flex items-center gap-1"><FileText className="w-3.5 h-3.5" /> {form.approvalFileName}</p></div>
                   )}
                   <div>
                     <p className="text-muted-foreground text-xs mb-1.5">Channels</p>
-                    <div className="flex gap-2">{form.channels.map((ch) => <span key={ch} className={`text-xs px-2 py-0.5 rounded-full font-medium ${channelColor[ch]}`}>{ch}</span>)}</div>
+                    <div className="flex gap-2 flex-wrap">{form.channels.map((ch) => <span key={ch} className={`text-xs px-2 py-0.5 rounded-full font-medium ${channelColor[ch]}`}>{ch}</span>)}</div>
                   </div>
                   {form.description && (
                     <div><p className="text-muted-foreground text-xs mb-1">Description</p><p className="text-sm text-foreground">{form.description}</p></div>

@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Download, Search, Megaphone, Eye, MousePointerClick } from "lucide-react";
+import { Download, Search, Megaphone, Eye, MousePointerClick, Send as SendIcon } from "lucide-react";
 import { useState } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -37,6 +37,18 @@ const campaignReports = [
   { id: 6, name: "Password Reset Batch", channel: "Email", status: "Completed", sent: 340, delivered: 338, failed: 2, opened: 310, clicked: 290, rate: 99.4, date: "Jun 3, 2025" },
 ];
 
+// Direct (non-campaign) messages
+const directMessages = [
+  { id: 1, recipient: "+91 98765 43210", channel: "SMS", template: "OTP Verification", status: "Delivered", senderId: "DICNTFY", sentAt: "Jun 9, 2025 14:32", deliveredAt: "Jun 9, 2025 14:32" },
+  { id: 2, recipient: "+91 98765 43211", channel: "SMS", template: "OTP Verification", status: "Delivered", senderId: "MYBHRT", sentAt: "Jun 9, 2025 14:30", deliveredAt: "Jun 9, 2025 14:30" },
+  { id: 3, recipient: "+91 98765 43212", channel: "WhatsApp", template: "Welcome Message", status: "Delivered", senderId: "My Bharat", sentAt: "Jun 9, 2025 13:15", deliveredAt: "Jun 9, 2025 13:15" },
+  { id: 4, recipient: "ravi@mybharat.gov.in", channel: "Email", template: "Welcome Email", status: "Delivered", senderId: "noreply@mybharat.gov.in", sentAt: "Jun 9, 2025 12:00", deliveredAt: "Jun 9, 2025 12:01" },
+  { id: 5, recipient: "+91 98765 43213", channel: "SMS", template: "Custom", status: "Failed", senderId: "DICNTFY", sentAt: "Jun 9, 2025 11:45", deliveredAt: "—" },
+  { id: 6, recipient: "+91 98765 43214", channel: "WhatsApp", template: "Appointment Reminder", status: "Delivered", senderId: "My Bharat", sentAt: "Jun 8, 2025 16:20", deliveredAt: "Jun 8, 2025 16:20" },
+  { id: 7, recipient: "+91 98765 43215", channel: "SMS", template: "Custom", status: "Delivered", senderId: "MYBHRT", sentAt: "Jun 8, 2025 15:00", deliveredAt: "Jun 8, 2025 15:00" },
+  { id: 8, recipient: "priya@test.com", channel: "Email", template: "Invoice", status: "Delivered", senderId: "noreply@mybharat.gov.in", sentAt: "Jun 8, 2025 10:30", deliveredAt: "Jun 8, 2025 10:31" },
+];
+
 const csvUploads = [
   { file: "users_batch_1.csv", date: "Jun 8", total: 2400, valid: 2310, invalid: 62, duplicates: 28 },
   { file: "promo_list.csv", date: "Jun 5", total: 5200, valid: 4980, invalid: 140, duplicates: 80 },
@@ -54,11 +66,21 @@ const statusStyle: Record<string, string> = {
   Completed: "bg-success/10 text-success",
   "Partially Failed": "bg-warning/10 text-warning",
   Failed: "bg-destructive/10 text-destructive",
+  Delivered: "bg-success/10 text-success",
+  Pending: "bg-warning/10 text-warning",
 };
 
 const ProjectReportsPage = () => {
   const [period, setPeriod] = useState("weekly");
   const [tab, setTab] = useState("overview");
+  const [directSearch, setDirectSearch] = useState("");
+  const [directChannelFilter, setDirectChannelFilter] = useState("all");
+
+  const filteredDirect = directMessages.filter(m => {
+    const matchSearch = m.recipient.toLowerCase().includes(directSearch.toLowerCase()) || m.template.toLowerCase().includes(directSearch.toLowerCase());
+    const matchChannel = directChannelFilter === "all" || m.channel === directChannelFilter;
+    return matchSearch && matchChannel;
+  });
 
   return (
     <div className="space-y-6">
@@ -81,9 +103,10 @@ const ProjectReportsPage = () => {
       </div>
 
       <Tabs value={tab} onValueChange={setTab}>
-        <TabsList>
+        <TabsList className="flex-wrap">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="campaigns">Campaign-wise</TabsTrigger>
+          <TabsTrigger value="direct">Direct Messages</TabsTrigger>
           <TabsTrigger value="templates">Template-wise</TabsTrigger>
           <TabsTrigger value="uploads">CSV Uploads</TabsTrigger>
         </TabsList>
@@ -193,9 +216,7 @@ const ProjectReportsPage = () => {
                       <tr key={c.id} className="border-b border-border/50 last:border-0 hover:bg-muted/30">
                         <td className="p-3 font-medium text-foreground whitespace-nowrap">{c.name}</td>
                         <td className="p-3"><Badge variant="secondary" className="text-xs">{c.channel}</Badge></td>
-                        <td className="p-3">
-                          <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${statusStyle[c.status]}`}>{c.status}</span>
-                        </td>
+                        <td className="p-3"><span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${statusStyle[c.status]}`}>{c.status}</span></td>
                         <td className="p-3 text-foreground">{c.sent.toLocaleString()}</td>
                         <td className="p-3 text-success">{c.delivered.toLocaleString()}</td>
                         <td className="p-3 text-destructive">{c.failed.toLocaleString()}</td>
@@ -205,6 +226,79 @@ const ProjectReportsPage = () => {
                         <td className="p-3 text-muted-foreground text-xs whitespace-nowrap">{c.date}</td>
                       </tr>
                     ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Direct Messages */}
+        <TabsContent value="direct" className="space-y-6 mt-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { label: "Total Direct Messages", value: String(directMessages.length) },
+              { label: "Delivered", value: String(directMessages.filter(m => m.status === "Delivered").length) },
+              { label: "Failed", value: String(directMessages.filter(m => m.status === "Failed").length) },
+              { label: "Success Rate", value: `${((directMessages.filter(m => m.status === "Delivered").length / directMessages.length) * 100).toFixed(1)}%` },
+            ].map((s) => (
+              <Card key={s.label} className="shadow-card">
+                <CardContent className="pt-4 pb-3">
+                  <p className="text-xs text-muted-foreground">{s.label}</p>
+                  <p className="text-xl font-bold text-foreground mt-1">{s.value}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <Card className="shadow-card">
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <SendIcon className="w-4 h-4 text-muted-foreground" />
+                  Direct Message Log
+                </CardTitle>
+                <div className="flex gap-2">
+                  <div className="relative w-48">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input placeholder="Search..." className="pl-9 h-9" value={directSearch} onChange={e => setDirectSearch(e.target.value)} />
+                  </div>
+                  <Select value={directChannelFilter} onValueChange={setDirectChannelFilter}>
+                    <SelectTrigger className="w-32 h-9"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Channels</SelectItem>
+                      <SelectItem value="SMS">SMS</SelectItem>
+                      <SelectItem value="WhatsApp">WhatsApp</SelectItem>
+                      <SelectItem value="Email">Email</SelectItem>
+                      <SelectItem value="RCS">RCS</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead><tr className="border-b border-border">
+                    {["Recipient", "Channel", "Sender ID", "Template", "Status", "Sent At", "Delivered At"].map(h => (
+                      <th key={h} className="text-left font-medium text-muted-foreground p-3 text-xs whitespace-nowrap">{h}</th>
+                    ))}
+                  </tr></thead>
+                  <tbody>
+                    {filteredDirect.map(m => (
+                      <tr key={m.id} className="border-b border-border/50 last:border-0 hover:bg-muted/30">
+                        <td className="p-3 font-mono text-xs text-foreground">{m.recipient}</td>
+                        <td className="p-3"><Badge variant="secondary" className="text-xs">{m.channel}</Badge></td>
+                        <td className="p-3 text-xs text-muted-foreground">{m.senderId}</td>
+                        <td className="p-3 text-foreground text-xs">{m.template}</td>
+                        <td className="p-3"><span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusStyle[m.status]}`}>{m.status}</span></td>
+                        <td className="p-3 text-xs text-muted-foreground whitespace-nowrap">{m.sentAt}</td>
+                        <td className="p-3 text-xs text-muted-foreground whitespace-nowrap">{m.deliveredAt}</td>
+                      </tr>
+                    ))}
+                    {filteredDirect.length === 0 && (
+                      <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">No direct messages found</td></tr>
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -230,9 +324,7 @@ const ProjectReportsPage = () => {
             ))}
           </div>
           <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle className="text-base">Template Performance</CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle className="text-base">Template Performance</CardTitle></CardHeader>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">

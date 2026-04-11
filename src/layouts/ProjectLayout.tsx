@@ -12,7 +12,7 @@ const projectNav = [
   { to: "/project", icon: LayoutDashboard, label: "Dashboard", end: true },
   { to: "/project/campaigns", icon: Megaphone, label: "Campaigns" },
   { to: "/project/send", icon: Send, label: "Send Message" },
-  { to: "/project/templates", icon: FileText, label: "Templates" },
+  { to: "/project/templates", icon: FileText, label: "Headers & Templates" },
   { to: "/project/upload", icon: Upload, label: "Upload Recipients" },
   { to: "/project/reports", icon: BarChart3, label: "Reports" },
   { to: "/project/config", icon: Settings2, label: "Configuration" },

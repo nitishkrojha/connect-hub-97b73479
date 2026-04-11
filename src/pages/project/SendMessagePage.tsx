@@ -12,9 +12,10 @@ import { toast } from "sonner";
 import {
   Send, Upload, Database, Phone, MessageSquare, Mail, Sparkles,
   FileText, X, Check, AlertCircle, Users, Plus, Trash2, Calendar,
-  Filter, Server,
+  Filter, Server, FolderOpen,
 } from "lucide-react";
 import { defaultApis, type ApiEndpoint, type ApiFilter } from "./ProjectConfigPage";
+import { useAuth } from "@/contexts/AuthContext";
 
 const templates: Record<string, { id: string; name: string; body: string; variables: string[] }[]> = {
   sms: [
@@ -34,7 +35,7 @@ const templates: Record<string, { id: string; name: string; body: string; variab
   ],
 };
 
-const channelConfig = [
+const allChannelConfig = [
   { id: "sms", label: "SMS", icon: Phone, colorClass: "border-channel-sms text-channel-sms", activeBg: "bg-channel-sms/5 border-channel-sms", iconBg: "bg-channel-sms/10" },
   { id: "whatsapp", label: "WhatsApp", icon: MessageSquare, colorClass: "border-channel-whatsapp text-channel-whatsapp", activeBg: "bg-channel-whatsapp/5 border-channel-whatsapp", iconBg: "bg-channel-whatsapp/10" },
   { id: "email", label: "Email", icon: Mail, colorClass: "border-channel-email text-channel-email", activeBg: "bg-channel-email/5 border-channel-email", iconBg: "bg-channel-email/10" },
@@ -43,14 +44,32 @@ const channelConfig = [
 
 const allVariables = ["name", "otp", "project_name", "date", "amount", "link"];
 
+// Previously uploaded CSVs
+const existingCsvUploads = [
+  { id: "csv-1", name: "users_batch_1.csv", uploadDate: "Jun 8, 2025", totalRecords: 2400, validRecords: 2310 },
+  { id: "csv-2", name: "promo_list.csv", uploadDate: "Jun 5, 2025", totalRecords: 5200, validRecords: 4980 },
+  { id: "csv-3", name: "otp_numbers.csv", uploadDate: "Jun 3, 2025", totalRecords: 890, validRecords: 878 },
+  { id: "csv-4", name: "event_attendees.csv", uploadDate: "Jun 1, 2025", totalRecords: 1560, validRecords: 1520 },
+];
+
 const SendMessagePage = () => {
-  const [channel, setChannel] = useState("sms");
+  const { user } = useAuth();
+  const enabledChannels = user?.enabledChannels || ["SMS", "WhatsApp", "Email", "RCS"];
+
+  // Filter channels based on permissions
+  const channelConfig = allChannelConfig.filter(ch =>
+    enabledChannels.map(c => c.toLowerCase()).includes(ch.id)
+  );
+
+  const [channel, setChannel] = useState(channelConfig[0]?.id || "sms");
   const [sendMode, setSendMode] = useState("database");
   const [numbers, setNumbers] = useState<string[]>([""]);
   const [selectedTemplate, setSelectedTemplate] = useState("");
   const [messageBody, setMessageBody] = useState("");
   const [subject, setSubject] = useState("");
   const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [csvSource, setCsvSource] = useState<"new" | "existing">("new");
+  const [selectedExistingCsv, setSelectedExistingCsv] = useState("");
   const [csvPreview, setCsvPreview] = useState<{ headers: string[]; rows: string[][]; valid: number; invalid: number; duplicates: number } | null>(null);
   const [sending, setSending] = useState(false);
   const [scheduleEnabled, setScheduleEnabled] = useState(false);
@@ -59,13 +78,10 @@ const SendMessagePage = () => {
   const [fetchedCount, setFetchedCount] = useState<number | null>(null);
   const [selectedApiId, setSelectedApiId] = useState(defaultApis[0]?.id || "");
 
-  // Dynamic API filter values
   const [apiFilterValues, setApiFilterValues] = useState<Record<string, string>>({});
 
-  // Get the active API's filters dynamically
   const activeApi = defaultApis.find(a => a.id === selectedApiId && a.status === "Active");
 
-  // Build dynamic filters with options parsed from the "example" field
   const dynamicFilters = useMemo(() => {
     if (!activeApi) return [];
     return activeApi.filters.map(f => ({
@@ -107,6 +123,21 @@ const SendMessagePage = () => {
     reader.readAsText(file);
   };
 
+  const handleSelectExistingCsv = (csvId: string) => {
+    setSelectedExistingCsv(csvId);
+    const csv = existingCsvUploads.find(c => c.id === csvId);
+    if (csv) {
+      setCsvPreview({
+        headers: ["mobile", "name", "email"],
+        rows: [["9876543210", "Ravi Kumar", "ravi@test.com"], ["9876543211", "Priya Sharma", "priya@test.com"]],
+        valid: csv.validRecords,
+        invalid: csv.totalRecords - csv.validRecords,
+        duplicates: Math.floor((csv.totalRecords - csv.validRecords) * 0.3),
+      });
+      toast.success(`Loaded ${csv.validRecords.toLocaleString()} valid records from ${csv.name}`);
+    }
+  };
+
   const handleFetchRecipients = () => {
     let count = 12400;
     const activeFilters = Object.values(apiFilterValues).filter(Boolean).length;
@@ -119,7 +150,7 @@ const SendMessagePage = () => {
     setSending(true);
     setTimeout(() => {
       setSending(false);
-      toast.success("Campaign submitted successfully!", { description: `Messages queued for delivery via ${channel.toUpperCase()}` });
+      toast.success("Message sent successfully!", { description: `Messages queued for delivery via ${channel.toUpperCase()}` });
     }, 1500);
   };
 
@@ -135,10 +166,10 @@ const SendMessagePage = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Send Message</h1>
-        <p className="text-muted-foreground mt-1">Compose and send via any channel</p>
+        <p className="text-muted-foreground mt-1">Compose and send via any enabled channel</p>
       </div>
 
-      {/* Channel Selection */}
+      {/* Channel Selection - only enabled channels */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {channelConfig.map((ch) => {
           const isActive = channel === ch.id;
@@ -159,6 +190,16 @@ const SendMessagePage = () => {
         })}
       </div>
 
+      {channelConfig.length === 0 && (
+        <Card className="shadow-card">
+          <CardContent className="pt-6 text-center text-muted-foreground">
+            <AlertCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
+            <p className="font-medium text-foreground">No channels enabled</p>
+            <p className="text-sm mt-1">Please request channel access from your Profile page.</p>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Two-column layout */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {/* Left Column — Recipients */}
@@ -171,16 +212,15 @@ const SendMessagePage = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <Tabs value={sendMode} onValueChange={(v) => { setSendMode(v); setFetchedCount(null); }}>
+              <Tabs value={sendMode} onValueChange={(v) => { setSendMode(v); setFetchedCount(null); setCsvPreview(null); setCsvFile(null); setSelectedExistingCsv(""); }}>
                 <TabsList className="grid w-full grid-cols-3 mb-5">
                   <TabsTrigger value="database">Bulk DB</TabsTrigger>
                   <TabsTrigger value="manual">Manual</TabsTrigger>
-                  <TabsTrigger value="csv">CSV Upload</TabsTrigger>
+                  <TabsTrigger value="csv">CSV</TabsTrigger>
                 </TabsList>
 
                 {/* === Bulk DB Tab === */}
                 <TabsContent value="database" className="space-y-4">
-                  {/* API Selection (if multiple APIs configured) */}
                   {defaultApis.filter(a => a.status === "Active").length > 1 && (
                     <div>
                       <Label className="text-foreground text-xs mb-1.5 block">Select API Source</Label>
@@ -200,12 +240,10 @@ const SendMessagePage = () => {
                   ) : (
                     <div className="space-y-3">
                       <div className="p-2 rounded-lg bg-info/5 border border-info/20">
-                        <p className="text-xs text-muted-foreground"><Server className="w-3 h-3 inline mr-1" />Dynamic filters from <span className="font-medium text-foreground">{activeApi.name}</span>. All filters are optional — leave empty to fetch all data.</p>
+                        <p className="text-xs text-muted-foreground"><Server className="w-3 h-3 inline mr-1" />Dynamic filters from <span className="font-medium text-foreground">{activeApi.name}</span>. All filters are optional.</p>
                       </div>
 
-                      {dynamicFilters.length === 0 ? (
-                        <p className="text-xs text-muted-foreground">No filters configured for this API. All recipients will be fetched.</p>
-                      ) : (
+                      {dynamicFilters.length > 0 && (
                         <div className="space-y-2">
                           {dynamicFilters.map(f => (
                             <div key={f.key}>
@@ -215,21 +253,14 @@ const SendMessagePage = () => {
                                   value={apiFilterValues[f.key] || ""}
                                   onValueChange={v => setApiFilterValues(p => ({ ...p, [f.key]: v === "__all__" ? "" : v }))}
                                 >
-                                  <SelectTrigger className="h-9 text-xs">
-                                    <SelectValue placeholder={`All ${f.label}`} />
-                                  </SelectTrigger>
+                                  <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={`All ${f.label}`} /></SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="__all__">All {f.label}</SelectItem>
                                     {f.options.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
                                   </SelectContent>
                                 </Select>
                               ) : (
-                                <Input
-                                  placeholder={`Enter ${f.label}`}
-                                  value={apiFilterValues[f.key] || ""}
-                                  onChange={e => setApiFilterValues(p => ({ ...p, [f.key]: e.target.value }))}
-                                  className="h-9 text-xs"
-                                />
+                                <Input placeholder={`Enter ${f.label}`} value={apiFilterValues[f.key] || ""} onChange={e => setApiFilterValues(p => ({ ...p, [f.key]: e.target.value }))} className="h-9 text-xs" />
                               )}
                             </div>
                           ))}
@@ -260,34 +291,57 @@ const SendMessagePage = () => {
                 <TabsContent value="manual" className="space-y-3">
                   {numbers.map((num, i) => (
                     <div key={i} className="flex items-center gap-2">
-                      <Input
-                        placeholder={channel === "email" ? "recipient@example.com" : "+91 XXXXX XXXXX"}
-                        value={num}
-                        onChange={(e) => updateNumber(i, e.target.value)}
-                      />
+                      <Input placeholder={channel === "email" ? "recipient@example.com" : "+91 XXXXX XXXXX"} value={num} onChange={(e) => updateNumber(i, e.target.value)} />
                       {numbers.length > 1 && (
-                        <Button variant="ghost" size="icon" onClick={() => removeNumber(i)}>
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => removeNumber(i)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
                       )}
                     </div>
                   ))}
-                  <Button variant="outline" size="sm" onClick={addNumber} className="w-full">
-                    <Plus className="w-4 h-4 mr-1" /> Add Recipient
-                  </Button>
+                  <Button variant="outline" size="sm" onClick={addNumber} className="w-full"><Plus className="w-4 h-4 mr-1" /> Add Recipient</Button>
                 </TabsContent>
 
-                {/* === CSV Upload Tab === */}
+                {/* === CSV Tab === */}
                 <TabsContent value="csv" className="space-y-4">
-                  <div className="border-2 border-dashed border-border rounded-xl p-6 text-center hover:border-primary/40 transition-colors">
-                    <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground mb-2">Upload CSV with recipient data</p>
-                    <input type="file" accept=".csv" onChange={handleCsvUpload} className="hidden" id="csv-upload" />
-                    <Button variant="outline" size="sm" onClick={() => document.getElementById("csv-upload")?.click()}>
-                      Choose File
+                  {/* Toggle: New Upload or Existing */}
+                  <div className="flex gap-2">
+                    <Button variant={csvSource === "new" ? "default" : "outline"} size="sm" className="flex-1" onClick={() => { setCsvSource("new"); setCsvPreview(null); setSelectedExistingCsv(""); }}>
+                      <Upload className="w-3.5 h-3.5 mr-1" /> Upload New
                     </Button>
-                    {csvFile && <p className="text-xs text-foreground mt-2">{csvFile.name}</p>}
+                    <Button variant={csvSource === "existing" ? "default" : "outline"} size="sm" className="flex-1" onClick={() => { setCsvSource("existing"); setCsvPreview(null); setCsvFile(null); }}>
+                      <FolderOpen className="w-3.5 h-3.5 mr-1" /> From Existing
+                    </Button>
                   </div>
+
+                  {csvSource === "new" ? (
+                    <div className="border-2 border-dashed border-border rounded-xl p-6 text-center hover:border-primary/40 transition-colors">
+                      <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground mb-2">Upload CSV with recipient data</p>
+                      <input type="file" accept=".csv" onChange={handleCsvUpload} className="hidden" id="csv-upload" />
+                      <Button variant="outline" size="sm" onClick={() => document.getElementById("csv-upload")?.click()}>Choose File</Button>
+                      {csvFile && <p className="text-xs text-foreground mt-2">{csvFile.name}</p>}
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <Label className="text-foreground text-xs">Select from previously uploaded CSVs</Label>
+                      {existingCsvUploads.map(csv => (
+                        <button
+                          key={csv.id}
+                          onClick={() => handleSelectExistingCsv(csv.id)}
+                          className={`w-full p-3 rounded-lg border text-left transition-all ${selectedExistingCsv === csv.id ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"}`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <FileText className="w-4 h-4 text-muted-foreground" />
+                              <span className="text-sm font-medium text-foreground">{csv.name}</span>
+                            </div>
+                            <Badge variant="secondary" className="text-xs">{csv.validRecords.toLocaleString()} records</Badge>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">Uploaded: {csv.uploadDate} · Total: {csv.totalRecords.toLocaleString()}</p>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
                   {csvPreview && (
                     <div className="space-y-3">
                       <div className="flex gap-3 text-xs">
@@ -364,12 +418,7 @@ const SendMessagePage = () => {
               {/* Message Body */}
               <div>
                 <Label className="text-foreground text-sm">Message Body</Label>
-                <Textarea
-                  placeholder="Type your message..."
-                  value={messageBody}
-                  onChange={(e) => setMessageBody(e.target.value)}
-                  className="mt-1.5 min-h-[140px]"
-                />
+                <Textarea placeholder="Type your message..." value={messageBody} onChange={(e) => setMessageBody(e.target.value)} className="mt-1.5 min-h-[140px]" />
                 {channel === "sms" && (
                   <p className="text-xs text-muted-foreground mt-1">{messageBody.length} chars · {smsParts} SMS part{smsParts > 1 ? "s" : ""}</p>
                 )}
@@ -380,9 +429,7 @@ const SendMessagePage = () => {
                 <Label className="text-foreground text-xs mb-2 block">Insert Variable</Label>
                 <div className="flex flex-wrap gap-1.5">
                   {allVariables.map((v) => (
-                    <Button key={v} variant="outline" size="sm" className="text-xs h-7" onClick={() => insertVariable(v)}>
-                      {`{{${v}}}`}
-                    </Button>
+                    <Button key={v} variant="outline" size="sm" className="text-xs h-7" onClick={() => insertVariable(v)}>{`{{${v}}}`}</Button>
                   ))}
                 </div>
               </div>
@@ -394,14 +441,8 @@ const SendMessagePage = () => {
               </div>
               {scheduleEnabled && (
                 <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label className="text-foreground text-xs">Date</Label>
-                    <Input type="date" className="mt-1" />
-                  </div>
-                  <div>
-                    <Label className="text-foreground text-xs">Time</Label>
-                    <Input type="time" className="mt-1" />
-                  </div>
+                  <div><Label className="text-foreground text-xs">Date</Label><Input type="date" className="mt-1" /></div>
+                  <div><Label className="text-foreground text-xs">Time</Label><Input type="time" className="mt-1" /></div>
                 </div>
               )}
             </CardContent>
@@ -412,7 +453,7 @@ const SendMessagePage = () => {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-foreground">Campaign Summary</p>
+                  <p className="text-sm font-medium text-foreground">Message Summary</p>
                   <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
                     <span>Channel: <strong className="text-foreground">{channel.toUpperCase()}</strong></span>
                     <span>·</span>
@@ -421,15 +462,11 @@ const SendMessagePage = () => {
                     <span>Mode: <strong className="text-foreground">{sendMode === "database" ? "Bulk DB" : sendMode === "csv" ? "CSV" : "Manual"}</strong></span>
                   </div>
                 </div>
-                <Button
-                  onClick={handleSend}
-                  disabled={sending || !messageBody.trim() || recipientCount === 0}
-                  className="min-w-[140px]"
-                >
+                <Button onClick={handleSend} disabled={sending || !messageBody.trim() || recipientCount === 0} className="min-w-[140px]">
                   {sending ? (
                     <span className="flex items-center gap-2"><span className="animate-spin">⏳</span> Sending...</span>
                   ) : (
-                    <span className="flex items-center gap-2"><Send className="w-4 h-4" /> Send Campaign</span>
+                    <span className="flex items-center gap-2"><Send className="w-4 h-4" /> Send Message</span>
                   )}
                 </Button>
               </div>

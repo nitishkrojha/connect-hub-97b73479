@@ -43,6 +43,13 @@ const csvUploads = [
   { file: "otp_numbers.csv", date: "Jun 3", total: 890, valid: 878, invalid: 8, duplicates: 4 },
 ];
 
+const templateReports = [
+  { id: "TPL-SMS-00001", name: "OTP Verification", channel: "SMS", totalSent: 8420, delivered: 8252, failed: 168, rate: 98.0, lastUsed: "Jun 9, 2025" },
+  { id: "TPL-WA-00002", name: "Welcome Message", channel: "WhatsApp", totalSent: 5640, delivered: 5527, failed: 113, rate: 98.0, lastUsed: "Jun 8, 2025" },
+  { id: "TPL-EML-00003", name: "Welcome Email", channel: "Email", totalSent: 4200, delivered: 4074, failed: 126, rate: 97.0, lastUsed: "Jun 7, 2025" },
+  { id: "TPL-SMS-00006", name: "Appointment Reminder", channel: "SMS", totalSent: 2180, delivered: 2136, failed: 44, rate: 98.0, lastUsed: "Jun 6, 2025" },
+];
+
 const statusStyle: Record<string, string> = {
   Completed: "bg-success/10 text-success",
   "Partially Failed": "bg-warning/10 text-warning",
@@ -77,6 +84,7 @@ const ProjectReportsPage = () => {
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="campaigns">Campaign-wise</TabsTrigger>
+          <TabsTrigger value="templates">Template-wise</TabsTrigger>
           <TabsTrigger value="uploads">CSV Uploads</TabsTrigger>
         </TabsList>
 
@@ -195,6 +203,55 @@ const ProjectReportsPage = () => {
                         <td className="p-3 text-foreground">{c.clicked > 0 ? c.clicked.toLocaleString() : "—"}</td>
                         <td className="p-3"><Badge variant="secondary">{c.rate}%</Badge></td>
                         <td className="p-3 text-muted-foreground text-xs whitespace-nowrap">{c.date}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Template-wise */}
+        <TabsContent value="templates" className="space-y-6 mt-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { label: "Active Templates", value: "4" },
+              { label: "Total Sent via Templates", value: "20,440" },
+              { label: "Avg. Delivery Rate", value: "97.8%" },
+              { label: "Most Used", value: "OTP Verification" },
+            ].map((s) => (
+              <Card key={s.label} className="shadow-card">
+                <CardContent className="pt-4 pb-3">
+                  <p className="text-xs text-muted-foreground">{s.label}</p>
+                  <p className="text-lg font-bold text-foreground mt-1">{s.value}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          <Card className="shadow-card">
+            <CardHeader>
+              <CardTitle className="text-base">Template Performance</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead><tr className="border-b border-border">
+                    {["Template ID", "Name", "Channel", "Total Sent", "Delivered", "Failed", "Success Rate", "Last Used"].map((h) => (
+                      <th key={h} className="text-left font-medium text-muted-foreground p-3 text-xs whitespace-nowrap">{h}</th>
+                    ))}
+                  </tr></thead>
+                  <tbody>
+                    {templateReports.map((t) => (
+                      <tr key={t.id} className="border-b border-border/50 last:border-0 hover:bg-muted/30">
+                        <td className="p-3"><span className="font-mono text-xs text-primary bg-primary/10 px-2 py-0.5 rounded">{t.id}</span></td>
+                        <td className="p-3 font-medium text-foreground whitespace-nowrap">{t.name}</td>
+                        <td className="p-3"><Badge variant="secondary" className="text-xs">{t.channel}</Badge></td>
+                        <td className="p-3 text-foreground">{t.totalSent.toLocaleString()}</td>
+                        <td className="p-3 text-success">{t.delivered.toLocaleString()}</td>
+                        <td className="p-3 text-destructive">{t.failed.toLocaleString()}</td>
+                        <td className="p-3"><Badge variant="secondary">{t.rate}%</Badge></td>
+                        <td className="p-3 text-muted-foreground text-xs whitespace-nowrap">{t.lastUsed}</td>
                       </tr>
                     ))}
                   </tbody>

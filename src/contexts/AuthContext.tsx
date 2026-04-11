@@ -9,6 +9,7 @@ export interface User {
   role: UserRole;
   projectId?: string;
   projectName?: string;
+  enabledChannels?: string[];
 }
 
 interface AuthContextType {
@@ -27,6 +28,7 @@ const DEMO_USERS: Record<string, User & { password: string }> = {
     email: "admin@dicnotifier.io",
     role: "admin",
     password: "admin123",
+    enabledChannels: ["SMS", "WhatsApp", "Email", "RCS"],
   },
   "project@dicnotifier.io": {
     id: "proj-1",
@@ -36,6 +38,7 @@ const DEMO_USERS: Record<string, User & { password: string }> = {
     projectId: "proj-mybharat",
     projectName: "My Bharat",
     password: "project123",
+    enabledChannels: ["SMS", "WhatsApp"],
   },
 };
 

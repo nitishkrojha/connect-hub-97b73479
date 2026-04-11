@@ -24,6 +24,7 @@ import ProjectReportsPage from "./pages/project/ProjectReportsPage";
 import ProjectConfigPage from "./pages/project/ProjectConfigPage";
 import ProjectQuotaPage from "./pages/project/ProjectQuotaPage";
 import CampaignHistoryPage from "./pages/project/CampaignHistoryPage";
+import DeveloperDocsPage from "./pages/project/DeveloperDocsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -72,6 +73,7 @@ const App = () => (
               <Route path="config" element={<ProjectConfigPage />} />
               <Route path="quota" element={<ProjectQuotaPage />} />
               <Route path="history" element={<CampaignHistoryPage />} />
+              <Route path="docs" element={<DeveloperDocsPage />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />

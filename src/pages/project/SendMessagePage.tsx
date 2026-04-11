@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,52 +42,40 @@ const channelConfig = [
 
 const allVariables = ["name", "otp", "project_name", "date", "amount", "link"];
 
-const dbSegments = [
-  { id: "db1", name: "All Active Users", count: 12400 },
-  { id: "db2", name: "Premium Members", count: 3200 },
-  { id: "db3", name: "New Signups (Last 7 Days)", count: 890 },
-  { id: "db4", name: "Inactive Users (30+ Days)", count: 5600 },
+// Simulated configured API endpoints (same shape as ProjectConfigPage's ApiEndpoint)
+const configuredApis = [
+  {
+    id: "api-1",
+    name: "My Bharat User API",
+    endpoint: "https://api.mybharat.gov.in/v1/users",
+    status: "Active" as const,
+    filters: [
+      { key: "state", label: "State", type: "select" },
+      { key: "district", label: "District", type: "select" },
+      { key: "block", label: "Block", type: "select" },
+      { key: "gram_panchayat", label: "Gram Panchayat", type: "select" },
+      { key: "village", label: "Village", type: "select" },
+      { key: "urban_rural", label: "Urban/Rural", type: "select" },
+      { key: "user_type", label: "User Type", type: "select" },
+      { key: "category", label: "Category", type: "select" },
+      { key: "activity", label: "Activity", type: "select" },
+      { key: "activity_status", label: "Activity Status", type: "select" },
+    ],
+  },
 ];
 
-// Simulated API-driven dynamic filters (from project's configured API)
-interface ApiFilter {
-  key: string;
-  label: string;
-  options: string[];
-}
-
-const simulatedApiFilters: ApiFilter[] = [
-  { key: "state", label: "State", options: ["Madhya Pradesh", "Uttar Pradesh", "Rajasthan", "Maharashtra", "Bihar"] },
-  { key: "district", label: "District", options: ["Bhopal", "Indore", "Jabalpur", "Gwalior", "Ujjain"] },
-  { key: "urban_rural", label: "Urban/Rural", options: ["Urban", "Rural"] },
-  { key: "block", label: "Block", options: ["Huzur", "Berasia", "Phanda", "Sehore", "Nasrullaganj"] },
-  { key: "gram_panchayat", label: "Gram Panchayat", options: ["Ratua Khurd", "Bairagarh Chichli", "Khajuri Sadak", "Misrod", "Awadhpuri"] },
-  { key: "village", label: "Village", options: ["Lambakheda", "Neelbad", "Kolar", "Ratibad", "Bagroda"] },
-  { key: "user_type", label: "User Type", options: ["Youth", "Organization"] },
-  { key: "category", label: "Category", options: ["Education", "Health", "Agriculture", "Finance", "Technology"] },
-  { key: "activity", label: "Activity", options: ["Quiz", "Events", "ELP", "Essay"] },
-  { key: "activity_status", label: "Activity Status", options: ["Attendee", "Successfully Completed"] },
-];
-
-// Static fallback filters (when no API is configured)
-const staticFilters = {
-  states: ["Madhya Pradesh", "Uttar Pradesh", "Rajasthan", "Maharashtra", "Bihar", "Gujarat"],
-  districts: ["Bhopal", "Indore", "Jabalpur", "Gwalior", "Ujjain", "Sagar"],
-  urbanRural: ["Urban", "Rural"],
-  blocks: ["Huzur", "Berasia", "Phanda", "Sehore", "Nasrullaganj"],
-  gramPanchayats: ["Ratua Khurd", "Bairagarh Chichli", "Khajuri Sadak", "Misrod", "Awadhpuri"],
-  villages: ["Lambakheda", "Neelbad", "Kolar", "Ratibad", "Bagroda"],
-  userTypes: ["Youth", "Organization"],
-  categories: ["Education", "Health", "Agriculture", "Finance", "Technology"],
-  subCategories: {
-    Education: ["Primary", "Secondary", "Higher", "Vocational"],
-    Health: ["General", "Maternal", "Child", "Mental"],
-    Agriculture: ["Crop", "Dairy", "Fishery", "Horticulture"],
-    Finance: ["Banking", "Insurance", "Microfinance", "Investment"],
-    Technology: ["IT", "Mobile", "Digital Literacy", "Cybersecurity"],
-  } as Record<string, string[]>,
-  activityTypes: ["Quiz", "Events", "ELP", "Essay"],
-  activityStatus: ["Attendee", "Successfully Completed"],
+// Simulated API response with filter options (would come from the API's filters_available)
+const apiFilterOptions: Record<string, string[]> = {
+  state: ["Madhya Pradesh", "Uttar Pradesh", "Rajasthan", "Maharashtra", "Bihar"],
+  district: ["Bhopal", "Indore", "Jabalpur", "Gwalior", "Ujjain"],
+  urban_rural: ["Urban", "Rural"],
+  block: ["Huzur", "Berasia", "Phanda", "Sehore", "Nasrullaganj"],
+  gram_panchayat: ["Ratua Khurd", "Bairagarh Chichli", "Khajuri Sadak", "Misrod", "Awadhpuri"],
+  village: ["Lambakheda", "Neelbad", "Kolar", "Ratibad", "Bagroda"],
+  user_type: ["Youth", "Organization"],
+  category: ["Education", "Health", "Agriculture", "Finance", "Technology"],
+  activity: ["Quiz", "Events", "ELP", "Essay"],
+  activity_status: ["Attendee", "Successfully Completed"],
 };
 
 const SendMessagePage = () => {
@@ -99,27 +87,23 @@ const SendMessagePage = () => {
   const [subject, setSubject] = useState("");
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [csvPreview, setCsvPreview] = useState<{ headers: string[]; rows: string[][]; valid: number; invalid: number; duplicates: number } | null>(null);
-  const [selectedSegment, setSelectedSegment] = useState("");
   const [sending, setSending] = useState(false);
   const [scheduleEnabled, setScheduleEnabled] = useState(false);
   const [fetchedCount, setFetchedCount] = useState<number | null>(null);
-  const [dbSource, setDbSource] = useState<"static" | "api">("api");
+  const [selectedApiId, setSelectedApiId] = useState(configuredApis[0]?.id || "");
 
   // Dynamic API filter values
   const [apiFilterValues, setApiFilterValues] = useState<Record<string, string>>({});
 
-  // Static filter states
-  const [filterState, setFilterState] = useState("");
-  const [filterDistrict, setFilterDistrict] = useState("");
-  const [filterUrbanRural, setFilterUrbanRural] = useState("");
-  const [filterBlock, setFilterBlock] = useState("");
-  const [filterGP, setFilterGP] = useState("");
-  const [filterVillage, setFilterVillage] = useState("");
-  const [filterUserType, setFilterUserType] = useState("");
-  const [filterCategory, setFilterCategory] = useState("");
-  const [filterSubCategory, setFilterSubCategory] = useState("");
-  const [filterActivity, setFilterActivity] = useState("");
-  const [filterActivityStatus, setFilterActivityStatus] = useState("");
+  // Get the active API's filters dynamically
+  const activeApi = configuredApis.find(a => a.id === selectedApiId && a.status === "Active");
+  const dynamicFilters = useMemo(() => {
+    if (!activeApi) return [];
+    return activeApi.filters.map(f => ({
+      ...f,
+      options: apiFilterOptions[f.key] || [],
+    }));
+  }, [activeApi]);
 
   const currentTemplates = templates[channel] || [];
 
@@ -156,18 +140,8 @@ const SendMessagePage = () => {
 
   const handleFetchRecipients = () => {
     let count = 12400;
-    if (dbSource === "api") {
-      const activeFilters = Object.values(apiFilterValues).filter(Boolean).length;
-      count = Math.max(Math.floor(12400 * Math.pow(0.45, activeFilters)), 15);
-    } else {
-      if (filterState) count = Math.floor(count * 0.4);
-      if (filterDistrict) count = Math.floor(count * 0.3);
-      if (filterUrbanRural) count = Math.floor(count * 0.6);
-      if (filterBlock) count = Math.floor(count * 0.5);
-      if (filterUserType) count = Math.floor(count * 0.35);
-      if (filterCategory) count = Math.floor(count * 0.45);
-      if (filterActivity) count = Math.floor(count * 0.25);
-    }
+    const activeFilters = Object.values(apiFilterValues).filter(Boolean).length;
+    count = Math.max(Math.floor(12400 * Math.pow(0.45, activeFilters)), 15);
     setFetchedCount(Math.max(count, 12));
     toast.success(`${Math.max(count, 12).toLocaleString()} recipients fetched`);
   };
@@ -187,6 +161,16 @@ const SendMessagePage = () => {
     : fetchedCount ?? 0;
 
   const smsParts = Math.max(1, Math.ceil(messageBody.length / 160));
+
+  // Group filters for display
+  const locationKeys = ["state", "district", "urban_rural", "block", "gram_panchayat", "village"];
+  const userKeys = ["user_type", "category"];
+  const activityKeys = ["activity", "activity_status"];
+
+  const locationFilters = dynamicFilters.filter(f => locationKeys.includes(f.key));
+  const userFilters = dynamicFilters.filter(f => userKeys.includes(f.key));
+  const activityFilters = dynamicFilters.filter(f => activityKeys.includes(f.key));
+  const otherFilters = dynamicFilters.filter(f => ![...locationKeys, ...userKeys, ...activityKeys].includes(f.key));
 
   return (
     <div className="space-y-6">
@@ -237,137 +221,100 @@ const SendMessagePage = () => {
 
                 {/* === Bulk DB Tab === */}
                 <TabsContent value="database" className="space-y-4">
-                  {/* Source Toggle */}
-                  <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
-                    <Button variant={dbSource === "api" ? "default" : "ghost"} size="sm" className="flex-1 h-8 text-xs" onClick={() => setDbSource("api")}>
-                      <Server className="w-3.5 h-3.5 mr-1" /> API Filters
-                    </Button>
-                    <Button variant={dbSource === "static" ? "default" : "ghost"} size="sm" className="flex-1 h-8 text-xs" onClick={() => setDbSource("static")}>
-                      <Database className="w-3.5 h-3.5 mr-1" /> Static Filters
-                    </Button>
-                  </div>
+                  {/* API Selection (if multiple APIs configured) */}
+                  {configuredApis.length > 1 && (
+                    <div>
+                      <Label className="text-foreground text-xs mb-1.5 block">Select API Source</Label>
+                      <Select value={selectedApiId} onValueChange={v => { setSelectedApiId(v); setApiFilterValues({}); setFetchedCount(null); }}>
+                        <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Select API" /></SelectTrigger>
+                        <SelectContent>{configuredApis.filter(a => a.status === "Active").map(a => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                  )}
 
-                  {dbSource === "api" ? (
-                    /* Dynamic API Filters */
+                  {!activeApi ? (
+                    <div className="text-center py-6 text-muted-foreground">
+                      <Server className="w-8 h-8 mx-auto mb-2 opacity-40" />
+                      <p className="text-sm">No API endpoints configured</p>
+                      <p className="text-xs mt-1">Go to <span className="font-medium text-foreground">Configuration → API Endpoints</span> to add one.</p>
+                    </div>
+                  ) : (
                     <div className="space-y-3">
                       <div className="p-2 rounded-lg bg-info/5 border border-info/20">
-                        <p className="text-xs text-muted-foreground"><Server className="w-3 h-3 inline mr-1" />Filters loaded from your configured API endpoint. Manage in <span className="font-medium text-foreground">Configuration → API Endpoints</span>.</p>
+                        <p className="text-xs text-muted-foreground"><Server className="w-3 h-3 inline mr-1" />Filters from <span className="font-medium text-foreground">{activeApi.name}</span>. Manage in <span className="font-medium text-foreground">Configuration → API Endpoints</span>.</p>
                       </div>
+
+                      {dynamicFilters.length === 0 && (
+                        <p className="text-xs text-muted-foreground">No filters configured for this API. All recipients will be fetched.</p>
+                      )}
 
                       {/* Location Filters */}
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><MapPin className="w-3 h-3" /> Location</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        {simulatedApiFilters.filter(f => ["state", "district", "urban_rural", "block", "gram_panchayat", "village"].includes(f.key)).map(f => (
-                          <Select key={f.key} value={apiFilterValues[f.key] || ""} onValueChange={v => setApiFilterValues(p => ({ ...p, [f.key]: v }))}>
-                            <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={f.label} /></SelectTrigger>
-                            <SelectContent>{f.options.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
-                          </Select>
-                        ))}
-                      </div>
+                      {locationFilters.length > 0 && (
+                        <>
+                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><MapPin className="w-3 h-3" /> Location</p>
+                          <div className="grid grid-cols-2 gap-2">
+                            {locationFilters.map(f => (
+                              <Select key={f.key} value={apiFilterValues[f.key] || ""} onValueChange={v => setApiFilterValues(p => ({ ...p, [f.key]: v }))}>
+                                <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={f.label} /></SelectTrigger>
+                                <SelectContent>{f.options.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+                              </Select>
+                            ))}
+                          </div>
+                        </>
+                      )}
 
                       {/* User Filters */}
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><UserCheck className="w-3 h-3" /> User Filters</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        {simulatedApiFilters.filter(f => ["user_type", "category"].includes(f.key)).map(f => (
-                          <Select key={f.key} value={apiFilterValues[f.key] || ""} onValueChange={v => setApiFilterValues(p => ({ ...p, [f.key]: v }))}>
-                            <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={f.label} /></SelectTrigger>
-                            <SelectContent>{f.options.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
-                          </Select>
-                        ))}
-                      </div>
+                      {userFilters.length > 0 && (
+                        <>
+                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><UserCheck className="w-3 h-3" /> User Filters</p>
+                          <div className="grid grid-cols-2 gap-2">
+                            {userFilters.map(f => (
+                              <Select key={f.key} value={apiFilterValues[f.key] || ""} onValueChange={v => setApiFilterValues(p => ({ ...p, [f.key]: v }))}>
+                                <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={f.label} /></SelectTrigger>
+                                <SelectContent>{f.options.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+                              </Select>
+                            ))}
+                          </div>
+                        </>
+                      )}
 
                       {/* Activity Filters */}
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><Activity className="w-3 h-3" /> Activity</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        {simulatedApiFilters.filter(f => ["activity", "activity_status"].includes(f.key)).map(f => (
-                          <Select key={f.key} value={apiFilterValues[f.key] || ""} onValueChange={v => setApiFilterValues(p => ({ ...p, [f.key]: v }))}>
-                            <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={f.label} /></SelectTrigger>
-                            <SelectContent>{f.options.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
-                          </Select>
-                        ))}
-                      </div>
+                      {activityFilters.length > 0 && (
+                        <>
+                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><Activity className="w-3 h-3" /> Activity</p>
+                          <div className="grid grid-cols-2 gap-2">
+                            {activityFilters.map(f => (
+                              <Select key={f.key} value={apiFilterValues[f.key] || ""} onValueChange={v => setApiFilterValues(p => ({ ...p, [f.key]: v }))}>
+                                <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={f.label} /></SelectTrigger>
+                                <SelectContent>{f.options.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+                              </Select>
+                            ))}
+                          </div>
+                        </>
+                      )}
+
+                      {/* Other Filters (custom ones not in known groups) */}
+                      {otherFilters.length > 0 && (
+                        <>
+                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><Filter className="w-3 h-3" /> Other</p>
+                          <div className="grid grid-cols-2 gap-2">
+                            {otherFilters.map(f => (
+                              <Select key={f.key} value={apiFilterValues[f.key] || ""} onValueChange={v => setApiFilterValues(p => ({ ...p, [f.key]: v }))}>
+                                <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={f.label} /></SelectTrigger>
+                                <SelectContent>{f.options.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+                              </Select>
+                            ))}
+                          </div>
+                        </>
+                      )}
 
                       {Object.values(apiFilterValues).some(Boolean) && (
                         <Button variant="ghost" size="sm" className="text-xs" onClick={() => setApiFilterValues({})}>Clear All Filters</Button>
                       )}
                     </div>
-                  ) : (
-                    /* Static Filters */
-                    <div className="space-y-3">
-                      <div>
-                        <Label className="text-foreground text-sm mb-1.5 block">Select Audience Segment</Label>
-                        <Select value={selectedSegment} onValueChange={setSelectedSegment}>
-                          <SelectTrigger><SelectValue placeholder="Choose segment" /></SelectTrigger>
-                          <SelectContent>
-                            {dbSegments.map((s) => <SelectItem key={s.id} value={s.id}>{s.name} ({s.count.toLocaleString()})</SelectItem>)}
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <hr className="border-border" />
-                      <p className="text-sm font-medium text-foreground flex items-center gap-1.5"><Filter className="w-3.5 h-3.5" /> Or filter by criteria</p>
-
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><MapPin className="w-3 h-3" /> Location</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        <Select value={filterState} onValueChange={setFilterState}>
-                          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="State" /></SelectTrigger>
-                          <SelectContent>{staticFilters.states.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                        </Select>
-                        <Select value={filterDistrict} onValueChange={setFilterDistrict}>
-                          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="District" /></SelectTrigger>
-                          <SelectContent>{staticFilters.districts.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
-                        </Select>
-                        <Select value={filterUrbanRural} onValueChange={setFilterUrbanRural}>
-                          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Urban/Rural" /></SelectTrigger>
-                          <SelectContent>{staticFilters.urbanRural.map((u) => <SelectItem key={u} value={u}>{u}</SelectItem>)}</SelectContent>
-                        </Select>
-                        <Select value={filterBlock} onValueChange={setFilterBlock}>
-                          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Block" /></SelectTrigger>
-                          <SelectContent>{staticFilters.blocks.map((b) => <SelectItem key={b} value={b}>{b}</SelectItem>)}</SelectContent>
-                        </Select>
-                        <Select value={filterGP} onValueChange={setFilterGP}>
-                          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Gram Panchayat" /></SelectTrigger>
-                          <SelectContent>{staticFilters.gramPanchayats.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent>
-                        </Select>
-                        <Select value={filterVillage} onValueChange={setFilterVillage}>
-                          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Village" /></SelectTrigger>
-                          <SelectContent>{staticFilters.villages.map((v) => <SelectItem key={v} value={v}>{v}</SelectItem>)}</SelectContent>
-                        </Select>
-                      </div>
-
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><UserCheck className="w-3 h-3" /> User Type</p>
-                      <Select value={filterUserType} onValueChange={setFilterUserType}>
-                        <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Select user type" /></SelectTrigger>
-                        <SelectContent>{staticFilters.userTypes.map((u) => <SelectItem key={u} value={u}>{u}</SelectItem>)}</SelectContent>
-                      </Select>
-
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><FolderTree className="w-3 h-3" /> User Category</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        <Select value={filterCategory} onValueChange={(v) => { setFilterCategory(v); setFilterSubCategory(""); }}>
-                          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Category" /></SelectTrigger>
-                          <SelectContent>{staticFilters.categories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                        </Select>
-                        <Select value={filterSubCategory} onValueChange={setFilterSubCategory} disabled={!filterCategory}>
-                          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Sub-category" /></SelectTrigger>
-                          <SelectContent>{(staticFilters.subCategories[filterCategory] || []).map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                        </Select>
-                      </div>
-
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1"><Activity className="w-3 h-3" /> User Activity</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        <Select value={filterActivity} onValueChange={setFilterActivity}>
-                          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Activity type" /></SelectTrigger>
-                          <SelectContent>{staticFilters.activityTypes.map((a) => <SelectItem key={a} value={a}>{a}</SelectItem>)}</SelectContent>
-                        </Select>
-                        <Select value={filterActivityStatus} onValueChange={setFilterActivityStatus} disabled={!filterActivity}>
-                          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Status" /></SelectTrigger>
-                          <SelectContent>{staticFilters.activityStatus.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                        </Select>
-                      </div>
-                    </div>
                   )}
 
-                  <Button variant="outline" className="w-full" onClick={handleFetchRecipients}>
+                  <Button variant="outline" className="w-full" onClick={handleFetchRecipients} disabled={!activeApi}>
                     <Users className="w-4 h-4 mr-2" /> Fetch Recipients
                   </Button>
 
@@ -517,7 +464,7 @@ const SendMessagePage = () => {
                   <span className="text-muted-foreground">Recipients</span>
                   <span className="font-medium text-foreground">{recipientCount.toLocaleString()}</span>
                   <span className="text-muted-foreground">Mode</span>
-                  <span className="font-medium text-foreground capitalize">{sendMode === "csv" ? "CSV Upload" : sendMode === "database" ? `Bulk DB (${dbSource === "api" ? "API" : "Static"})` : "Manual"}</span>
+                  <span className="font-medium text-foreground capitalize">{sendMode === "csv" ? "CSV Upload" : sendMode === "database" ? "Bulk DB (API)" : "Manual"}</span>
                   {selectedTemplate && (
                     <>
                       <span className="text-muted-foreground">Template</span>

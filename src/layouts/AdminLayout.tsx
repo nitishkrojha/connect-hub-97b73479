@@ -12,7 +12,7 @@ const adminNav = [
   { to: "/admin", icon: LayoutDashboard, label: "Dashboard", end: true },
   { to: "/admin/projects", icon: Building2, label: "Projects" },
   { to: "/admin/channels", icon: Settings2, label: "Channels" },
-  { to: "/admin/templates", icon: FileText, label: "Templates" },
+  { to: "/admin/templates", icon: FileText, label: "Headers & Templates" },
   { to: "/admin/reports", icon: BarChart3, label: "Reports" },
   { to: "/admin/quota", icon: Gauge, label: "Quotas" },
   { to: "/admin/audit", icon: ScrollText, label: "Audit Logs" },

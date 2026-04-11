@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Save, Server, Plus, Trash2, Copy, ExternalLink, Key, Code, Info } from "lucide-react";
+import { Save, Server, Plus, Trash2, Copy, ExternalLink, Key, Code, Info, Check } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface ApiEndpoint {

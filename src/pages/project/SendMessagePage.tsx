@@ -479,12 +479,32 @@ const SendMessagePage = () => {
   const [actionButtons, setActionButtons] = useState<{ label: string; type: string; value: string }[]>([]);
   const [recipientDialogOpen, setRecipientDialogOpen] = useState(false);
   const [recipientData, setRecipientData] = useState<{ mode: string; count: number; label: string; details: string } | null>(null);
+  const [selectedProvider, setSelectedProvider] = useState("default");
+
+  // Simulated providers per channel
+  const channelProviders: Record<string, { id: string; name: string; status: string }[]> = {
+    sms: [
+      { id: "default", name: "NIC Gateway (Default)", status: "active" },
+      { id: "sms-cdac", name: "CDAC mGov", status: "active" },
+    ],
+    whatsapp: [
+      { id: "default", name: "Meta Cloud API (Default)", status: "active" },
+    ],
+    email: [
+      { id: "default", name: "Amazon SES (Default)", status: "active" },
+    ],
+    rcs: [
+      { id: "default", name: "Google RBM (Default)", status: "degraded" },
+    ],
+  };
 
   const currentTemplates = templates[channel] || [];
   const supportsMedia = ["whatsapp", "email", "rcs"].includes(channel);
   const supportsActions = ["whatsapp", "email", "rcs"].includes(channel);
   const smsParts = Math.max(1, Math.ceil(messageBody.length / 160));
   const recipientCount = recipientData?.count ?? 0;
+
+  const currentProviders = channelProviders[channel] || [];
 
   const handleChannelChange = (newChannel: string) => {
     setChannel(newChannel);
@@ -493,6 +513,7 @@ const SendMessagePage = () => {
     setSubject("");
     setMediaFile(null);
     setActionButtons([]);
+    setSelectedProvider("default");
   };
 
   const handleTemplateSelect = (templateId: string) => {
@@ -628,7 +649,29 @@ const SendMessagePage = () => {
                 </Select>
               </div>
 
-              {/* Template */}
+              {/* Provider Selection */}
+              {currentProviders.length > 1 && (
+                <div>
+                  <Label className="text-foreground text-xs">Send via Provider</Label>
+                  <Select value={selectedProvider} onValueChange={setSelectedProvider}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {currentProviders.map(p => (
+                        <SelectItem key={p.id} value={p.id}>
+                          <span className="flex items-center gap-2">
+                            {p.name}
+                            {p.status === "degraded" && <span className="text-[10px] text-warning">⚠ Degraded</span>}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-[10px] text-muted-foreground mt-1">Auto-fallback is enabled if the selected provider fails</p>
+                </div>
+              )}
+
               <div>
                 <Label className="text-foreground text-xs">Template</Label>
                 <Select value={selectedTemplate} onValueChange={handleTemplateSelect}>
@@ -742,6 +785,7 @@ const SendMessagePage = () => {
                     <span>Recipients: <strong className="text-foreground">{recipientCount.toLocaleString()}</strong></span>
                     {mediaFile && <><span>·</span><span>📎 Attachment</span></>}
                     {actionButtons.filter(b => b.label).length > 0 && <><span>·</span><span>🔘 {actionButtons.filter(b => b.label).length} Button(s)</span></>}
+                    {currentProviders.length > 1 && <><span>·</span><span>Via: <strong className="text-foreground">{currentProviders.find(p => p.id === selectedProvider)?.name || "Default"}</strong></span></>}
                   </div>
                 </div>
                 <Button size="lg" onClick={handleSend} disabled={sending || !messageBody.trim() || recipientCount === 0} className="min-w-[140px]">

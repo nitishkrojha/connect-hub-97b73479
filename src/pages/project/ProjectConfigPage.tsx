@@ -9,6 +9,48 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Save, Server, Plus, Trash2, Copy, ExternalLink, Key, Code, Info, Check } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import ChannelProviderManager, { type ChannelProvider, type ProviderField } from "@/components/ChannelProviderManager";
+
+const smsProviderFields: ProviderField[] = [
+  { key: "apiEndpoint", label: "API Endpoint", placeholder: "https://sms-provider.com/api/send" },
+  { key: "apiKey", label: "API Key", type: "password", placeholder: "Your SMS API Key" },
+  { key: "senderId", label: "Default Sender ID", placeholder: "DICNTFY" },
+  { key: "dltEntityId", label: "DLT Entity ID", placeholder: "1101456780000012345" },
+];
+
+const whatsappProviderFields: ProviderField[] = [
+  { key: "apiUrl", label: "WhatsApp Business API URL", placeholder: "https://graph.facebook.com/v17.0/..." },
+  { key: "accessToken", label: "Access Token", type: "password", placeholder: "Your WhatsApp API Token" },
+  { key: "phoneNumberId", label: "Phone Number ID", placeholder: "102938475610293" },
+  { key: "businessAccountId", label: "Business Account ID", type: "password" },
+];
+
+const emailProviderFields: ProviderField[] = [
+  { key: "smtpHost", label: "SMTP Host", placeholder: "smtp.provider.com" },
+  { key: "smtpPort", label: "SMTP Port", placeholder: "587" },
+  { key: "username", label: "Username", type: "password" },
+  { key: "password", label: "Password", type: "password" },
+  { key: "fromAddress", label: "From Address", placeholder: "noreply@example.com" },
+];
+
+const rcsProviderFields: ProviderField[] = [
+  { key: "apiEndpoint", label: "RCS API Endpoint", placeholder: "https://rcs-provider.com/api" },
+  { key: "apiKey", label: "API Key", type: "password" },
+  { key: "agentId", label: "Agent ID", placeholder: "agent-prod" },
+  { key: "brandName", label: "Brand Name", placeholder: "My Brand" },
+];
+
+const defaultSmsProviders: ChannelProvider[] = [
+  { id: "sms-nic", name: "NIC Gateway", provider: "NIC", status: "active", isDefault: true, priority: 1, autoFallback: true, credentials: { apiEndpoint: "https://smsgw.nic.in/api/send", apiKey: "••••••", senderId: "DICNTFY", dltEntityId: "1101456780000012345" } },
+  { id: "sms-cdac", name: "CDAC mGov", provider: "CDAC", status: "active", isDefault: false, priority: 2, autoFallback: true, credentials: { apiEndpoint: "https://mgov.gov.in/sms/api", apiKey: "••••••", senderId: "MYBHRT", dltEntityId: "1101456780000012346" } },
+];
+const defaultWaProviders: ChannelProvider[] = [
+  { id: "wa-meta", name: "Meta Cloud API", provider: "Meta", status: "active", isDefault: true, priority: 1, autoFallback: true, credentials: { apiUrl: "https://graph.facebook.com/v18.0/...", accessToken: "••••••", phoneNumberId: "102938475610293", businessAccountId: "BA••••1234" } },
+];
+const defaultEmailProviders: ChannelProvider[] = [
+  { id: "email-ses", name: "Amazon SES", provider: "AWS SES", status: "active", isDefault: true, priority: 1, autoFallback: true, credentials: { smtpHost: "email-smtp.ap-south-1.amazonaws.com", smtpPort: "587", username: "AKIA••••Q3F", password: "••••••", fromAddress: "noreply@mybharat.gov.in" } },
+];
+const defaultRcsProviders: ChannelProvider[] = [];
 
 export interface ApiFilter {
   key: string;
@@ -98,6 +140,10 @@ const ProjectConfigPage = () => {
   const [configSource, setConfigSource] = useState<"notifier" | "own">("notifier");
   const [apis, setApis] = useState<ApiEndpoint[]>(defaultApis);
   const [showSample, setShowSample] = useState(false);
+  const [smsProviders, setSmsProviders] = useState<ChannelProvider[]>(defaultSmsProviders);
+  const [waProviders, setWaProviders] = useState<ChannelProvider[]>(defaultWaProviders);
+  const [emailProviders, setEmailProviders] = useState<ChannelProvider[]>(defaultEmailProviders);
+  const [rcsProviders, setRcsProviders] = useState<ChannelProvider[]>(defaultRcsProviders);
   const [editingApi, setEditingApi] = useState<ApiEndpoint | null>(null);
   const [showAddApi, setShowAddApi] = useState(false);
   const [newApi, setNewApi] = useState({
@@ -222,23 +268,20 @@ const ProjectConfigPage = () => {
 
         <TabsContent value="sms">
           <Card className="shadow-card mt-4">
-            <CardHeader><CardTitle className="text-base">SMS Settings</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label className="text-foreground text-sm font-semibold">Sender IDs (Headers)</Label>
-                <p className="text-xs text-muted-foreground mb-2">Add multiple sender IDs. These will be available for selection while sending messages.</p>
-                {["DICNTFY", "MYBHRT"].map((sid, i) => (
-                  <div key={i} className="flex items-center gap-2 mb-2">
-                    <Input defaultValue={sid} className="flex-1" />
-                    <Badge variant="outline" className="text-xs">Active</Badge>
-                  </div>
-                ))}
-                <Button variant="outline" size="sm" className="mt-1"><Plus className="w-3.5 h-3.5 mr-1" /> Add Sender ID</Button>
-              </div>
-              {configSource === "own" && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div><Label className="text-foreground text-sm">API Endpoint</Label><Input placeholder="https://sms-provider.com/api/send" className="mt-1.5" /></div>
-                  <div><Label className="text-foreground text-sm">API Key</Label><Input type="password" placeholder="Your SMS API Key" className="mt-1.5" /></div>
+            <CardHeader><CardTitle className="text-base">SMS Providers & Settings</CardTitle></CardHeader>
+            <CardContent className="space-y-5">
+              {configSource === "own" ? (
+                <ChannelProviderManager
+                  channel="sms"
+                  channelLabel="SMS"
+                  providers={smsProviders}
+                  onProvidersChange={setSmsProviders}
+                  fields={smsProviderFields}
+                />
+              ) : (
+                <div className="p-3 rounded-lg bg-muted/50 border border-border text-sm text-muted-foreground">
+                  <Info className="w-4 h-4 inline mr-1 text-primary" />
+                  Using DIC Notifier's built-in SMS gateway. Switch to "Own Configuration" in Service Config to manage your own providers.
                 </div>
               )}
               <div className="flex items-center gap-3">
@@ -251,18 +294,22 @@ const ProjectConfigPage = () => {
 
         <TabsContent value="whatsapp">
           <Card className="shadow-card mt-4">
-            <CardHeader><CardTitle className="text-base">WhatsApp Settings</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div><Label className="text-foreground text-sm">Business Display Name</Label><Input defaultValue="My Bharat" className="mt-1.5" /></div>
-                <div><Label className="text-foreground text-sm">WhatsApp Business Number</Label><Input defaultValue="+91 98765 00001" className="mt-1.5" /></div>
-                {configSource === "own" && (
-                  <>
-                    <div><Label className="text-foreground text-sm">WhatsApp Business API URL</Label><Input placeholder="https://graph.facebook.com/v17.0/..." className="mt-1.5" /></div>
-                    <div><Label className="text-foreground text-sm">Access Token</Label><Input type="password" placeholder="Your WhatsApp API Token" className="mt-1.5" /></div>
-                  </>
-                )}
-              </div>
+            <CardHeader><CardTitle className="text-base">WhatsApp Providers & Settings</CardTitle></CardHeader>
+            <CardContent className="space-y-5">
+              {configSource === "own" ? (
+                <ChannelProviderManager
+                  channel="whatsapp"
+                  channelLabel="WhatsApp"
+                  providers={waProviders}
+                  onProvidersChange={setWaProviders}
+                  fields={whatsappProviderFields}
+                />
+              ) : (
+                <div className="p-3 rounded-lg bg-muted/50 border border-border text-sm text-muted-foreground">
+                  <Info className="w-4 h-4 inline mr-1 text-primary" />
+                  Using DIC Notifier's built-in WhatsApp service. Switch to "Own Configuration" in Service Config to manage your own providers.
+                </div>
+              )}
               <div className="flex items-center gap-3">
                 <Switch defaultChecked /><Label className="text-foreground text-sm">Enable Media Messages</Label>
               </div>
@@ -273,20 +320,22 @@ const ProjectConfigPage = () => {
 
         <TabsContent value="email">
           <Card className="shadow-card mt-4">
-            <CardHeader><CardTitle className="text-base">Email Settings</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div><Label className="text-foreground text-sm">Sender Name</Label><Input defaultValue="My Bharat Team" className="mt-1.5" /></div>
-                <div><Label className="text-foreground text-sm">Reply-To Email</Label><Input defaultValue="support@mybharat.gov.in" className="mt-1.5" /></div>
-                <div><Label className="text-foreground text-sm">From Address</Label><Input defaultValue="noreply@mybharat.gov.in" className="mt-1.5" /></div>
-                {configSource === "own" && (
-                  <>
-                    <div><Label className="text-foreground text-sm">SMTP Host</Label><Input placeholder="smtp.provider.com" className="mt-1.5" /></div>
-                    <div><Label className="text-foreground text-sm">SMTP Port</Label><Input placeholder="587" className="mt-1.5" /></div>
-                    <div><Label className="text-foreground text-sm">SMTP Password</Label><Input type="password" placeholder="SMTP Password" className="mt-1.5" /></div>
-                  </>
-                )}
-              </div>
+            <CardHeader><CardTitle className="text-base">Email Providers & Settings</CardTitle></CardHeader>
+            <CardContent className="space-y-5">
+              {configSource === "own" ? (
+                <ChannelProviderManager
+                  channel="email"
+                  channelLabel="Email"
+                  providers={emailProviders}
+                  onProvidersChange={setEmailProviders}
+                  fields={emailProviderFields}
+                />
+              ) : (
+                <div className="p-3 rounded-lg bg-muted/50 border border-border text-sm text-muted-foreground">
+                  <Info className="w-4 h-4 inline mr-1 text-primary" />
+                  Using DIC Notifier's built-in Email service. Switch to "Own Configuration" in Service Config to manage your own providers.
+                </div>
+              )}
               <div className="flex items-center gap-3">
                 <Switch defaultChecked /><Label className="text-foreground text-sm">Enable HTML Emails</Label>
               </div>
@@ -297,18 +346,22 @@ const ProjectConfigPage = () => {
 
         <TabsContent value="rcs">
           <Card className="shadow-card mt-4">
-            <CardHeader><CardTitle className="text-base">RCS Settings</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div><Label className="text-foreground text-sm">Agent Display Name</Label><Input defaultValue="My Bharat Bot" className="mt-1.5" /></div>
-                <div><Label className="text-foreground text-sm">Profile Color</Label><Input defaultValue="#2563EB" type="color" className="mt-1.5 w-20 h-9" /></div>
-                {configSource === "own" && (
-                  <>
-                    <div><Label className="text-foreground text-sm">RCS API Endpoint</Label><Input placeholder="https://rcs-provider.com/api" className="mt-1.5" /></div>
-                    <div><Label className="text-foreground text-sm">API Key</Label><Input type="password" placeholder="Your RCS API Key" className="mt-1.5" /></div>
-                  </>
-                )}
-              </div>
+            <CardHeader><CardTitle className="text-base">RCS Providers & Settings</CardTitle></CardHeader>
+            <CardContent className="space-y-5">
+              {configSource === "own" ? (
+                <ChannelProviderManager
+                  channel="rcs"
+                  channelLabel="RCS"
+                  providers={rcsProviders}
+                  onProvidersChange={setRcsProviders}
+                  fields={rcsProviderFields}
+                />
+              ) : (
+                <div className="p-3 rounded-lg bg-muted/50 border border-border text-sm text-muted-foreground">
+                  <Info className="w-4 h-4 inline mr-1 text-primary" />
+                  Using DIC Notifier's built-in RCS service. Switch to "Own Configuration" in Service Config to manage your own providers.
+                </div>
+              )}
               <div className="flex items-center gap-3">
                 <Switch defaultChecked /><Label className="text-foreground text-sm">Enable Rich Cards</Label>
               </div>

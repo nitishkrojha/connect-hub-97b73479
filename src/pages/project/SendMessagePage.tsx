@@ -54,6 +54,21 @@ const existingCsvUploads = [
   { id: "csv-3", name: "otp_numbers.csv", uploadDate: "Jun 3, 2025", totalRecords: 890, validRecords: 878 },
 ];
 
+/* ─── Media Preview Helper ─── */
+const MediaPreview = ({ file, className = "h-24" }: { file: File; className?: string }) => {
+  const [url, setUrl] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    const objectUrl = URL.createObjectURL(file);
+    setUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [file]);
+  const isImage = file.type.startsWith("image/");
+  const isVideo = file.type.startsWith("video/");
+  if (isImage && url) return <img src={url} alt={file.name} className={`w-full ${className} object-cover rounded-lg`} />;
+  if (isVideo && url) return <video src={url} className={`w-full ${className} object-cover rounded-lg`} controls muted />;
+  return <div className={`w-full ${className} bg-muted/50 flex items-center justify-center rounded-lg`}><Paperclip className="w-4 h-4 text-muted-foreground" /><span className="text-[10px] text-muted-foreground ml-1">{file.name}</span></div>;
+};
+
 /* ─── Preview Components ─── */
 
 const PhoneFrame = ({ children, headerBg, headerContent }: { children: React.ReactNode; headerBg?: string; headerContent: React.ReactNode }) => (

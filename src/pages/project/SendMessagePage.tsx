@@ -479,6 +479,27 @@ const SendMessagePage = () => {
   const [actionButtons, setActionButtons] = useState<{ label: string; type: string; value: string }[]>([]);
   const [recipientDialogOpen, setRecipientDialogOpen] = useState(false);
   const [recipientData, setRecipientData] = useState<{ mode: string; count: number; label: string; details: string } | null>(null);
+  const [selectedProvider, setSelectedProvider] = useState("default");
+
+  // Simulated providers per channel
+  const channelProviders: Record<string, { id: string; name: string; status: string }[]> = {
+    sms: [
+      { id: "default", name: "NIC Gateway (Default)", status: "active" },
+      { id: "sms-cdac", name: "CDAC mGov", status: "active" },
+    ],
+    whatsapp: [
+      { id: "default", name: "Meta Cloud API (Default)", status: "active" },
+    ],
+    email: [
+      { id: "default", name: "Amazon SES (Default)", status: "active" },
+    ],
+    rcs: [
+      { id: "default", name: "Google RBM (Default)", status: "degraded" },
+    ],
+  };
+  const [actionButtons, setActionButtons] = useState<{ label: string; type: string; value: string }[]>([]);
+  const [recipientDialogOpen, setRecipientDialogOpen] = useState(false);
+  const [recipientData, setRecipientData] = useState<{ mode: string; count: number; label: string; details: string } | null>(null);
 
   const currentTemplates = templates[channel] || [];
   const supportsMedia = ["whatsapp", "email", "rcs"].includes(channel);

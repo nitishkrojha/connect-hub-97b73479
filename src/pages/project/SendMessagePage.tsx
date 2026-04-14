@@ -56,8 +56,8 @@ const existingCsvUploads = [
 
 /* ─── Media Preview Helper ─── */
 const MediaPreview = ({ file, className = "h-24" }: { file: File; className?: string }) => {
-  const [url, setUrl] = React.useState<string | null>(null);
-  React.useEffect(() => {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
     const objectUrl = URL.createObjectURL(file);
     setUrl(objectUrl);
     return () => URL.revokeObjectURL(objectUrl);

@@ -504,6 +504,8 @@ const SendMessagePage = () => {
   const smsParts = Math.max(1, Math.ceil(messageBody.length / 160));
   const recipientCount = recipientData?.count ?? 0;
 
+  const currentProviders = channelProviders[channel] || [];
+
   const handleChannelChange = (newChannel: string) => {
     setChannel(newChannel);
     setSelectedTemplate("");
@@ -511,6 +513,7 @@ const SendMessagePage = () => {
     setSubject("");
     setMediaFile(null);
     setActionButtons([]);
+    setSelectedProvider("default");
   };
 
   const handleTemplateSelect = (templateId: string) => {

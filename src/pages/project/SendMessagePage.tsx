@@ -785,6 +785,7 @@ const SendMessagePage = () => {
                     <span>Recipients: <strong className="text-foreground">{recipientCount.toLocaleString()}</strong></span>
                     {mediaFile && <><span>·</span><span>📎 Attachment</span></>}
                     {actionButtons.filter(b => b.label).length > 0 && <><span>·</span><span>🔘 {actionButtons.filter(b => b.label).length} Button(s)</span></>}
+                    {currentProviders.length > 1 && <><span>·</span><span>Via: <strong className="text-foreground">{currentProviders.find(p => p.id === selectedProvider)?.name || "Default"}</strong></span></>}
                   </div>
                 </div>
                 <Button size="lg" onClick={handleSend} disabled={sending || !messageBody.trim() || recipientCount === 0} className="min-w-[140px]">

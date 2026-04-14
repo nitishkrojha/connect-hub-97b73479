@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,6 +54,21 @@ const existingCsvUploads = [
   { id: "csv-3", name: "otp_numbers.csv", uploadDate: "Jun 3, 2025", totalRecords: 890, validRecords: 878 },
 ];
 
+/* ─── Media Preview Helper ─── */
+const MediaPreview = ({ file, className = "h-24" }: { file: File; className?: string }) => {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    const objectUrl = URL.createObjectURL(file);
+    setUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [file]);
+  const isImage = file.type.startsWith("image/");
+  const isVideo = file.type.startsWith("video/");
+  if (isImage && url) return <img src={url} alt={file.name} className={`w-full ${className} object-cover rounded-lg`} />;
+  if (isVideo && url) return <video src={url} className={`w-full ${className} object-cover rounded-lg`} controls muted />;
+  return <div className={`w-full ${className} bg-muted/50 flex items-center justify-center rounded-lg`}><Paperclip className="w-4 h-4 text-muted-foreground" /><span className="text-[10px] text-muted-foreground ml-1">{file.name}</span></div>;
+};
+
 /* ─── Preview Components ─── */
 
 const PhoneFrame = ({ children, headerBg, headerContent }: { children: React.ReactNode; headerBg?: string; headerContent: React.ReactNode }) => (
@@ -108,7 +123,7 @@ const WhatsAppPreview = ({ body, senderId, mediaFile, actionButtons }: { body: s
     {body.trim() ? (
       <div className="space-y-1">
         <div className="bg-background rounded-xl rounded-tl-sm px-3 py-2 max-w-[95%] shadow-sm border border-border/50">
-          {mediaFile && <div className="mb-2 rounded-lg bg-muted/50 h-24 flex items-center justify-center"><Image className="w-5 h-5 text-muted-foreground" /><span className="text-[10px] text-muted-foreground ml-1">{mediaFile.name}</span></div>}
+          {mediaFile && <div className="mb-2 overflow-hidden rounded-lg"><MediaPreview file={mediaFile} className="h-32" /></div>}
           <p className="text-xs text-foreground leading-relaxed whitespace-pre-wrap break-words">{body}</p>
           <div className="flex items-center justify-end gap-1 mt-1"><span className="text-[9px] text-muted-foreground">Now</span><CheckCheck className="w-3 h-3 text-blue-500" /></div>
         </div>
@@ -145,7 +160,7 @@ const EmailPreview = ({ body, subject, senderId, mediaFile, actionButtons }: { b
       <div className="p-4 min-h-[200px]">
         {body.trim() ? (
           <div>
-            {mediaFile && <div className="mb-3 rounded-lg bg-muted/30 border border-border p-3 flex items-center gap-2"><Paperclip className="w-4 h-4 text-muted-foreground" /><span className="text-xs text-foreground">{mediaFile.name}</span><FileDown className="w-3 h-3 ml-auto text-muted-foreground" /></div>}
+            {mediaFile && <div className="mb-3 overflow-hidden rounded-lg"><MediaPreview file={mediaFile} className="h-36" /></div>}
             <p className="text-xs text-foreground leading-relaxed whitespace-pre-wrap break-words">{body}</p>
             {actionButtons.filter(b => b.label.trim()).length > 0 && (
               <div className="flex flex-wrap gap-2 mt-4">
@@ -175,7 +190,7 @@ const RcsPreview = ({ body, senderId, mediaFile, actionButtons }: { body: string
   >
     {body.trim() ? (
       <div className="rounded-xl border border-border overflow-hidden shadow-sm max-w-[95%]">
-        {mediaFile && <div className="bg-muted/30 h-24 flex items-center justify-center"><Image className="w-5 h-5 text-muted-foreground" /><span className="text-[10px] text-muted-foreground ml-1">{mediaFile.name}</span></div>}
+        {mediaFile && <div className="overflow-hidden"><MediaPreview file={mediaFile} className="h-32" /></div>}
         <div className="px-3 py-2.5">
           <p className="text-xs text-foreground leading-relaxed whitespace-pre-wrap break-words">{body}</p>
           <p className="text-[9px] text-muted-foreground text-right mt-1.5">Now</p>

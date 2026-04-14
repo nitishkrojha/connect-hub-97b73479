@@ -649,7 +649,29 @@ const SendMessagePage = () => {
                 </Select>
               </div>
 
-              {/* Template */}
+              {/* Provider Selection */}
+              {currentProviders.length > 1 && (
+                <div>
+                  <Label className="text-foreground text-xs">Send via Provider</Label>
+                  <Select value={selectedProvider} onValueChange={setSelectedProvider}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {currentProviders.map(p => (
+                        <SelectItem key={p.id} value={p.id}>
+                          <span className="flex items-center gap-2">
+                            {p.name}
+                            {p.status === "degraded" && <span className="text-[10px] text-warning">⚠ Degraded</span>}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-[10px] text-muted-foreground mt-1">Auto-fallback is enabled if the selected provider fails</p>
+                </div>
+              )}
+
               <div>
                 <Label className="text-foreground text-xs">Template</Label>
                 <Select value={selectedTemplate} onValueChange={handleTemplateSelect}>

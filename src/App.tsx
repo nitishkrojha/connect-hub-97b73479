@@ -63,6 +63,7 @@ const App = () => (
               <Route path="quota" element={<AdminQuotaPage />} />
               <Route path="audit" element={<AdminAuditPage />} />
               <Route path="users" element={<AdminUsersPage />} />
+              <Route path="number-history" element={<NumberHistoryPage />} />
               <Route path="profile" element={<ProfilePage />} />
             </Route>
 
@@ -76,6 +77,7 @@ const App = () => (
               <Route path="config" element={<ProjectConfigPage />} />
               <Route path="quota" element={<ProjectQuotaPage />} />
               <Route path="history" element={<CampaignHistoryPage />} />
+              <Route path="number-history" element={<NumberHistoryPage />} />
               <Route path="docs" element={<DeveloperDocsPage />} />
               <Route path="profile" element={<ProfilePage />} />
             </Route>

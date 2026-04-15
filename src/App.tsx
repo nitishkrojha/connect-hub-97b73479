@@ -26,6 +26,7 @@ import ProjectQuotaPage from "./pages/project/ProjectQuotaPage";
 import CampaignHistoryPage from "./pages/project/CampaignHistoryPage";
 import DeveloperDocsPage from "./pages/project/DeveloperDocsPage";
 import ProfilePage from "./pages/ProfilePage";
+import NumberHistoryPage from "./pages/NumberHistoryPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();

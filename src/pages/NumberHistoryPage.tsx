@@ -105,7 +105,7 @@ const NumberHistoryPage = () => {
     : null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-hidden">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Number History Lookup</h1>
         <p className="text-muted-foreground mt-1">Search any number or email to view complete communication history</p>

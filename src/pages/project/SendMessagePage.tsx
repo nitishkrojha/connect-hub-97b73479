@@ -37,6 +37,9 @@ const templates: Record<string, { id: string; name: string; body: string; variab
   rcs: [
     { id: "r1", name: "Promo Card", body: "{{name}}, check out our latest offer: {{offer_details}}", variables: ["name", "offer_details"] },
   ],
+  ivrs: [
+    { id: "iv1", name: "Survey Call", body: "Hello {{name}}, this is an automated call from {{project_name}}. Press 1 for Account Info, Press 2 for Complaints.", variables: ["name", "project_name"] },
+  ],
 };
 
 const allChannelConfig = [

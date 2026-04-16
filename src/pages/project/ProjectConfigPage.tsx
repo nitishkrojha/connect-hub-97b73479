@@ -146,13 +146,19 @@ const sampleWebhookPayload = `{
   "direction": "inbound",
   "from": "+919876543210",
   "to": "+911234567890",
-  "started_at": "2025-06-12T10:42:11Z",
-  "answered_at": "2025-06-12T10:42:14Z",
-  "ended_at": "2025-06-12T10:44:48Z",
-  "duration_seconds": 154,
   "status": "completed",
   "menu_path": ["1", "3"],
-  "agent_transferred": false,
+  "agent_transferred": true,
+
+  "ivrs_start_time": "2025-06-12T10:42:11Z",
+  "ivrs_end_time":   "2025-06-12T10:42:38Z",
+  "queue_time":      12,
+  "hold_time":       8,
+  "agent_start_time":"2025-06-12T10:42:50Z",
+  "agent_end_time":  "2025-06-12T10:44:48Z",
+  "total_agent_duration": 118,
+
+  "duration_seconds": 157,
   "recording_url": "https://ivrs-provider.com/rec/CL-9F3A2B81.mp3",
   "metadata": { "campaign_id": "CMP-2025-06-A", "language": "hi" }
 }`;
@@ -163,8 +169,15 @@ const requiredKeys = [
   { key: "direction", desc: "inbound | outbound" },
   { key: "from / to", desc: "Caller and recipient numbers in E.164 format" },
   { key: "status", desc: "completed | failed | no-answer | busy | dropped" },
-  { key: "duration_seconds", desc: "Total call duration (numeric)" },
   { key: "menu_path", desc: "Array of IVR key presses, e.g. [\"1\", \"3\"]" },
+  { key: "ivrs_start_time", desc: "ISO timestamp — when the IVR flow started for this call" },
+  { key: "ivrs_end_time", desc: "ISO timestamp — when the IVR flow ended (before queue/agent)" },
+  { key: "queue_time", desc: "Seconds the caller waited in queue before agent pickup" },
+  { key: "hold_time", desc: "Seconds the caller was put on hold during the call" },
+  { key: "agent_start_time", desc: "ISO timestamp — when the agent answered the call" },
+  { key: "agent_end_time", desc: "ISO timestamp — when the agent ended the call" },
+  { key: "total_agent_duration", desc: "Total seconds spent on the agent leg (numeric)" },
+  { key: "duration_seconds", desc: "Total call duration end-to-end (numeric)" },
 ];
 
 const dailyWebhookStats = [

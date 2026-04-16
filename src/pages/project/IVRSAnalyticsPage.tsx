@@ -26,10 +26,10 @@ const inboundDaily = [
 ];
 const inboundFunnel = [
   { name: "Total Inbound Calls", value: 5600, fill: "hsl(199, 89%, 48%)" },
-  { name: "Answered", value: 5070, fill: "hsl(217, 91%, 50%)" },
-  { name: "Reached IVR Menu", value: 4480, fill: "hsl(262, 83%, 58%)" },
+  { name: "IVR Answered", value: 5070, fill: "hsl(217, 91%, 50%)" },
+  { name: "Menu Selection", value: 4480, fill: "hsl(262, 83%, 58%)" },
   { name: "Option Selected", value: 3210, fill: "hsl(142, 70%, 45%)" },
-  { name: "Resolved / Completed", value: 2080, fill: "hsl(38, 92%, 50%)" },
+  { name: "Agent Answered", value: 2080, fill: "hsl(38, 92%, 50%)" },
 ];
 const inboundMenu = [
   { name: "Press 1: Account Info", count: 1420, pct: 44.2 },
@@ -58,10 +58,10 @@ const outboundDaily = [
 ];
 const outboundFunnel = [
   { name: "Total Outbound Calls", value: 6880, fill: "hsl(173, 58%, 39%)" },
-  { name: "Connected", value: 5180, fill: "hsl(217, 91%, 50%)" },
+  { name: "IVR Connected", value: 5180, fill: "hsl(217, 91%, 50%)" },
   { name: "IVR Played", value: 4440, fill: "hsl(262, 83%, 58%)" },
   { name: "Recipient Responded", value: 3130, fill: "hsl(142, 70%, 45%)" },
-  { name: "Action Completed", value: 2040, fill: "hsl(38, 92%, 50%)" },
+  { name: "User Answered", value: 2040, fill: "hsl(38, 92%, 50%)" },
 ];
 const outboundDisposition = [
   { name: "Completed", value: 2040, color: "hsl(142, 70%, 45%)" },

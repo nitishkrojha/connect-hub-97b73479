@@ -90,6 +90,101 @@ const outboundStats = [
   { label: "Avg Duration", value: "1m 48s", icon: Clock, trend: "+0.3s", sub: "Per connected call" },
 ];
 
+/* ── Call timing analytics (derived from webhook timestamps) ── */
+const inboundTimingStats = [
+  { label: "Avg Handling Time", value: "3m 12s", icon: Timer, trend: "-8s", sub: "IVR + queue + agent" },
+  { label: "Avg Queue Time", value: "24s", icon: Clock, trend: "-3s", sub: "Wait before agent" },
+  { label: "Avg Hold Time", value: "11s", icon: PauseCircle, trend: "+1s", sub: "During the call" },
+  { label: "Avg Agent Talk Time", value: "2m 04s", icon: Headphones, trend: "-5s", sub: "On agent leg" },
+];
+const outboundTimingStats = [
+  { label: "Avg Handling Time", value: "2m 28s", icon: Timer, trend: "-4s", sub: "IVR + agent" },
+  { label: "Avg Queue Time", value: "9s", icon: Clock, trend: "-1s", sub: "Before recipient picks up" },
+  { label: "Avg Hold Time", value: "6s", icon: PauseCircle, trend: "0s", sub: "During the call" },
+  { label: "Avg Agent Talk Time", value: "1m 38s", icon: Headphones, trend: "+3s", sub: "On agent leg" },
+];
+
+const inboundTimingDaily = [
+  { day: "Mon", aht: 198, queue: 28, hold: 12 },
+  { day: "Tue", aht: 205, queue: 31, hold: 13 },
+  { day: "Wed", aht: 188, queue: 22, hold: 10 },
+  { day: "Thu", aht: 212, queue: 34, hold: 14 },
+  { day: "Fri", aht: 220, queue: 38, hold: 15 },
+  { day: "Sat", aht: 175, queue: 18, hold: 9 },
+  { day: "Sun", aht: 168, queue: 15, hold: 8 },
+];
+const outboundTimingDaily = [
+  { day: "Mon", aht: 142, queue: 10, hold: 7 },
+  { day: "Tue", aht: 151, queue: 11, hold: 6 },
+  { day: "Wed", aht: 138, queue: 8, hold: 6 },
+  { day: "Thu", aht: 156, queue: 12, hold: 7 },
+  { day: "Fri", aht: 162, queue: 13, hold: 8 },
+  { day: "Sat", aht: 128, queue: 7, hold: 5 },
+  { day: "Sun", aht: 120, queue: 6, hold: 4 },
+];
+
+const TimingAnalytics = ({
+  stats, daily, label,
+}: {
+  stats: typeof inboundTimingStats;
+  daily: { day: string; aht: number; queue: number; hold: number }[];
+  label: string;
+}) => (
+  <Card className="shadow-card">
+    <CardHeader>
+      <CardTitle className="text-base flex items-center gap-2">
+        <Timer className="w-4 h-4 text-primary" />
+        Call Timing Analytics — {label}
+      </CardTitle>
+      <p className="text-xs text-muted-foreground mt-1">
+        Derived from <code className="font-mono text-[11px] bg-muted px-1 rounded">ivrs_start_time</code>,{" "}
+        <code className="font-mono text-[11px] bg-muted px-1 rounded">queue_time</code>,{" "}
+        <code className="font-mono text-[11px] bg-muted px-1 rounded">hold_time</code> and agent timestamps in the webhook payload
+      </p>
+    </CardHeader>
+    <CardContent className="space-y-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {stats.map((s) => (
+          <div key={s.label} className="rounded-lg border border-border p-3 bg-muted/20">
+            <div className="flex items-center justify-between mb-1">
+              <s.icon className="w-4 h-4 text-primary" />
+              <div className="flex items-center gap-0.5 text-[10px]">
+                {s.trend.startsWith("+") ? (
+                  <ArrowUpRight className="w-3 h-3 text-destructive" />
+                ) : (
+                  <ArrowDownRight className="w-3 h-3 text-success" />
+                )}
+                <span className={`font-medium ${s.trend.startsWith("+") ? "text-destructive" : "text-success"}`}>{s.trend}</span>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">{s.label}</p>
+            <p className="text-lg font-bold text-foreground">{s.value}</p>
+            <p className="text-[10px] text-muted-foreground">{s.sub}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="h-64">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={daily}>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+            <XAxis dataKey="day" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
+            <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} unit="s" />
+            <Tooltip
+              contentStyle={{ borderRadius: "8px", border: "1px solid hsl(var(--border))", fontSize: "13px" }}
+              formatter={(v: number) => `${v}s`}
+            />
+            <Legend wrapperStyle={{ fontSize: "12px" }} />
+            <Line type="monotone" dataKey="aht" name="Avg Handling Time" stroke="hsl(217, 91%, 50%)" strokeWidth={2} dot={{ r: 3 }} />
+            <Line type="monotone" dataKey="queue" name="Avg Queue Time" stroke="hsl(38, 92%, 50%)" strokeWidth={2} dot={{ r: 3 }} />
+            <Line type="monotone" dataKey="hold" name="Avg Hold Time" stroke="hsl(262, 83%, 58%)" strokeWidth={2} dot={{ r: 3 }} />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </CardContent>
+  </Card>
+);
+
 const FunnelView = ({ data }: { data: { name: string; value: number; fill: string }[] }) => (
   <div className="space-y-3">
     {data.map((step, i) => {

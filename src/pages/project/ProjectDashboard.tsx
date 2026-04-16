@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Megaphone, MessageSquare, CheckCircle2, XCircle, TrendingUp,
-  Smartphone, Mail, Sparkles, Clock, CalendarDays, FileText,
+  Smartphone, Mail, Sparkles, Clock, CalendarDays, FileText, Phone,
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
 
@@ -21,6 +21,7 @@ const channelUsage = [
   { name: "WhatsApp", sent: 4800, color: "hsl(142, 70%, 45%)" },
   { name: "Email", sent: 8200, color: "hsl(217, 91%, 50%)" },
   { name: "RCS", sent: 1100, color: "hsl(38, 92%, 50%)" },
+  { name: "IVRS", sent: 2400, color: "hsl(173, 58%, 39%)" },
 ];
 
 const recentCampaigns = [
@@ -135,8 +136,8 @@ const ProjectDashboard = () => {
                     <span className="text-sm font-medium text-foreground">{ch.name}</span>
                     <span className="text-xs text-muted-foreground">{ch.sent.toLocaleString()}</span>
                   </div>
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div className="rounded-full h-2 transition-all" style={{ width: `${(ch.sent / 8200) * 100}%`, backgroundColor: ch.color }} />
+                    <div className="w-full bg-muted rounded-full h-2">
+                      <div className="rounded-full h-2 transition-all" style={{ width: `${(ch.sent / 8200) * 100}%`, backgroundColor: ch.color }} />
                   </div>
                 </div>
               ))}

@@ -2,7 +2,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard, Building2, Settings2, FileText, BarChart3,
-  Gauge, ScrollText, Users, Send, LogOut, ChevronLeft, Menu, Search,
+  Gauge, ScrollText, Users, Send, LogOut, ChevronLeft, Menu, Search, Phone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -17,6 +17,7 @@ const adminNav = [
   { to: "/admin/quota", icon: Gauge, label: "Quotas" },
   { to: "/admin/audit", icon: ScrollText, label: "Audit Logs" },
   { to: "/admin/users", icon: Users, label: "Users" },
+  { to: "/admin/ivrs", icon: Phone, label: "IVRS Analytics" },
   { to: "/admin/number-history", icon: Search, label: "Number Lookup" },
 ];
 

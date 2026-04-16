@@ -464,7 +464,7 @@ const RecipientDialog = ({
 
 const SendMessagePage = () => {
   const { user } = useAuth();
-  const enabledChannels = user?.enabledChannels || ["SMS", "WhatsApp", "Email", "RCS", "IVRS"];
+  const enabledChannels = user?.enabledChannels || ["SMS", "WhatsApp", "Email", "RCS"];
   const channelConfig = allChannelConfig.filter(ch => enabledChannels.map(c => c.toLowerCase()).includes(ch.id));
 
   const [channel, setChannel] = useState(channelConfig[0]?.id || "sms");
@@ -495,9 +495,6 @@ const SendMessagePage = () => {
     ],
     rcs: [
       { id: "default", name: "Google RBM (Default)", status: "degraded" },
-    ],
-    ivrs: [
-      { id: "default", name: "Ozonetel CloudAgent (Default)", status: "active" },
     ],
   };
 

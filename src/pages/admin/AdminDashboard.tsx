@@ -2,17 +2,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Building2, MessageSquare, CheckCircle2, XCircle, TrendingUp,
-  Send, Mail, Smartphone, Sparkles, Phone,
+  Mail, Smartphone, Sparkles,
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 
 const monthlyData = [
-  { name: "Jan", sms: 4200, whatsapp: 3100, email: 8500, rcs: 900, ivrs: 1800 },
-  { name: "Feb", sms: 5100, whatsapp: 3800, email: 9200, rcs: 1200, ivrs: 2100 },
-  { name: "Mar", sms: 4800, whatsapp: 4200, email: 10100, rcs: 1500, ivrs: 2400 },
-  { name: "Apr", sms: 6200, whatsapp: 5100, email: 11800, rcs: 1800, ivrs: 2800 },
-  { name: "May", sms: 7100, whatsapp: 5900, email: 12500, rcs: 2100, ivrs: 3100 },
-  { name: "Jun", sms: 6800, whatsapp: 6400, email: 13200, rcs: 2400, ivrs: 3400 },
+  { name: "Jan", sms: 4200, whatsapp: 3100, email: 8500, rcs: 900 },
+  { name: "Feb", sms: 5100, whatsapp: 3800, email: 9200, rcs: 1200 },
+  { name: "Mar", sms: 4800, whatsapp: 4200, email: 10100, rcs: 1500 },
+  { name: "Apr", sms: 6200, whatsapp: 5100, email: 11800, rcs: 1800 },
+  { name: "May", sms: 7100, whatsapp: 5900, email: 12500, rcs: 2100 },
+  { name: "Jun", sms: 6800, whatsapp: 6400, email: 13200, rcs: 2400 },
 ];
 
 const channelPie = [
@@ -20,7 +20,6 @@ const channelPie = [
   { name: "WhatsApp", value: 28500, color: "hsl(142, 70%, 45%)" },
   { name: "Email", value: 65300, color: "hsl(217, 91%, 50%)" },
   { name: "RCS", value: 9900, color: "hsl(38, 92%, 50%)" },
-  { name: "IVRS", value: 15600, color: "hsl(173, 58%, 39%)" },
 ];
 
 const topProjects = [
@@ -49,7 +48,6 @@ const channelCards = [
   { label: "WhatsApp", count: "28.5K", icon: MessageSquare, colorClass: "bg-channel-whatsapp" },
   { label: "Email", count: "65.3K", icon: Mail, colorClass: "bg-channel-email" },
   { label: "RCS", count: "9.9K", icon: Sparkles, colorClass: "bg-channel-rcs" },
-  { label: "IVRS", count: "15.6K", icon: Phone, colorClass: "bg-channel-ivrs" },
 ];
 
 const AdminDashboard = () => {
@@ -85,7 +83,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Channel Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {channelCards.map((ch) => (
           <Card key={ch.label} className="shadow-card animate-fade-in">
             <CardContent className="pt-4 pb-3 flex items-center gap-3">
@@ -119,7 +117,7 @@ const AdminDashboard = () => {
                   <Bar dataKey="whatsapp" name="WhatsApp" fill="hsl(142, 70%, 45%)" radius={[3,3,0,0]} />
                   <Bar dataKey="email" name="Email" fill="hsl(217, 91%, 50%)" radius={[3,3,0,0]} />
                   <Bar dataKey="rcs" name="RCS" fill="hsl(38, 92%, 50%)" radius={[3,3,0,0]} />
-                  <Bar dataKey="ivrs" name="IVRS" fill="hsl(173, 58%, 39%)" radius={[3,3,0,0]} />
+                  
                 </BarChart>
               </ResponsiveContainer>
             </div>

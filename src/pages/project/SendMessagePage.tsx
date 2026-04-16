@@ -85,7 +85,7 @@ const PhoneFrame = ({ children, headerBg, headerContent }: { children: React.Rea
       <div className={`rounded-t-2xl px-4 py-3 flex items-center gap-3 ${headerBg || "bg-muted/60 border-b border-border"}`}>
         {headerContent}
       </div>
-      <div className="bg-background rounded-b-2xl min-h-[280px] p-3 flex flex-col justify-end">
+      <div className="bg-background rounded-b-2xl min-h-[460px] p-3 flex flex-col justify-end">
         {children}
       </div>
     </div>
@@ -157,7 +157,7 @@ const EmailPreview = ({ body, subject, senderId, mediaFile, actionButtons }: { b
           <span className="text-[10px] text-muted-foreground ml-auto">Now</span>
         </div>
       </div>
-      <div className="p-4 min-h-[200px]">
+      <div className="p-4 min-h-[380px]">
         {body.trim() ? (
           <div>
             {mediaFile && <div className="mb-3 overflow-hidden rounded-lg"><MediaPreview file={mediaFile} className="h-36" /></div>}

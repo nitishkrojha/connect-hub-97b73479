@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Save, Server, Plus, Trash2, Copy, ExternalLink, Key, Code, Info, Check } from "lucide-react";
+import { Save, Server, Plus, Trash2, Copy, ExternalLink, Key, Code, Info, Check, Phone, PlayCircle, PauseCircle, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import ChannelProviderManager, { type ChannelProvider, type ProviderField } from "@/components/ChannelProviderManager";
 
@@ -40,13 +40,6 @@ const rcsProviderFields: ProviderField[] = [
   { key: "brandName", label: "Brand Name", placeholder: "My Brand" },
 ];
 
-const ivrsProviderFields: ProviderField[] = [
-  { key: "webhookUrl", label: "Webhook Endpoint URL", placeholder: "https://yourapp.com/api/ivrs/webhook" },
-  { key: "apiEndpoint", label: "IVRS API Endpoint", placeholder: "https://ivrs-provider.com/api/v1" },
-  { key: "apiKey", label: "API Key", type: "password" },
-  { key: "callerId", label: "Caller ID / DID Number", placeholder: "+911234567890" },
-  { key: "maxRetries", label: "Max Retries", placeholder: "3" },
-];
 
 const defaultSmsProviders: ChannelProvider[] = [
   { id: "sms-nic", name: "NIC Gateway", provider: "NIC", status: "active", isDefault: true, priority: 1, autoFallback: true, credentials: { apiEndpoint: "https://smsgw.nic.in/api/send", apiKey: "••••••", senderId: "DICNTFY", dltEntityId: "1101456780000012345" } },
@@ -59,7 +52,7 @@ const defaultEmailProviders: ChannelProvider[] = [
   { id: "email-ses", name: "Amazon SES", provider: "AWS SES", status: "active", isDefault: true, priority: 1, autoFallback: true, credentials: { smtpHost: "email-smtp.ap-south-1.amazonaws.com", smtpPort: "587", username: "AKIA••••Q3F", password: "••••••", fromAddress: "noreply@mybharat.gov.in" } },
 ];
 const defaultRcsProviders: ChannelProvider[] = [];
-const defaultIvrsProviders: ChannelProvider[] = [];
+
 
 export interface ApiFilter {
   key: string;
@@ -153,7 +146,7 @@ const ProjectConfigPage = () => {
   const [waProviders, setWaProviders] = useState<ChannelProvider[]>(defaultWaProviders);
   const [emailProviders, setEmailProviders] = useState<ChannelProvider[]>(defaultEmailProviders);
   const [rcsProviders, setRcsProviders] = useState<ChannelProvider[]>(defaultRcsProviders);
-  const [ivrsProviders, setIvrsProviders] = useState<ChannelProvider[]>(defaultIvrsProviders);
+  
   const [editingApi, setEditingApi] = useState<ApiEndpoint | null>(null);
   const [showAddApi, setShowAddApi] = useState(false);
   const [newApi, setNewApi] = useState({

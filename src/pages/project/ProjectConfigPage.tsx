@@ -138,6 +138,264 @@ export const defaultApis: ApiEndpoint[] = [
   },
 ];
 
+/* ─── IVRS Webhook Endpoint Manager ─── */
+
+const sampleWebhookPayload = `{
+  "event": "call.completed",
+  "call_id": "CL-9F3A2B81",
+  "direction": "inbound",
+  "from": "+919876543210",
+  "to": "+911234567890",
+  "started_at": "2025-06-12T10:42:11Z",
+  "answered_at": "2025-06-12T10:42:14Z",
+  "ended_at": "2025-06-12T10:44:48Z",
+  "duration_seconds": 154,
+  "status": "completed",
+  "menu_path": ["1", "3"],
+  "agent_transferred": false,
+  "recording_url": "https://ivrs-provider.com/rec/CL-9F3A2B81.mp3",
+  "metadata": { "campaign_id": "CMP-2025-06-A", "language": "hi" }
+}`;
+
+const requiredKeys = [
+  { key: "event", desc: "Event type — call.initiated, call.answered, ivr.input, call.completed, call.failed" },
+  { key: "call_id", desc: "Unique identifier for the call from your IVRS provider" },
+  { key: "direction", desc: "inbound | outbound" },
+  { key: "from / to", desc: "Caller and recipient numbers in E.164 format" },
+  { key: "status", desc: "completed | failed | no-answer | busy | dropped" },
+  { key: "duration_seconds", desc: "Total call duration (numeric)" },
+  { key: "menu_path", desc: "Array of IVR key presses, e.g. [\"1\", \"3\"]" },
+];
+
+const dailyWebhookStats = [
+  { date: "Today", received: 1284, success: 1248, failed: 22, ignored: 14 },
+  { date: "Yesterday", received: 1452, success: 1421, failed: 18, ignored: 13 },
+  { date: "2 days ago", received: 1198, success: 1175, failed: 12, ignored: 11 },
+  { date: "3 days ago", received: 1340, success: 1310, failed: 19, ignored: 11 },
+  { date: "4 days ago", received: 980, success: 962, failed: 8, ignored: 10 },
+  { date: "5 days ago", received: 1100, success: 1080, failed: 11, ignored: 9 },
+  { date: "6 days ago", received: 1220, success: 1198, failed: 14, ignored: 8 },
+];
+
+const recentWebhookEvents = [
+  { id: "WH-9123", event: "call.completed", status: 200, time: "12 sec ago", from: "+919876543210", result: "success" },
+  { id: "WH-9122", event: "ivr.input", status: 200, time: "45 sec ago", from: "+919876543211", result: "success" },
+  { id: "WH-9121", event: "call.answered", status: 200, time: "1 min ago", from: "+919876543212", result: "success" },
+  { id: "WH-9120", event: "call.failed", status: 422, time: "3 min ago", from: "+919876543213", result: "failed" },
+  { id: "WH-9119", event: "call.completed", status: 200, time: "5 min ago", from: "+919876543214", result: "success" },
+  { id: "WH-9118", event: "unknown.event", status: 400, time: "8 min ago", from: "+919876543215", result: "ignored" },
+];
+
+const IVRSWebhookSection = () => {
+  const [endpointStatus, setEndpointStatus] = useState<"running" | "paused">("running");
+  const [secret] = useState("whsk_live_8f3a2b81c4d6e9f02a7b5c8d1e4f6a9b");
+  const [showSecret, setShowSecret] = useState(false);
+  const webhookUrl = "https://api.dicnotifier.io/v1/projects/mybharat/ivrs/webhook";
+
+  const copy = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success(`${label} copied`);
+  };
+
+  return (
+    <div className="space-y-5 mt-4">
+      <Card className="shadow-card">
+        <CardContent className="pt-5 pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className={`w-11 h-11 rounded-lg flex items-center justify-center ${endpointStatus === "running" ? "bg-success/10" : "bg-warning/10"}`}>
+                <Phone className={`w-5 h-5 ${endpointStatus === "running" ? "text-success" : "text-warning"}`} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-base font-semibold text-foreground">IVRS Webhook Endpoint</h3>
+                  {endpointStatus === "running" ? (
+                    <Badge className="bg-success/10 text-success hover:bg-success/10 text-[10px]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-success mr-1 animate-pulse" />Running
+                    </Badge>
+                  ) : (
+                    <Badge className="bg-warning/10 text-warning hover:bg-warning/10 text-[10px]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-warning mr-1" />Paused
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">Receives call events from your IVRS provider in real-time</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {endpointStatus === "running" ? (
+                <Button variant="outline" size="sm" onClick={() => { setEndpointStatus("paused"); toast.success("Endpoint paused"); }}>
+                  <PauseCircle className="w-4 h-4 mr-1.5" />Pause
+                </Button>
+              ) : (
+                <Button size="sm" onClick={() => { setEndpointStatus("running"); toast.success("Endpoint resumed"); }}>
+                  <PlayCircle className="w-4 h-4 mr-1.5" />Resume
+                </Button>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="shadow-card">
+        <CardHeader><CardTitle className="text-base">Endpoint Details</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label className="text-foreground text-sm">Webhook URL</Label>
+            <div className="flex gap-2 mt-1.5">
+              <Input value={webhookUrl} readOnly className="font-mono text-xs" />
+              <Button variant="outline" size="icon" onClick={() => copy(webhookUrl, "URL")}>
+                <Copy className="w-4 h-4" />
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1.5">Configure this URL in your IVRS provider's webhook settings (POST, application/json)</p>
+          </div>
+
+          <div>
+            <Label className="text-foreground text-sm">Signing Secret</Label>
+            <div className="flex gap-2 mt-1.5">
+              <Input value={showSecret ? secret : "••••••••••••••••••••••••••••••••"} readOnly type="text" className="font-mono text-xs" />
+              <Button variant="outline" size="sm" onClick={() => setShowSecret(!showSecret)}>{showSecret ? "Hide" : "Show"}</Button>
+              <Button variant="outline" size="icon" onClick={() => copy(secret, "Secret")}>
+                <Copy className="w-4 h-4" />
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1.5">Use this to sign requests via HMAC SHA-256 in the <code className="font-mono text-[11px] bg-muted px-1 rounded">X-DIC-Signature</code> header</p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-border">
+            <div className="flex items-center gap-2">
+              <Switch defaultChecked /><Label className="text-foreground text-sm">Verify HMAC Signature</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch defaultChecked /><Label className="text-foreground text-sm">Log all events</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch /><Label className="text-foreground text-sm">Notify on failure (email)</Label>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="shadow-card">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base">Expected Payload Format</CardTitle>
+            <Button variant="outline" size="sm" onClick={() => copy(sampleWebhookPayload, "Sample payload")}>
+              <Copy className="w-4 h-4 mr-1.5" />Copy Sample
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm font-medium text-foreground mb-2">Required Keys</p>
+              <div className="space-y-2">
+                {requiredKeys.map((k) => (
+                  <div key={k.key} className="flex gap-2 text-xs">
+                    <code className="font-mono bg-primary/10 text-primary px-1.5 py-0.5 rounded h-fit flex-shrink-0">{k.key}</code>
+                    <span className="text-muted-foreground">{k.desc}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-foreground mb-2">Sample JSON Body</p>
+              <pre className="bg-muted/50 border border-border rounded-lg p-3 text-[11px] font-mono text-foreground overflow-auto max-h-[280px]">
+{sampleWebhookPayload}
+              </pre>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="shadow-card">
+        <CardHeader><CardTitle className="text-base">Daily Webhook Activity (Last 7 days)</CardTitle></CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left text-xs font-medium text-muted-foreground pb-3 pr-4">Date</th>
+                  <th className="text-right text-xs font-medium text-muted-foreground pb-3 pr-4">Received</th>
+                  <th className="text-right text-xs font-medium text-muted-foreground pb-3 pr-4">Success</th>
+                  <th className="text-right text-xs font-medium text-muted-foreground pb-3 pr-4">Failed</th>
+                  <th className="text-right text-xs font-medium text-muted-foreground pb-3 pr-4">Ignored</th>
+                  <th className="text-right text-xs font-medium text-muted-foreground pb-3">Success Rate</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dailyWebhookStats.map((d) => {
+                  const rate = ((d.success / d.received) * 100).toFixed(1);
+                  return (
+                    <tr key={d.date} className="border-b border-border/50 last:border-0">
+                      <td className="py-2.5 pr-4 text-sm font-medium text-foreground">{d.date}</td>
+                      <td className="py-2.5 pr-4 text-sm text-foreground text-right">{d.received.toLocaleString()}</td>
+                      <td className="py-2.5 pr-4 text-sm text-success text-right font-medium">{d.success.toLocaleString()}</td>
+                      <td className="py-2.5 pr-4 text-sm text-destructive text-right">{d.failed}</td>
+                      <td className="py-2.5 pr-4 text-sm text-warning text-right">{d.ignored}</td>
+                      <td className="py-2.5 text-right">
+                        <Badge variant="secondary" className="text-xs">{rate}%</Badge>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="shadow-card">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base">Recent Webhook Events</CardTitle>
+            <Button variant="outline" size="sm">View All</Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[500px]">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left text-xs font-medium text-muted-foreground pb-3 pr-4">Event ID</th>
+                  <th className="text-left text-xs font-medium text-muted-foreground pb-3 pr-4">Event</th>
+                  <th className="text-left text-xs font-medium text-muted-foreground pb-3 pr-4">From</th>
+                  <th className="text-left text-xs font-medium text-muted-foreground pb-3 pr-4">HTTP</th>
+                  <th className="text-left text-xs font-medium text-muted-foreground pb-3 pr-4">Result</th>
+                  <th className="text-right text-xs font-medium text-muted-foreground pb-3">Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentWebhookEvents.map((e) => (
+                  <tr key={e.id} className="border-b border-border/50 last:border-0">
+                    <td className="py-2.5 pr-4 font-mono text-xs text-primary">{e.id}</td>
+                    <td className="py-2.5 pr-4 text-sm text-foreground">
+                      <code className="font-mono text-[11px] bg-muted px-1.5 py-0.5 rounded">{e.event}</code>
+                    </td>
+                    <td className="py-2.5 pr-4 text-xs text-muted-foreground">{e.from}</td>
+                    <td className="py-2.5 pr-4">
+                      <Badge variant="outline" className={`text-[10px] ${e.status >= 200 && e.status < 300 ? "text-success border-success/30" : "text-destructive border-destructive/30"}`}>{e.status}</Badge>
+                    </td>
+                    <td className="py-2.5 pr-4">
+                      {e.result === "success" && <span className="inline-flex items-center text-xs text-success"><CheckCircle2 className="w-3 h-3 mr-1" />Success</span>}
+                      {e.result === "failed" && <span className="inline-flex items-center text-xs text-destructive"><XCircle className="w-3 h-3 mr-1" />Failed</span>}
+                      {e.result === "ignored" && <span className="inline-flex items-center text-xs text-warning"><AlertCircle className="w-3 h-3 mr-1" />Ignored</span>}
+                    </td>
+                    <td className="py-2.5 text-xs text-muted-foreground text-right">{e.time}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Button onClick={() => toast.success("Webhook settings saved")}><Save className="w-4 h-4 mr-2" />Save Settings</Button>
+    </div>
+  );
+};
+
 const ProjectConfigPage = () => {
   const [configSource, setConfigSource] = useState<"notifier" | "own">("notifier");
   const [apis, setApis] = useState<ApiEndpoint[]>(defaultApis);

@@ -40,6 +40,14 @@ const rcsProviderFields: ProviderField[] = [
   { key: "brandName", label: "Brand Name", placeholder: "My Brand" },
 ];
 
+const ivrsProviderFields: ProviderField[] = [
+  { key: "webhookUrl", label: "Webhook Endpoint URL", placeholder: "https://yourapp.com/api/ivrs/webhook" },
+  { key: "apiEndpoint", label: "IVRS API Endpoint", placeholder: "https://ivrs-provider.com/api/v1" },
+  { key: "apiKey", label: "API Key", type: "password" },
+  { key: "callerId", label: "Caller ID / DID Number", placeholder: "+911234567890" },
+  { key: "maxRetries", label: "Max Retries", placeholder: "3" },
+];
+
 const defaultSmsProviders: ChannelProvider[] = [
   { id: "sms-nic", name: "NIC Gateway", provider: "NIC", status: "active", isDefault: true, priority: 1, autoFallback: true, credentials: { apiEndpoint: "https://smsgw.nic.in/api/send", apiKey: "••••••", senderId: "DICNTFY", dltEntityId: "1101456780000012345" } },
   { id: "sms-cdac", name: "CDAC mGov", provider: "CDAC", status: "active", isDefault: false, priority: 2, autoFallback: true, credentials: { apiEndpoint: "https://mgov.gov.in/sms/api", apiKey: "••••••", senderId: "MYBHRT", dltEntityId: "1101456780000012346" } },
@@ -51,6 +59,7 @@ const defaultEmailProviders: ChannelProvider[] = [
   { id: "email-ses", name: "Amazon SES", provider: "AWS SES", status: "active", isDefault: true, priority: 1, autoFallback: true, credentials: { smtpHost: "email-smtp.ap-south-1.amazonaws.com", smtpPort: "587", username: "AKIA••••Q3F", password: "••••••", fromAddress: "noreply@mybharat.gov.in" } },
 ];
 const defaultRcsProviders: ChannelProvider[] = [];
+const defaultIvrsProviders: ChannelProvider[] = [];
 
 export interface ApiFilter {
   key: string;
@@ -144,6 +153,7 @@ const ProjectConfigPage = () => {
   const [waProviders, setWaProviders] = useState<ChannelProvider[]>(defaultWaProviders);
   const [emailProviders, setEmailProviders] = useState<ChannelProvider[]>(defaultEmailProviders);
   const [rcsProviders, setRcsProviders] = useState<ChannelProvider[]>(defaultRcsProviders);
+  const [ivrsProviders, setIvrsProviders] = useState<ChannelProvider[]>(defaultIvrsProviders);
   const [editingApi, setEditingApi] = useState<ApiEndpoint | null>(null);
   const [showAddApi, setShowAddApi] = useState(false);
   const [newApi, setNewApi] = useState({
@@ -208,6 +218,7 @@ const ProjectConfigPage = () => {
           <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
           <TabsTrigger value="email">Email</TabsTrigger>
           <TabsTrigger value="rcs">RCS</TabsTrigger>
+          <TabsTrigger value="ivrs">IVRS</TabsTrigger>
           <TabsTrigger value="api">API Endpoints</TabsTrigger>
         </TabsList>
 
@@ -366,6 +377,35 @@ const ProjectConfigPage = () => {
                 <Switch defaultChecked /><Label className="text-foreground text-sm">Enable Rich Cards</Label>
               </div>
               <Button onClick={() => toast.success("RCS settings updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="ivrs">
+          <Card className="shadow-card mt-4">
+            <CardHeader><CardTitle className="text-base">IVRS Providers & Webhook Config</CardTitle></CardHeader>
+            <CardContent className="space-y-5">
+              {configSource === "own" ? (
+                <ChannelProviderManager
+                  channel="ivrs"
+                  channelLabel="IVRS"
+                  providers={ivrsProviders}
+                  onProvidersChange={setIvrsProviders}
+                  fields={ivrsProviderFields}
+                />
+              ) : (
+                <div className="p-3 rounded-lg bg-muted/50 border border-border text-sm text-muted-foreground">
+                  <Info className="w-4 h-4 inline mr-1 text-primary" />
+                  Using DIC Notifier's built-in IVRS service. Switch to "Own Configuration" in Service Config to manage your own providers.
+                </div>
+              )}
+              <div className="flex items-center gap-3">
+                <Switch defaultChecked /><Label className="text-foreground text-sm">Enable Webhook Logging</Label>
+              </div>
+              <div className="flex items-center gap-3">
+                <Switch defaultChecked /><Label className="text-foreground text-sm">Auto-retry Failed Calls</Label>
+              </div>
+              <Button onClick={() => toast.success("IVRS settings updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
             </CardContent>
           </Card>
         </TabsContent>

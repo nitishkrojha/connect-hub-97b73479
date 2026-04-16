@@ -289,6 +289,9 @@ const IVRSAnalyticsPage = () => {
         <TabsContent value="inbound" className="space-y-6 mt-4">
           <StatGrid stats={inboundStats} />
 
+          <TimingAnalytics stats={inboundTimingStats} daily={inboundTimingDaily} label="Inbound" />
+
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="shadow-card">
               <CardHeader><CardTitle className="text-base">Inbound Call Funnel</CardTitle></CardHeader>
@@ -347,6 +350,9 @@ const IVRSAnalyticsPage = () => {
         {/* ── OUTBOUND ── */}
         <TabsContent value="outbound" className="space-y-6 mt-4">
           <StatGrid stats={outboundStats} />
+
+          <TimingAnalytics stats={outboundTimingStats} daily={outboundTimingDaily} label="Outbound" />
+
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="shadow-card">

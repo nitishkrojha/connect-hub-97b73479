@@ -2,7 +2,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard, Megaphone, Send, FileText, Upload,
-  BarChart3, Settings2, Gauge, History, LogOut, Menu, ChevronLeft, Code2, Search, Phone,
+  BarChart3, Settings2, Gauge, History, LogOut, Menu, ChevronLeft, Code2, Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -18,7 +18,6 @@ const projectNav = [
   { to: "/project/config", icon: Settings2, label: "Configuration" },
   { to: "/project/quota", icon: Gauge, label: "Quota" },
   { to: "/project/history", icon: History, label: "History" },
-  { to: "/project/ivrs", icon: Phone, label: "IVRS Analytics" },
   { to: "/project/number-history", icon: Search, label: "Number Lookup" },
   { to: "/project/docs", icon: Code2, label: "Developer Docs" },
 ];

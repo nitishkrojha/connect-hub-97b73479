@@ -188,27 +188,6 @@ const AdminChannelsPage = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="ivrs">
-          <Card className="shadow-card mt-4">
-            <CardHeader><CardTitle className="text-base">IVRS Providers & Webhook Config</CardTitle></CardHeader>
-            <CardContent className="space-y-5">
-              <ChannelProviderManager channel="ivrs" channelLabel="IVRS" providers={ivrsProviders} onProvidersChange={setIvrsProviders} fields={ivrsFields} />
-              <div className="border-t border-border pt-4 space-y-3">
-                <p className="text-xs font-medium text-foreground">IVRS Settings</p>
-                <div className="flex items-center gap-3">
-                  <Switch defaultChecked /><Label className="text-foreground text-sm">Enable Webhook Logging</Label>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Switch defaultChecked /><Label className="text-foreground text-sm">Auto-retry Failed Calls</Label>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Switch /><Label className="text-foreground text-sm">Enable Call Recording</Label>
-                </div>
-              </div>
-              <Button onClick={() => toast.success("IVRS configuration saved")}><Save className="w-4 h-4 mr-2" />Save</Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
     </div>
   );

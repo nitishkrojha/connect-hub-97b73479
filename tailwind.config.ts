@@ -78,6 +78,7 @@ export default {
           whatsapp: "hsl(var(--channel-whatsapp))",
           email: "hsl(var(--channel-email))",
           rcs: "hsl(var(--channel-rcs))",
+          ivrs: "hsl(var(--channel-ivrs))",
         },
       },
       borderRadius: {

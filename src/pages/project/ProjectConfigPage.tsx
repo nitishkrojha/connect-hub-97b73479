@@ -211,7 +211,7 @@ const ProjectConfigPage = () => {
           <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
           <TabsTrigger value="email">Email</TabsTrigger>
           <TabsTrigger value="rcs">RCS</TabsTrigger>
-          <TabsTrigger value="ivrs">IVRS</TabsTrigger>
+          <TabsTrigger value="ivrs">IVRS Webhook</TabsTrigger>
           <TabsTrigger value="api">API Endpoints</TabsTrigger>
         </TabsList>
 
@@ -375,32 +375,7 @@ const ProjectConfigPage = () => {
         </TabsContent>
 
         <TabsContent value="ivrs">
-          <Card className="shadow-card mt-4">
-            <CardHeader><CardTitle className="text-base">IVRS Providers & Webhook Config</CardTitle></CardHeader>
-            <CardContent className="space-y-5">
-              {configSource === "own" ? (
-                <ChannelProviderManager
-                  channel="ivrs"
-                  channelLabel="IVRS"
-                  providers={ivrsProviders}
-                  onProvidersChange={setIvrsProviders}
-                  fields={ivrsProviderFields}
-                />
-              ) : (
-                <div className="p-3 rounded-lg bg-muted/50 border border-border text-sm text-muted-foreground">
-                  <Info className="w-4 h-4 inline mr-1 text-primary" />
-                  Using DIC Notifier's built-in IVRS service. Switch to "Own Configuration" in Service Config to manage your own providers.
-                </div>
-              )}
-              <div className="flex items-center gap-3">
-                <Switch defaultChecked /><Label className="text-foreground text-sm">Enable Webhook Logging</Label>
-              </div>
-              <div className="flex items-center gap-3">
-                <Switch defaultChecked /><Label className="text-foreground text-sm">Auto-retry Failed Calls</Label>
-              </div>
-              <Button onClick={() => toast.success("IVRS settings updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
-            </CardContent>
-          </Card>
+          <IVRSWebhookSection />
         </TabsContent>
 
         {/* API Endpoints Tab */}

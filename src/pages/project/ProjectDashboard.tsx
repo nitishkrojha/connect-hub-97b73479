@@ -64,8 +64,8 @@ const ProjectDashboard = () => {
 
       <Tabs defaultValue="overview">
         <TabsList>
-          <TabsTrigger value="overview"><BarChart3 className="w-4 h-4 mr-1.5" />Overview</TabsTrigger>
-          <TabsTrigger value="ivrs"><Phone className="w-4 h-4 mr-1.5" />IVRS Analytics</TabsTrigger>
+          <TabsTrigger value="overview"><BarChart3 className="w-4 h-4 mr-1.5" />Message Dashboard</TabsTrigger>
+          <TabsTrigger value="ivrs"><Phone className="w-4 h-4 mr-1.5" />Call Dashboard</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6 mt-4">

@@ -38,7 +38,7 @@ const DEMO_USERS: Record<string, User & { password: string }> = {
     projectId: "proj-mybharat",
     projectName: "My Bharat",
     password: "project123",
-    enabledChannels: ["SMS", "WhatsApp"],
+    enabledChannels: ["SMS", "WhatsApp", "Email", "RCS"],
   },
 };
 

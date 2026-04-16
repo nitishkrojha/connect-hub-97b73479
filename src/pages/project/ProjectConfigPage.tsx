@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Save, Server, Plus, Trash2, Copy, ExternalLink, Key, Code, Info, Check, Phone, PlayCircle, PauseCircle, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
+import { Save, Server, Plus, Trash2, Copy, ExternalLink, Key, Code, Info, Check, Phone, PlayCircle, PauseCircle, CheckCircle2, XCircle, AlertCircle, Sparkles, ArrowRight, Webhook } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import ChannelProviderManager, { type ChannelProvider, type ProviderField } from "@/components/ChannelProviderManager";
 
@@ -410,6 +410,7 @@ const IVRSWebhookSection = () => {
 };
 
 const ProjectConfigPage = () => {
+  const [activeTab, setActiveTab] = useState("general");
   const [configSource, setConfigSource] = useState<"notifier" | "own">("notifier");
   const [apis, setApis] = useState<ApiEndpoint[]>(defaultApis);
   const [showSample, setShowSample] = useState(false);
@@ -474,7 +475,36 @@ const ProjectConfigPage = () => {
         <p className="text-muted-foreground mt-1">Project-level communication settings & API integration</p>
       </div>
 
-      <Tabs defaultValue="general">
+      {/* New Feature Highlight: IVRS Webhook */}
+      <button
+        onClick={() => setActiveTab("ivrs")}
+        className="w-full text-left group relative overflow-hidden rounded-xl border-2 border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-5 hover:border-primary/60 hover:shadow-card-hover transition-all"
+      >
+        <div className="absolute top-3 right-3">
+          <Badge className="bg-primary text-primary-foreground hover:bg-primary text-[10px] gap-1">
+            <Sparkles className="w-3 h-3" />NEW FEATURE
+          </Badge>
+        </div>
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0">
+            <Webhook className="w-6 h-6 text-primary" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-base font-bold text-foreground flex items-center gap-2">
+              IVRS Dashboard Connection & Webhook
+            </h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              Connect your IVRS provider to DIC Notifier via webhook. Stream inbound & outbound call events in real-time and unlock the Call Dashboard analytics.
+            </p>
+            <div className="flex items-center gap-2 mt-3 text-sm font-medium text-primary group-hover:gap-3 transition-all">
+              Configure IVRS Webhook
+              <ArrowRight className="w-4 h-4" />
+            </div>
+          </div>
+        </div>
+      </button>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="flex-wrap">
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="service">Service Config</TabsTrigger>
@@ -482,7 +512,9 @@ const ProjectConfigPage = () => {
           <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
           <TabsTrigger value="email">Email</TabsTrigger>
           <TabsTrigger value="rcs">RCS</TabsTrigger>
-          <TabsTrigger value="ivrs">IVRS Webhook</TabsTrigger>
+          <TabsTrigger value="ivrs" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <Sparkles className="w-3 h-3 mr-1" />IVRS Webhook
+          </TabsTrigger>
           <TabsTrigger value="api">API Endpoints</TabsTrigger>
         </TabsList>
 

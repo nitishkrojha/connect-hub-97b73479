@@ -37,9 +37,6 @@ const templates: Record<string, { id: string; name: string; body: string; variab
   rcs: [
     { id: "r1", name: "Promo Card", body: "{{name}}, check out our latest offer: {{offer_details}}", variables: ["name", "offer_details"] },
   ],
-  ivrs: [
-    { id: "iv1", name: "Survey Call", body: "Hello {{name}}, this is an automated call from {{project_name}}. Press 1 for Account Info, Press 2 for Complaints.", variables: ["name", "project_name"] },
-  ],
 };
 
 const allChannelConfig = [
@@ -47,7 +44,6 @@ const allChannelConfig = [
   { id: "whatsapp", label: "WhatsApp", icon: MessageSquare, color: "hsl(142, 70%, 40%)" },
   { id: "email", label: "Email", icon: Mail, color: "hsl(var(--channel-email, 0 72% 51%))" },
   { id: "rcs", label: "RCS", icon: Sparkles, color: "hsl(var(--channel-rcs, 280 67% 55%))" },
-  { id: "ivrs", label: "IVRS", icon: Phone, color: "hsl(var(--channel-ivrs, 173 58% 39%))" },
 ];
 
 const allVariables = ["name", "otp", "project_name", "date", "amount", "link"];
@@ -468,7 +464,7 @@ const RecipientDialog = ({
 
 const SendMessagePage = () => {
   const { user } = useAuth();
-  const enabledChannels = user?.enabledChannels || ["SMS", "WhatsApp", "Email", "RCS", "IVRS"];
+  const enabledChannels = user?.enabledChannels || ["SMS", "WhatsApp", "Email", "RCS"];
   const channelConfig = allChannelConfig.filter(ch => enabledChannels.map(c => c.toLowerCase()).includes(ch.id));
 
   const [channel, setChannel] = useState(channelConfig[0]?.id || "sms");
@@ -499,9 +495,6 @@ const SendMessagePage = () => {
     ],
     rcs: [
       { id: "default", name: "Google RBM (Default)", status: "degraded" },
-    ],
-    ivrs: [
-      { id: "default", name: "Ozonetel CloudAgent (Default)", status: "active" },
     ],
   };
 

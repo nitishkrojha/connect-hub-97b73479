@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ivrsWebhookHero from "@/assets/ivrs-webhook-hero.jpg";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -476,33 +477,68 @@ const ProjectConfigPage = () => {
       </div>
 
       {/* New Feature Highlight: IVRS Webhook */}
-      <button
-        onClick={() => setActiveTab("ivrs")}
-        className="w-full text-left group relative overflow-hidden rounded-xl border-2 border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-5 hover:border-primary/60 hover:shadow-card-hover transition-all"
-      >
-        <div className="absolute top-3 right-3">
-          <Badge className="bg-primary text-primary-foreground hover:bg-primary text-[10px] gap-1">
+      <div className="relative overflow-hidden rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-background shadow-card-hover">
+        <div className="absolute top-4 right-4 z-10">
+          <Badge className="bg-primary text-primary-foreground hover:bg-primary text-[10px] gap-1 shadow">
             <Sparkles className="w-3 h-3" />NEW FEATURE
           </Badge>
         </div>
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0">
-            <Webhook className="w-6 h-6 text-primary" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-              IVRS Dashboard Connection & Webhook
-            </h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              Connect your IVRS provider to DIC Notifier via webhook. Stream inbound & outbound call events in real-time and unlock the Call Dashboard analytics.
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center p-6 lg:p-8">
+          <div className="space-y-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/15 text-primary text-xs font-semibold">
+              <Webhook className="w-3.5 h-3.5" />IVRS Dashboard Connection
+            </div>
+            <h2 className="text-2xl lg:text-3xl font-bold text-foreground leading-tight">
+              Now get full analytics on your <span className="text-primary">running IVRS system</span>
+            </h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Already running an IVRS with another provider? No need to migrate. Just add a webhook endpoint
+              from DIC Notifier into your IVRS platform — we'll capture every inbound and outbound call event
+              in real-time and turn it into rich Call Dashboard analytics, funnels, agent timing & SLA reports.
             </p>
-            <div className="flex items-center gap-2 mt-3 text-sm font-medium text-primary group-hover:gap-3 transition-all">
-              Configure IVRS Webhook
-              <ArrowRight className="w-4 h-4" />
+            <div className="grid grid-cols-3 gap-2 pt-2">
+              <div className="rounded-lg border border-border bg-card/60 p-3 text-center">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-1.5">
+                  <span className="text-primary font-bold text-sm">1</span>
+                </div>
+                <p className="text-[11px] font-medium text-foreground">Copy Webhook URL</p>
+              </div>
+              <div className="rounded-lg border border-border bg-card/60 p-3 text-center">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-1.5">
+                  <span className="text-primary font-bold text-sm">2</span>
+                </div>
+                <p className="text-[11px] font-medium text-foreground">Paste in your IVRS</p>
+              </div>
+              <div className="rounded-lg border border-border bg-card/60 p-3 text-center">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-1.5">
+                  <span className="text-primary font-bold text-sm">3</span>
+                </div>
+                <p className="text-[11px] font-medium text-foreground">Get Live Analytics</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2 pt-2">
+              <Button onClick={() => setActiveTab("ivrs")} className="gap-2">
+                <Webhook className="w-4 h-4" />Configure IVRS Webhook
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+              <Button variant="outline" onClick={() => setActiveTab("ivrs")}>
+                View Payload Format
+              </Button>
             </div>
           </div>
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent rounded-xl blur-2xl" />
+            <img
+              src={ivrsWebhookHero}
+              alt="IVRS webhook connecting to DIC Notifier analytics dashboard"
+              width={1024}
+              height={640}
+              loading="lazy"
+              className="relative w-full h-auto rounded-xl border border-border shadow-card"
+            />
+          </div>
         </div>
-      </button>
+      </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="flex-wrap">

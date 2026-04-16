@@ -253,7 +253,7 @@ const ProjectConfigPage = () => {
                     <Server className="w-5 h-5 text-primary" />
                     <span className="font-semibold text-foreground">DIC Notifier Service</span>
                   </div>
-                  <p className="text-xs text-muted-foreground">Use the platform's built-in SMS, WhatsApp, Email & RCS services. No configuration needed.</p>
+                  <p className="text-xs text-muted-foreground">Use the platform's built-in SMS, WhatsApp, Email, RCS & IVRS services. No configuration needed.</p>
                 </button>
                 <button
                   onClick={() => setConfigSource("own")}

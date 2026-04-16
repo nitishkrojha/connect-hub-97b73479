@@ -2,103 +2,171 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Phone, PhoneIncoming, PhoneOutgoing, PhoneMissed, Clock, TrendingUp,
-  BarChart3, Users, CheckCircle2, XCircle, ArrowDownRight, ArrowUpRight,
-  Filter, Download, RefreshCw,
+  Phone, PhoneIncoming, PhoneOutgoing, PhoneMissed, Clock,
+  CheckCircle2, ArrowDownRight, ArrowUpRight, Download, RefreshCw,
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, LineChart, Line, AreaChart, Area, FunnelChart, Funnel, LabelList,
+  PieChart, Pie, Cell, AreaChart, Area,
 } from "recharts";
 
-const funnelData = [
-  { name: "Total Calls", value: 12480, fill: "hsl(199, 89%, 48%)" },
-  { name: "Connected", value: 10250, fill: "hsl(217, 91%, 50%)" },
-  { name: "IVR Menu Reached", value: 8920, fill: "hsl(262, 83%, 58%)" },
-  { name: "Option Selected", value: 6340, fill: "hsl(142, 70%, 45%)" },
-  { name: "Completed Action", value: 4120, fill: "hsl(38, 92%, 50%)" },
+/* ── Inbound mock data ── */
+const inboundDaily = [
+  { day: "Mon", calls: 820, answered: 740, missed: 80 },
+  { day: "Tue", calls: 950, answered: 870, missed: 80 },
+  { day: "Wed", calls: 780, answered: 700, missed: 80 },
+  { day: "Thu", calls: 1100, answered: 990, missed: 110 },
+  { day: "Fri", calls: 1250, answered: 1140, missed: 110 },
+  { day: "Sat", calls: 420, answered: 380, missed: 40 },
+  { day: "Sun", calls: 280, answered: 250, missed: 30 },
+];
+const inboundFunnel = [
+  { name: "Total Inbound Calls", value: 5600, fill: "hsl(199, 89%, 48%)" },
+  { name: "Answered", value: 5070, fill: "hsl(217, 91%, 50%)" },
+  { name: "Reached IVR Menu", value: 4480, fill: "hsl(262, 83%, 58%)" },
+  { name: "Option Selected", value: 3210, fill: "hsl(142, 70%, 45%)" },
+  { name: "Resolved / Completed", value: 2080, fill: "hsl(38, 92%, 50%)" },
+];
+const inboundMenu = [
+  { name: "Press 1: Account Info", count: 1420, pct: 44.2 },
+  { name: "Press 2: Complaints", count: 760, pct: 23.7 },
+  { name: "Press 3: Schemes", count: 510, pct: 15.9 },
+  { name: "Press 4: Talk to Agent", count: 320, pct: 10.0 },
+  { name: "Press 0: Repeat", count: 200, pct: 6.2 },
+];
+const inboundDisposition = [
+  { name: "Resolved", value: 2080, color: "hsl(142, 70%, 45%)" },
+  { name: "Dropped Mid-IVR", value: 1130, color: "hsl(38, 92%, 50%)" },
+  { name: "Transferred to Agent", value: 560, color: "hsl(199, 89%, 48%)" },
+  { name: "Voicemail", value: 220, color: "hsl(262, 83%, 58%)" },
+  { name: "Missed", value: 530, color: "hsl(0, 84%, 60%)" },
 ];
 
-const dailyVolume = [
-  { day: "Mon", inbound: 820, outbound: 1200 },
-  { day: "Tue", inbound: 950, outbound: 1350 },
-  { day: "Wed", inbound: 780, outbound: 1100 },
-  { day: "Thu", inbound: 1100, outbound: 1500 },
-  { day: "Fri", inbound: 1250, outbound: 1680 },
-  { day: "Sat", inbound: 420, outbound: 600 },
-  { day: "Sun", inbound: 280, outbound: 380 },
+/* ── Outbound mock data ── */
+const outboundDaily = [
+  { day: "Mon", calls: 1200, answered: 920, failed: 280 },
+  { day: "Tue", calls: 1350, answered: 1010, failed: 340 },
+  { day: "Wed", calls: 1100, answered: 850, failed: 250 },
+  { day: "Thu", calls: 1500, answered: 1180, failed: 320 },
+  { day: "Fri", calls: 1680, answered: 1300, failed: 380 },
+  { day: "Sat", calls: 600, answered: 470, failed: 130 },
+  { day: "Sun", calls: 380, answered: 290, failed: 90 },
+];
+const outboundFunnel = [
+  { name: "Total Outbound Calls", value: 6880, fill: "hsl(173, 58%, 39%)" },
+  { name: "Connected", value: 5180, fill: "hsl(217, 91%, 50%)" },
+  { name: "IVR Played", value: 4440, fill: "hsl(262, 83%, 58%)" },
+  { name: "Recipient Responded", value: 3130, fill: "hsl(142, 70%, 45%)" },
+  { name: "Action Completed", value: 2040, fill: "hsl(38, 92%, 50%)" },
+];
+const outboundDisposition = [
+  { name: "Completed", value: 2040, color: "hsl(142, 70%, 45%)" },
+  { name: "Dropped Mid-IVR", value: 1000, color: "hsl(38, 92%, 50%)" },
+  { name: "No Response", value: 1050, color: "hsl(0, 84%, 60%)" },
+  { name: "Busy / Unreachable", value: 2580, color: "hsl(215, 15%, 47%)" },
+  { name: "Voicemail", value: 210, color: "hsl(262, 83%, 58%)" },
+];
+const outboundCampaigns = [
+  { name: "Scheme Awareness Drive", calls: 2400, answered: 1820, completed: 980, time: "2 hours ago" },
+  { name: "Loan Reminder Q2", calls: 1850, answered: 1420, completed: 760, time: "1 day ago" },
+  { name: "Survey: Customer Feedback", calls: 1200, answered: 890, completed: 320, time: "2 days ago" },
+  { name: "Event RSVP Confirmation", calls: 1430, answered: 1050, completed: 720, time: "3 days ago" },
 ];
 
-const menuOptions = [
-  { name: "Press 1: Account Info", count: 2840, pct: 44.8 },
-  { name: "Press 2: Complaints", count: 1520, pct: 24.0 },
-  { name: "Press 3: Schemes", count: 980, pct: 15.5 },
-  { name: "Press 4: Talk to Agent", count: 620, pct: 9.8 },
-  { name: "Press 0: Repeat", count: 380, pct: 5.9 },
+const inboundStats = [
+  { label: "Inbound Calls", value: "5,600", icon: PhoneIncoming, trend: "+12.1%", sub: "This month" },
+  { label: "Answered", value: "5,070", icon: CheckCircle2, trend: "+9.8%", sub: "90.5% answer rate" },
+  { label: "Missed", value: "530", icon: PhoneMissed, trend: "-3.2%", sub: "9.5% miss rate" },
+  { label: "Avg Hold Time", value: "42s", icon: Clock, trend: "-2s", sub: "Before menu" },
 ];
-
-const callDisposition = [
-  { name: "Completed", value: 4120, color: "hsl(142, 70%, 45%)" },
-  { name: "Dropped Mid-IVR", value: 2130, color: "hsl(38, 92%, 50%)" },
-  { name: "No Response", value: 1580, color: "hsl(0, 84%, 60%)" },
-  { name: "Busy/Unreachable", value: 2230, color: "hsl(215, 15%, 47%)" },
-  { name: "Voicemail", value: 420, color: "hsl(262, 83%, 58%)" },
-];
-
-const hourlyDistribution = [
-  { hour: "6AM", calls: 120 }, { hour: "8AM", calls: 580 }, { hour: "10AM", calls: 1200 },
-  { hour: "12PM", calls: 980 }, { hour: "2PM", calls: 1350 }, { hour: "4PM", calls: 1100 },
-  { hour: "6PM", calls: 820 }, { hour: "8PM", calls: 450 }, { hour: "10PM", calls: 180 },
-];
-
-const recentCalls = [
-  { id: "IVRS-001", number: "+919876543210", type: "Outbound", duration: "2:34", menu: "Press 1", status: "Completed", time: "10 min ago" },
-  { id: "IVRS-002", number: "+919876543211", type: "Inbound", duration: "1:12", menu: "Press 2", status: "Completed", time: "15 min ago" },
-  { id: "IVRS-003", number: "+919876543212", type: "Outbound", duration: "0:08", menu: "—", status: "No Response", time: "22 min ago" },
-  { id: "IVRS-004", number: "+919876543213", type: "Outbound", duration: "1:45", menu: "Press 4", status: "Transferred", time: "30 min ago" },
-  { id: "IVRS-005", number: "+919876543214", type: "Inbound", duration: "0:42", menu: "Press 1", status: "Dropped", time: "35 min ago" },
-  { id: "IVRS-006", number: "+919876543215", type: "Outbound", duration: "3:10", menu: "Press 3", status: "Completed", time: "42 min ago" },
-];
-
-const webhookLogs = [
-  { id: "WH-001", event: "call.initiated", status: "200 OK", time: "2 min ago", payload: "outbound call to +91..." },
-  { id: "WH-002", event: "call.answered", status: "200 OK", time: "2 min ago", payload: "call connected, duration start" },
-  { id: "WH-003", event: "ivr.input", status: "200 OK", time: "1 min ago", payload: "key press: 1" },
-  { id: "WH-004", event: "call.completed", status: "200 OK", time: "1 min ago", payload: "call ended, duration: 134s" },
-  { id: "WH-005", event: "call.failed", status: "200 OK", time: "5 min ago", payload: "busy, no answer after 30s" },
-];
-
-const statusColors: Record<string, string> = {
-  Completed: "bg-success/10 text-success",
-  Transferred: "bg-info/10 text-info",
-  Dropped: "bg-warning/10 text-warning",
-  "No Response": "bg-destructive/10 text-destructive",
-};
-
-const stats = [
-  { label: "Total Calls", value: "12,480", icon: Phone, trend: "+8.2%", sub: "This month" },
-  { label: "Inbound", value: "5,600", icon: PhoneIncoming, trend: "+12.1%", sub: "45% of total" },
-  { label: "Outbound", value: "6,880", icon: PhoneOutgoing, trend: "+5.4%", sub: "55% of total" },
+const outboundStats = [
+  { label: "Outbound Calls", value: "6,880", icon: PhoneOutgoing, trend: "+5.4%", sub: "This month" },
+  { label: "Connected", value: "5,180", icon: CheckCircle2, trend: "+4.1%", sub: "75.3% connect rate" },
+  { label: "Failed", value: "1,700", icon: PhoneMissed, trend: "-1.8%", sub: "24.7% failure" },
   { label: "Avg Duration", value: "1m 48s", icon: Clock, trend: "+0.3s", sub: "Per connected call" },
-  { label: "Connect Rate", value: "82.1%", icon: CheckCircle2, trend: "+1.2%", sub: "Calls connected" },
-  { label: "Drop Rate", value: "17.1%", icon: PhoneMissed, trend: "-0.8%", sub: "Dropped mid-IVR" },
 ];
+
+const FunnelView = ({ data }: { data: { name: string; value: number; fill: string }[] }) => (
+  <div className="space-y-3">
+    {data.map((step, i) => {
+      const pct = ((step.value / data[0].value) * 100).toFixed(1);
+      const dropOff = i > 0 ? (((data[i - 1].value - step.value) / data[i - 1].value) * 100).toFixed(1) : null;
+      return (
+        <div key={step.name}>
+          <div className="flex items-center justify-between text-sm mb-1">
+            <span className="font-medium text-foreground">{step.name}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-foreground font-semibold">{step.value.toLocaleString()}</span>
+              <Badge variant="secondary" className="text-[10px]">{pct}%</Badge>
+              {dropOff && <span className="text-[10px] text-destructive">-{dropOff}%</span>}
+            </div>
+          </div>
+          <div className="w-full bg-muted rounded-full h-3">
+            <div className="rounded-full h-3 transition-all" style={{ width: `${pct}%`, backgroundColor: step.fill }} />
+          </div>
+        </div>
+      );
+    })}
+  </div>
+);
+
+const DispositionPie = ({ data }: { data: { name: string; value: number; color: string }[] }) => (
+  <>
+    <div className="h-52">
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie data={data} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" strokeWidth={2} stroke="hsl(var(--card))">
+            {data.map((entry) => <Cell key={entry.name} fill={entry.color} />)}
+          </Pie>
+          <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid hsl(var(--border))", fontSize: "13px" }} />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+    <div className="grid grid-cols-2 gap-2 mt-2">
+      {data.map((d) => (
+        <div key={d.name} className="flex items-center gap-2 text-xs">
+          <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: d.color }} />
+          <span className="text-muted-foreground truncate">{d.name}</span>
+          <span className="text-foreground font-medium ml-auto">{d.value.toLocaleString()}</span>
+        </div>
+      ))}
+    </div>
+  </>
+);
+
+const StatGrid = ({ stats }: { stats: typeof inboundStats }) => (
+  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    {stats.map((s) => (
+      <Card key={s.label} className="shadow-card animate-fade-in">
+        <CardContent className="pt-4 pb-3">
+          <div className="flex items-center justify-between mb-1">
+            <s.icon className="w-4 h-4 text-primary" />
+            <div className="flex items-center gap-0.5 text-[10px]">
+              {s.trend.startsWith("+") ? <ArrowUpRight className="w-3 h-3 text-success" /> : <ArrowDownRight className="w-3 h-3 text-success" />}
+              <span className="text-success font-medium">{s.trend}</span>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">{s.label}</p>
+          <p className="text-lg font-bold text-foreground">{s.value}</p>
+          <p className="text-[10px] text-muted-foreground">{s.sub}</p>
+        </CardContent>
+      </Card>
+    ))}
+  </div>
+);
 
 const IVRSAnalyticsPage = () => {
   const [dateRange, setDateRange] = useState("this-month");
-  const [callType, setCallType] = useState("all");
 
   return (
     <div className="space-y-6 overflow-hidden">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">IVRS Analytics</h1>
-          <p className="text-muted-foreground mt-1">Inbound & Outbound call analytics, funnel reports & webhook logs</p>
+          <h2 className="text-xl font-bold text-foreground">IVRS Analytics</h2>
+          <p className="text-sm text-muted-foreground mt-0.5">Inbound & Outbound call analytics derived from your IVRS webhook</p>
         </div>
         <div className="flex items-center gap-2">
           <Select value={dateRange} onValueChange={setDateRange}>
@@ -110,98 +178,68 @@ const IVRSAnalyticsPage = () => {
               <SelectItem value="last-month">Last Month</SelectItem>
             </SelectContent>
           </Select>
-          <Select value={callType} onValueChange={setCallType}>
-            <SelectTrigger className="w-[120px]"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Calls</SelectItem>
-              <SelectItem value="inbound">Inbound</SelectItem>
-              <SelectItem value="outbound">Outbound</SelectItem>
-            </SelectContent>
-          </Select>
           <Button variant="outline" size="icon"><RefreshCw className="w-4 h-4" /></Button>
+          <Button variant="outline" size="sm"><Download className="w-4 h-4 mr-1" />Export</Button>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        {stats.map((s) => (
-          <Card key={s.label} className="shadow-card animate-fade-in">
-            <CardContent className="pt-4 pb-3">
-              <div className="flex items-center justify-between mb-1">
-                <s.icon className="w-4 h-4 text-primary" />
-                <div className="flex items-center gap-0.5 text-[10px]">
-                  {s.trend.startsWith("+") ? <ArrowUpRight className="w-3 h-3 text-success" /> : <ArrowDownRight className="w-3 h-3 text-success" />}
-                  <span className="text-success font-medium">{s.trend}</span>
-                </div>
-              </div>
-              <p className="text-lg font-bold text-foreground">{s.value}</p>
-              <p className="text-[10px] text-muted-foreground">{s.sub}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <Tabs defaultValue="funnel">
-        <TabsList className="flex-wrap">
-          <TabsTrigger value="funnel">Call Funnel</TabsTrigger>
-          <TabsTrigger value="volume">Volume & Trends</TabsTrigger>
-          <TabsTrigger value="menu">IVR Menu Analysis</TabsTrigger>
-          <TabsTrigger value="logs">Call Logs</TabsTrigger>
-          <TabsTrigger value="webhooks">Webhook Logs</TabsTrigger>
+      <Tabs defaultValue="inbound">
+        <TabsList>
+          <TabsTrigger value="inbound"><PhoneIncoming className="w-4 h-4 mr-1.5" />Inbound</TabsTrigger>
+          <TabsTrigger value="outbound"><PhoneOutgoing className="w-4 h-4 mr-1.5" />Outbound</TabsTrigger>
         </TabsList>
 
-        {/* Funnel Tab */}
-        <TabsContent value="funnel" className="space-y-6 mt-4">
+        {/* ── INBOUND ── */}
+        <TabsContent value="inbound" className="space-y-6 mt-4">
+          <StatGrid stats={inboundStats} />
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="shadow-card">
-              <CardHeader><CardTitle className="text-base">IVRS Call Funnel</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="text-base">Inbound Call Funnel</CardTitle></CardHeader>
+              <CardContent><FunnelView data={inboundFunnel} /></CardContent>
+            </Card>
+
+            <Card className="shadow-card">
+              <CardHeader><CardTitle className="text-base">Inbound Disposition</CardTitle></CardHeader>
+              <CardContent><DispositionPie data={inboundDisposition} /></CardContent>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="shadow-card">
+              <CardHeader><CardTitle className="text-base">Daily Inbound Volume</CardTitle></CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {funnelData.map((step, i) => {
-                    const pct = ((step.value / funnelData[0].value) * 100).toFixed(1);
-                    const dropOff = i > 0 ? (((funnelData[i - 1].value - step.value) / funnelData[i - 1].value) * 100).toFixed(1) : null;
-                    return (
-                      <div key={step.name}>
-                        <div className="flex items-center justify-between text-sm mb-1">
-                          <span className="font-medium text-foreground">{step.name}</span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-foreground font-semibold">{step.value.toLocaleString()}</span>
-                            <Badge variant="secondary" className="text-[10px]">{pct}%</Badge>
-                            {dropOff && <span className="text-[10px] text-destructive">-{dropOff}%</span>}
-                          </div>
-                        </div>
-                        <div className="w-full bg-muted rounded-full h-3">
-                          <div
-                            className="rounded-full h-3 transition-all"
-                            style={{ width: `${pct}%`, backgroundColor: step.fill }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={inboundDaily}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="day" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
+                      <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
+                      <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid hsl(var(--border))", fontSize: "13px" }} />
+                      <Bar dataKey="answered" name="Answered" fill="hsl(142, 70%, 45%)" radius={[3, 3, 0, 0]} stackId="a" />
+                      <Bar dataKey="missed" name="Missed" fill="hsl(0, 84%, 60%)" radius={[3, 3, 0, 0]} stackId="a" />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
               </CardContent>
             </Card>
 
             <Card className="shadow-card">
-              <CardHeader><CardTitle className="text-base">Call Disposition</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="text-base">IVR Menu Selection (Inbound)</CardTitle></CardHeader>
               <CardContent>
-                <div className="h-52">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie data={callDisposition} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" strokeWidth={2} stroke="hsl(var(--card))">
-                        {callDisposition.map((entry) => <Cell key={entry.name} fill={entry.color} />)}
-                      </Pie>
-                      <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid hsl(var(--border))", fontSize: "13px" }} />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="grid grid-cols-2 gap-2 mt-2">
-                  {callDisposition.map((d) => (
-                    <div key={d.name} className="flex items-center gap-2 text-xs">
-                      <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: d.color }} />
-                      <span className="text-muted-foreground truncate">{d.name}</span>
-                      <span className="text-foreground font-medium ml-auto">{d.value.toLocaleString()}</span>
+                <div className="space-y-3.5">
+                  {inboundMenu.map((opt) => (
+                    <div key={opt.name}>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-sm font-medium text-foreground">{opt.name}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-foreground font-semibold">{opt.count.toLocaleString()}</span>
+                          <Badge variant="secondary" className="text-xs">{opt.pct}%</Badge>
+                        </div>
+                      </div>
+                      <div className="w-full bg-muted rounded-full h-2.5">
+                        <div className="rounded-full h-2.5 bg-channel-ivrs" style={{ width: `${opt.pct}%` }} />
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -210,195 +248,68 @@ const IVRSAnalyticsPage = () => {
           </div>
         </TabsContent>
 
-        {/* Volume Tab */}
-        <TabsContent value="volume" className="space-y-6 mt-4">
+        {/* ── OUTBOUND ── */}
+        <TabsContent value="outbound" className="space-y-6 mt-4">
+          <StatGrid stats={outboundStats} />
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="shadow-card">
-              <CardHeader><CardTitle className="text-base">Daily Inbound vs Outbound</CardTitle></CardHeader>
-              <CardContent>
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={dailyVolume}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                      <XAxis dataKey="day" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
-                      <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
-                      <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid hsl(var(--border))", fontSize: "13px" }} />
-                      <Bar dataKey="inbound" name="Inbound" fill="hsl(199, 89%, 48%)" radius={[3, 3, 0, 0]} />
-                      <Bar dataKey="outbound" name="Outbound" fill="hsl(var(--channel-ivrs))" radius={[3, 3, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
+              <CardHeader><CardTitle className="text-base">Outbound Call Funnel</CardTitle></CardHeader>
+              <CardContent><FunnelView data={outboundFunnel} /></CardContent>
             </Card>
 
             <Card className="shadow-card">
-              <CardHeader><CardTitle className="text-base">Hourly Call Distribution</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="text-base">Outbound Disposition</CardTitle></CardHeader>
+              <CardContent><DispositionPie data={outboundDisposition} /></CardContent>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="shadow-card">
+              <CardHeader><CardTitle className="text-base">Daily Outbound Volume</CardTitle></CardHeader>
               <CardContent>
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={hourlyDistribution}>
+                    <AreaChart data={outboundDaily}>
                       <defs>
-                        <linearGradient id="ivrsGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(173, 58%, 39%)" stopOpacity={0.3} />
+                        <linearGradient id="ivrsOutGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="hsl(173, 58%, 39%)" stopOpacity={0.4} />
                           <stop offset="95%" stopColor="hsl(173, 58%, 39%)" stopOpacity={0} />
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                      <XAxis dataKey="hour" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+                      <XAxis dataKey="day" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
                       <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
                       <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid hsl(var(--border))", fontSize: "13px" }} />
-                      <Area type="monotone" dataKey="calls" stroke="hsl(173, 58%, 39%)" fill="url(#ivrsGrad)" strokeWidth={2} />
+                      <Area type="monotone" dataKey="answered" name="Answered" stroke="hsl(173, 58%, 39%)" fill="url(#ivrsOutGrad)" strokeWidth={2} />
+                      <Area type="monotone" dataKey="failed" name="Failed" stroke="hsl(0, 84%, 60%)" fill="transparent" strokeWidth={2} strokeDasharray="4 4" />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
               </CardContent>
             </Card>
-          </div>
-        </TabsContent>
 
-        {/* Menu Analysis Tab */}
-        <TabsContent value="menu" className="space-y-6 mt-4">
-          <Card className="shadow-card">
-            <CardHeader><CardTitle className="text-base">IVR Menu Option Distribution</CardTitle></CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {menuOptions.map((opt, i) => (
-                  <div key={opt.name}>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-sm font-medium text-foreground">{opt.name}</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-foreground font-semibold">{opt.count.toLocaleString()}</span>
-                        <Badge variant="secondary" className="text-xs">{opt.pct}%</Badge>
+            <Card className="shadow-card">
+              <CardHeader><CardTitle className="text-base">Recent Outbound Campaigns</CardTitle></CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {outboundCampaigns.map((c) => (
+                    <div key={c.name} className="border-b border-border/50 last:border-0 pb-3 last:pb-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium text-foreground">{c.name}</span>
+                        <span className="text-[10px] text-muted-foreground">{c.time}</span>
+                      </div>
+                      <div className="flex items-center gap-3 text-xs">
+                        <span className="text-muted-foreground">Calls: <span className="font-medium text-foreground">{c.calls.toLocaleString()}</span></span>
+                        <span className="text-muted-foreground">Answered: <span className="font-medium text-foreground">{c.answered.toLocaleString()}</span></span>
+                        <span className="text-muted-foreground">Completed: <span className="font-medium text-success">{c.completed.toLocaleString()}</span></span>
                       </div>
                     </div>
-                    <div className="w-full bg-muted rounded-full h-2.5">
-                      <div
-                        className="rounded-full h-2.5 transition-all bg-channel-ivrs"
-                        style={{ width: `${opt.pct}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Card className="shadow-card">
-              <CardContent className="pt-5 pb-4 text-center">
-                <p className="text-2xl font-bold text-foreground">2.3</p>
-                <p className="text-sm text-muted-foreground">Avg Menu Depth</p>
-                <p className="text-xs text-success mt-1">Users navigate 2.3 levels on average</p>
-              </CardContent>
-            </Card>
-            <Card className="shadow-card">
-              <CardContent className="pt-5 pb-4 text-center">
-                <p className="text-2xl font-bold text-foreground">34s</p>
-                <p className="text-sm text-muted-foreground">Avg Time to First Input</p>
-                <p className="text-xs text-muted-foreground mt-1">From call connect to key press</p>
-              </CardContent>
-            </Card>
-            <Card className="shadow-card">
-              <CardContent className="pt-5 pb-4 text-center">
-                <p className="text-2xl font-bold text-foreground">9.8%</p>
-                <p className="text-sm text-muted-foreground">Agent Transfer Rate</p>
-                <p className="text-xs text-warning mt-1">Press 4 → Live Agent</p>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
-
-        {/* Call Logs Tab */}
-        <TabsContent value="logs" className="mt-4">
-          <Card className="shadow-card">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base">Recent Call Logs</CardTitle>
-                <Button variant="outline" size="sm"><Download className="w-4 h-4 mr-1" /> Export</Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[600px]">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left text-xs font-medium text-muted-foreground pb-3 pr-3">Call ID</th>
-                      <th className="text-left text-xs font-medium text-muted-foreground pb-3 pr-3">Number</th>
-                      <th className="text-left text-xs font-medium text-muted-foreground pb-3 pr-3">Type</th>
-                      <th className="text-left text-xs font-medium text-muted-foreground pb-3 pr-3">Duration</th>
-                      <th className="text-left text-xs font-medium text-muted-foreground pb-3 pr-3">Menu</th>
-                      <th className="text-left text-xs font-medium text-muted-foreground pb-3 pr-3">Status</th>
-                      <th className="text-right text-xs font-medium text-muted-foreground pb-3">Time</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {recentCalls.map((call) => (
-                      <tr key={call.id} className="border-b border-border/50 last:border-0">
-                        <td className="py-2.5 pr-3 text-xs font-mono text-primary">{call.id}</td>
-                        <td className="py-2.5 pr-3 text-sm text-foreground">{call.number}</td>
-                        <td className="py-2.5 pr-3">
-                          <Badge variant="outline" className="text-xs">
-                            {call.type === "Inbound" ? <PhoneIncoming className="w-3 h-3 mr-1" /> : <PhoneOutgoing className="w-3 h-3 mr-1" />}
-                            {call.type}
-                          </Badge>
-                        </td>
-                        <td className="py-2.5 pr-3 text-sm text-foreground">{call.duration}</td>
-                        <td className="py-2.5 pr-3 text-sm text-muted-foreground">{call.menu}</td>
-                        <td className="py-2.5 pr-3">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[call.status] || "bg-muted text-muted-foreground"}`}>
-                            {call.status}
-                          </span>
-                        </td>
-                        <td className="py-2.5 text-xs text-muted-foreground text-right">{call.time}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Webhook Logs Tab */}
-        <TabsContent value="webhooks" className="mt-4">
-          <Card className="shadow-card">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base">Webhook Event Logs</CardTitle>
-                <Badge variant="secondary" className="text-xs">Receiving from IVRS Provider</Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[500px]">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left text-xs font-medium text-muted-foreground pb-3 pr-3">Event ID</th>
-                      <th className="text-left text-xs font-medium text-muted-foreground pb-3 pr-3">Event</th>
-                      <th className="text-left text-xs font-medium text-muted-foreground pb-3 pr-3">Status</th>
-                      <th className="text-left text-xs font-medium text-muted-foreground pb-3 pr-3">Payload</th>
-                      <th className="text-right text-xs font-medium text-muted-foreground pb-3">Time</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {webhookLogs.map((wh) => (
-                      <tr key={wh.id} className="border-b border-border/50 last:border-0">
-                        <td className="py-2.5 pr-3 text-xs font-mono text-primary">{wh.id}</td>
-                        <td className="py-2.5 pr-3">
-                          <Badge variant="outline" className="text-xs font-mono">{wh.event}</Badge>
-                        </td>
-                        <td className="py-2.5 pr-3">
-                          <Badge variant="secondary" className="text-xs bg-success/10 text-success">{wh.status}</Badge>
-                        </td>
-                        <td className="py-2.5 pr-3 text-xs text-muted-foreground truncate max-w-[200px]">{wh.payload}</td>
-                        <td className="py-2.5 text-xs text-muted-foreground text-right">{wh.time}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
         </TabsContent>
       </Tabs>
     </div>

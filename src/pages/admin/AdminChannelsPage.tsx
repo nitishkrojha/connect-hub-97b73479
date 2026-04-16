@@ -6,7 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Save, Smartphone, MessageSquare, Mail, Sparkles, CheckCircle2, XCircle, Phone } from "lucide-react";
+import { Save, Smartphone, MessageSquare, Mail, Sparkles, CheckCircle2, XCircle } from "lucide-react";
 import ChannelProviderManager, { type ChannelProvider, type ProviderField } from "@/components/ChannelProviderManager";
 
 const smsFields: ProviderField[] = [
@@ -39,13 +39,6 @@ const rcsFields: ProviderField[] = [
   { key: "brandName", label: "Brand Name", placeholder: "DIC Notifier" },
 ];
 
-const ivrsFields: ProviderField[] = [
-  { key: "webhookUrl", label: "Webhook Endpoint URL", placeholder: "https://yourapp.com/api/ivrs/webhook" },
-  { key: "apiEndpoint", label: "IVRS API Endpoint", placeholder: "https://ivrs-provider.com/api/v1" },
-  { key: "apiKey", label: "API Key", type: "password" },
-  { key: "callerId", label: "Caller ID / DID Number", placeholder: "+911234567890" },
-  { key: "maxRetries", label: "Max Retries", placeholder: "3" },
-];
 
 const defaultAdminSms: ChannelProvider[] = [
   { id: "adm-sms-1", name: "Twilio Primary", provider: "Twilio", status: "active", isDefault: true, priority: 1, autoFallback: true, credentials: { apiEndpoint: "https://api.twilio.com/2010-04-01", accountSid: "AC••••e4f2", authToken: "••••••", senderId: "DICNTFY", dltEntityId: "1101456780000012345" } },
@@ -60,9 +53,6 @@ const defaultAdminEmail: ChannelProvider[] = [
 const defaultAdminRcs: ChannelProvider[] = [
   { id: "adm-rcs-1", name: "Google RBM", provider: "Google RBM", status: "degraded", isDefault: true, priority: 1, autoFallback: true, credentials: { agentId: "dicnotifier-agent-prod", apiKey: "••••••", brandName: "DIC Notifier" } },
 ];
-const defaultAdminIvrs: ChannelProvider[] = [
-  { id: "adm-ivrs-1", name: "Ozonetel CloudAgent", provider: "Ozonetel", status: "active", isDefault: true, priority: 1, autoFallback: true, credentials: { webhookUrl: "https://dicnotifier.io/api/ivrs/webhook", apiEndpoint: "https://api.ozonetel.com/v2", apiKey: "••••••", callerId: "+911234567890", maxRetries: "3" } },
-];
 
 const AdminChannelsPage = () => {
   const [activeTab, setActiveTab] = useState("sms");
@@ -70,7 +60,7 @@ const AdminChannelsPage = () => {
   const [waProviders, setWaProviders] = useState<ChannelProvider[]>(defaultAdminWa);
   const [emailProviders, setEmailProviders] = useState<ChannelProvider[]>(defaultAdminEmail);
   const [rcsProviders, setRcsProviders] = useState<ChannelProvider[]>(defaultAdminRcs);
-  const [ivrsProviders, setIvrsProviders] = useState<ChannelProvider[]>(defaultAdminIvrs);
+  
 
   const getChannelStatus = (providers: ChannelProvider[]) => {
     if (providers.length === 0) return "inactive";
@@ -84,7 +74,7 @@ const AdminChannelsPage = () => {
     { name: "WhatsApp API", icon: MessageSquare, status: getChannelStatus(waProviders), count: waProviders.filter(p => p.status === "active").length, colorClass: "bg-channel-whatsapp" },
     { name: "Email SMTP", icon: Mail, status: getChannelStatus(emailProviders), count: emailProviders.filter(p => p.status === "active").length, colorClass: "bg-channel-email" },
     { name: "RCS Provider", icon: Sparkles, status: getChannelStatus(rcsProviders), count: rcsProviders.filter(p => p.status === "active").length, colorClass: "bg-channel-rcs" },
-    { name: "IVRS Provider", icon: Phone, status: getChannelStatus(ivrsProviders), count: ivrsProviders.filter(p => p.status === "active").length, colorClass: "bg-channel-ivrs" },
+    
   ];
 
   return (
@@ -95,7 +85,7 @@ const AdminChannelsPage = () => {
       </div>
 
       {/* Provider Health */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {healthCards.map((p) => (
           <Card key={p.name} className="shadow-card">
             <CardContent className="pt-4 pb-3 flex items-center gap-3">
@@ -126,7 +116,6 @@ const AdminChannelsPage = () => {
           <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
           <TabsTrigger value="email">Email</TabsTrigger>
           <TabsTrigger value="rcs">RCS</TabsTrigger>
-          <TabsTrigger value="ivrs">IVRS</TabsTrigger>
         </TabsList>
 
         <TabsContent value="sms">

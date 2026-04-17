@@ -412,6 +412,147 @@ const IVRSWebhookSection = () => {
   );
 };
 
+/* ─── Message-In Channel Connections Section ─── */
+const MessageInChannels = () => {
+  const [chs, setChs] = useState<ChannelMeta[]>(seedChannels);
+  const [openKey, setOpenKey] = useState<string | null>(null);
+
+  const toggleConnect = (key: string, connect: boolean) => {
+    setChs(prev => prev.map(c => c.key === key ? {
+      ...c,
+      connected: connect,
+      lastSync: connect ? "just now" : undefined,
+      messagesToday: connect ? 0 : undefined,
+      webhookUrl: connect ? `https://api.dic.notify/webhooks/${c.key}/${Math.random().toString(36).slice(2, 8)}` : undefined,
+    } : c));
+    toast.success(connect ? "Channel connected" : "Channel disconnected");
+    setOpenKey(null);
+  };
+
+  const copy = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard");
+  };
+
+  return (
+    <Card className="shadow-card mt-4">
+      <CardHeader>
+        <CardTitle className="text-base">Inbound Channel Connections</CardTitle>
+        <p className="text-xs text-muted-foreground mt-1">Connect channels that customers use to send messages to you (Email, WhatsApp, Social, Chatbot, Webhook).</p>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {chs.map(ch => {
+            const Icon = ch.icon;
+            return (
+              <Card key={ch.key} className="border border-border">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                  <div className="flex items-center gap-3">
+                    <div className={cn("w-10 h-10 rounded-lg bg-muted flex items-center justify-center", ch.color)}>
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <CardTitle className="text-sm">{ch.name}</CardTitle>
+                  </div>
+                  <Badge variant={ch.connected ? "default" : "outline"} className={ch.connected ? "bg-success/15 text-success border-success/30 hover:bg-success/15 text-[10px]" : "text-[10px]"}>
+                    {ch.connected ? "Connected" : "Not connected"}
+                  </Badge>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {ch.connected ? (
+                    <>
+                      <div className="text-xs space-y-1 text-muted-foreground">
+                        <div className="flex justify-between"><span>Last sync</span><span className="text-foreground">{ch.lastSync}</span></div>
+                        <div className="flex justify-between"><span>Today</span><span className="text-foreground">{ch.messagesToday} msgs</span></div>
+                      </div>
+                      {ch.webhookUrl && (
+                        <div className="bg-muted rounded-md p-2 flex items-center gap-2">
+                          <code className="text-[10px] truncate flex-1">{ch.webhookUrl}</code>
+                          <Button size="sm" variant="ghost" onClick={() => copy(ch.webhookUrl!)} className="h-6 w-6 p-0">
+                            <Copy className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      )}
+                      <Button size="sm" variant="outline" className="w-full" onClick={() => toggleConnect(ch.key, false)}>
+                        Disconnect
+                      </Button>
+                    </>
+                  ) : (
+                    <Dialog open={openKey === ch.key} onOpenChange={o => setOpenKey(o ? ch.key : null)}>
+                      <DialogTrigger asChild>
+                        <Button size="sm" className="w-full">
+                          <Check className="w-3.5 h-3.5 mr-1" /> Connect
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader><DialogTitle>Connect {ch.name}</DialogTitle></DialogHeader>
+                        <div className="space-y-3">
+                          {ch.key === "email" && (
+                            <>
+                              <div><Label className="text-xs">IMAP Server</Label><Input placeholder="imap.example.com" /></div>
+                              <div><Label className="text-xs">SMTP Server</Label><Input placeholder="smtp.example.com" /></div>
+                              <div><Label className="text-xs">Email</Label><Input type="email" placeholder="support@yourbiz.com" /></div>
+                              <div><Label className="text-xs">Password / App key</Label><Input type="password" /></div>
+                            </>
+                          )}
+                          {ch.key === "whatsapp" && (
+                            <>
+                              <div><Label className="text-xs">Business Number</Label><Input placeholder="+91 XXXXX XXXXX" /></div>
+                              <div><Label className="text-xs">WhatsApp Business API key</Label><Input type="password" /></div>
+                            </>
+                          )}
+                          {ch.key === "facebook" && (
+                            <>
+                              <div><Label className="text-xs">Page ID</Label><Input placeholder="1029384756" /></div>
+                              <div><Label className="text-xs">Page Access Token</Label><Input type="password" /></div>
+                            </>
+                          )}
+                          {ch.key === "instagram" && (
+                            <>
+                              <div><Label className="text-xs">Instagram Business Account</Label><Input placeholder="@handle" /></div>
+                              <div><Label className="text-xs">Access Token</Label><Input type="password" /></div>
+                            </>
+                          )}
+                          {ch.key === "twitter" && (
+                            <>
+                              <div><Label className="text-xs">Handle</Label><Input placeholder="@yourbrand" /></div>
+                              <div><Label className="text-xs">Bearer Token</Label><Input type="password" /></div>
+                            </>
+                          )}
+                          {ch.key === "telegram" && (
+                            <div><Label className="text-xs">Bot Token</Label><Input type="password" placeholder="123456:ABC-DEF…" /></div>
+                          )}
+                          {ch.key === "chatbot" && (
+                            <>
+                              <div><Label className="text-xs">Widget name</Label><Input placeholder="Website chat" /></div>
+                              <div><Label className="text-xs">Allowed domain</Label><Input placeholder="yourbiz.com" /></div>
+                            </>
+                          )}
+                          {ch.key === "webhook" && (
+                            <>
+                              <div><Label className="text-xs">Source name</Label><Input placeholder="My CRM" /></div>
+                              <div><Label className="text-xs">Signing secret</Label><Input type="password" /></div>
+                            </>
+                          )}
+                        </div>
+                        <DialogFooter>
+                          <Button variant="outline" onClick={() => setOpenKey(null)}>Cancel</Button>
+                          <Button onClick={() => toggleConnect(ch.key, true)}>Connect</Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+type ConfigGroup = "out" | "ivrs" | "in";
+
 const ProjectConfigPage = () => {
   const [activeTab, setActiveTab] = useState("general");
   const [configSource, setConfigSource] = useState<"notifier" | "own">("notifier");

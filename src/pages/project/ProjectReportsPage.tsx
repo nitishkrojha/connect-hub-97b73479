@@ -99,6 +99,27 @@ const inboxChannelPerf = [
   { channel: "Telegram", volume: 140, ticketRate: 10, csat: 90 },
 ];
 
+// Per-channel received with status breakdown
+const inboxVolumeByChannel = [
+  { channel: "WhatsApp", received: 980, open: 142, inProgress: 96, closed: 742 },
+  { channel: "Email", received: 320, open: 58, inProgress: 41, closed: 221 },
+  { channel: "Chatbot", received: 540, open: 64, inProgress: 38, closed: 438 },
+  { channel: "Facebook", received: 180, open: 22, inProgress: 17, closed: 141 },
+  { channel: "Instagram", received: 95, open: 14, inProgress: 9, closed: 72 },
+  { channel: "Telegram", received: 140, open: 18, inProgress: 12, closed: 110 },
+];
+
+// Per-agent handled by channel + pending bucket
+const inboxAgentByChannel = agents.map((a, i) => ({
+  agent: a,
+  WhatsApp: 30 + ((i * 7) % 25),
+  Email: 12 + ((i * 5) % 18),
+  Chatbot: 18 + ((i * 11) % 22),
+  Facebook: 6 + ((i * 3) % 10),
+  Telegram: 4 + ((i * 4) % 9),
+  pending: 3 + ((i * 2) % 8),
+}));
+
 const ProjectReportsPage = () => {
   const [period, setPeriod] = useState("weekly");
   const [direction, setDirection] = useState<"out" | "in">("out");

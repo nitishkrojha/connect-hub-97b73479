@@ -641,6 +641,13 @@ const IVRSAnalyticsPage = () => {
 
           <TimingAnalytics stats={outboundTimingStats} daily={outboundTimingDaily} label="Outbound" />
 
+          <GeographicalAnalysis data={outboundGeo} label="Outbound" />
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <PeakHoursAnalysis data={outboundPeakHours} label="Outbound" />
+            <CallDurationBuckets data={outboundDurationBuckets} label="Outbound" />
+          </div>
+
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="shadow-card">

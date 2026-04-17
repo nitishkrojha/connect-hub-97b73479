@@ -696,7 +696,7 @@ const IVRSAnalyticsPage = () => {
               </div>
             </CardContent>
           </Card>
-
+        </TabsContent>
       </Tabs>
     </div>
   );

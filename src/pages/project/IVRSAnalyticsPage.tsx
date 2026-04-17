@@ -168,17 +168,25 @@ const outboundDurationBuckets = [
 const GeographicalAnalysis = ({
   data, label,
 }: {
-  data: { state: string; calls: number; pct: number }[];
+  data: Record<string, number>;
   label: string;
 }) => {
-  const max = Math.max(...data.map((d) => d.calls));
-  const total = data.reduce((s, d) => s + d.calls, 0);
+  const [hover, setHover] = useState<{ id: string; name: string; calls: number; x: number; y: number } | null>(null);
+  const values = Object.values(data);
+  const max = Math.max(...values, 1);
+  const total = values.reduce((s, v) => s + v, 0);
+
   const heat = (calls: number) => {
-    const intensity = calls / max; // 0..1
-    // green → amber → red gradient based on volume
-    const hue = 142 - intensity * 142; // 142 (green) → 0 (red)
+    if (!calls) return "hsl(var(--muted))";
+    const intensity = calls / max;
+    const hue = 142 - intensity * 142; // green → red
     return `hsl(${hue}, 75%, ${65 - intensity * 25}%)`;
   };
+
+  // Sorted leaderboard (top → bottom)
+  const sorted = indiaMap.locations
+    .map((l) => ({ id: l.id, name: l.name, calls: data[l.id] || 0 }))
+    .sort((a, b) => b.calls - a.calls);
 
   return (
     <Card className="shadow-card">
@@ -188,86 +196,103 @@ const GeographicalAnalysis = ({
           Geographical Analysis — {label} (India)
         </CardTitle>
         <p className="text-xs text-muted-foreground mt-1">
-          Call volume by state, derived from caller MSISDN circle in webhook payload
+          Call volume by state, derived from caller MSISDN circle in webhook payload. Hover over a state to see exact call volume.
         </p>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Stylised India heat map */}
-          <div className="relative bg-muted/20 rounded-lg border border-border p-4 flex items-center justify-center min-h-[320px]">
-            <svg viewBox="0 0 400 440" className="w-full h-full max-h-[340px]">
-              {/* Outline of India (simplified) */}
-              <path
-                d="M180 30 L210 25 L245 40 L275 70 L300 110 L320 150 L335 195 L325 235 L300 270 L285 305 L270 340 L245 370 L210 395 L180 410 L155 395 L135 370 L120 340 L110 305 L100 270 L85 235 L75 195 L80 150 L100 110 L130 70 L160 40 Z"
-                fill="hsl(var(--muted))"
-                stroke="hsl(var(--border))"
-                strokeWidth="1.5"
-              />
-              {/* State bubbles */}
-              {[
-                { state: "Delhi NCR", x: 175, y: 110 },
-                { state: "Uttar Pradesh", x: 215, y: 145 },
-                { state: "Rajasthan", x: 135, y: 145 },
-                { state: "Gujarat", x: 100, y: 200 },
-                { state: "Maharashtra", x: 155, y: 240 },
-                { state: "West Bengal", x: 270, y: 180 },
-                { state: "Telangana", x: 195, y: 280 },
-                { state: "Karnataka", x: 165, y: 310 },
-                { state: "Tamil Nadu", x: 200, y: 360 },
-                { state: "Kerala", x: 165, y: 380 },
-              ].map((s) => {
-                const d = data.find((x) => x.state === s.state);
-                if (!d) return null;
-                const r = 8 + (d.calls / max) * 18;
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          {/* Real India SVG map */}
+          <div className="lg:col-span-3 relative bg-muted/20 rounded-lg border border-border p-3 min-h-[420px]">
+            <svg
+              viewBox={indiaMap.viewBox}
+              className="w-full h-full max-h-[440px]"
+              xmlns="http://www.w3.org/2000/svg"
+              onMouseLeave={() => setHover(null)}
+            >
+              {indiaMap.locations.map((loc) => {
+                const calls = data[loc.id] || 0;
                 return (
-                  <g key={s.state}>
-                    <circle
-                      cx={s.x}
-                      cy={s.y}
-                      r={r}
-                      fill={heat(d.calls)}
-                      fillOpacity={0.85}
-                      stroke="hsl(var(--background))"
-                      strokeWidth="1.5"
-                    />
-                    <text
-                      x={s.x}
-                      y={s.y + r + 11}
-                      textAnchor="middle"
-                      className="fill-foreground"
-                      style={{ fontSize: "9px", fontWeight: 600 }}
-                    >
-                      {d.calls}
-                    </text>
-                  </g>
+                  <path
+                    key={loc.id}
+                    d={loc.path}
+                    fill={heat(calls)}
+                    stroke="hsl(var(--background))"
+                    strokeWidth={0.6}
+                    style={{ cursor: "pointer", transition: "fill 0.15s, opacity 0.15s" }}
+                    onMouseEnter={(e) => {
+                      const rect = (e.currentTarget.ownerSVGElement as SVGSVGElement).getBoundingClientRect();
+                      setHover({
+                        id: loc.id,
+                        name: loc.name,
+                        calls,
+                        x: e.clientX - rect.left,
+                        y: e.clientY - rect.top,
+                      });
+                    }}
+                    onMouseMove={(e) => {
+                      const rect = (e.currentTarget.ownerSVGElement as SVGSVGElement).getBoundingClientRect();
+                      setHover((h) => h ? { ...h, x: e.clientX - rect.left, y: e.clientY - rect.top } : h);
+                    }}
+                    onFocus={() => undefined}
+                  >
+                    <title>{`${loc.name}: ${calls.toLocaleString()} calls`}</title>
+                  </path>
                 );
               })}
             </svg>
+
+            {/* Floating tooltip */}
+            {hover && (
+              <div
+                className="pointer-events-none absolute z-10 bg-popover text-popover-foreground border border-border rounded-md shadow-lg px-3 py-2 text-xs"
+                style={{
+                  left: Math.min(hover.x + 12, 360),
+                  top: Math.max(hover.y - 50, 0),
+                }}
+              >
+                <div className="font-semibold text-foreground">{hover.name}</div>
+                <div className="text-muted-foreground">
+                  Calls: <span className="font-semibold text-foreground">{hover.calls.toLocaleString()}</span>
+                </div>
+                {hover.calls > 0 && (
+                  <div className="text-muted-foreground">
+                    Share: <span className="font-medium text-foreground">{((hover.calls / total) * 100).toFixed(1)}%</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Legend */}
             <div className="absolute bottom-3 right-3 flex items-center gap-1.5 text-[10px] text-muted-foreground bg-background/80 px-2 py-1 rounded border border-border">
               <span>Low</span>
-              <div className="w-16 h-2 rounded-full" style={{ background: "linear-gradient(to right, hsl(142,75%,55%), hsl(60,75%,55%), hsl(0,75%,50%))" }} />
+              <div className="w-20 h-2 rounded-full" style={{ background: "linear-gradient(to right, hsl(142,75%,55%), hsl(60,75%,55%), hsl(0,75%,50%))" }} />
               <span>High</span>
             </div>
           </div>
 
           {/* State leaderboard */}
-          <div>
-            <div className="text-xs text-muted-foreground mb-2">Total: <span className="font-semibold text-foreground">{total.toLocaleString()}</span> calls across {data.length} regions</div>
-            <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
-              {data.map((d) => (
-                <div key={d.state}>
-                  <div className="flex items-center justify-between text-xs mb-1">
-                    <span className="font-medium text-foreground">{d.state}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-foreground">{d.calls.toLocaleString()}</span>
-                      <Badge variant="secondary" className="text-[10px]">{d.pct}%</Badge>
+          <div className="lg:col-span-2">
+            <div className="text-xs text-muted-foreground mb-2">
+              Total: <span className="font-semibold text-foreground">{total.toLocaleString()}</span> calls across {sorted.filter((s) => s.calls > 0).length} regions
+            </div>
+            <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1">
+              {sorted.filter((s) => s.calls > 0).map((s) => {
+                const pct = total ? (s.calls / total) * 100 : 0;
+                return (
+                  <div key={s.id} onMouseEnter={() => setHover({ id: s.id, name: s.name, calls: s.calls, x: 20, y: 20 })}>
+                    <div className="flex items-center justify-between text-xs mb-1">
+                      <span className="font-medium text-foreground truncate">{s.name}</span>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className="font-semibold text-foreground">{s.calls.toLocaleString()}</span>
+                        <Badge variant="secondary" className="text-[10px]">{pct.toFixed(1)}%</Badge>
+                      </div>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-2">
+                      <div className="rounded-full h-2 transition-all" style={{ width: `${(s.calls / max) * 100}%`, backgroundColor: heat(s.calls) }} />
                     </div>
                   </div>
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div className="rounded-full h-2 transition-all" style={{ width: `${(d.calls / max) * 100}%`, backgroundColor: heat(d.calls) }} />
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

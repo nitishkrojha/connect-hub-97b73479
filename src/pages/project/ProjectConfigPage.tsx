@@ -621,316 +621,288 @@ const ProjectConfigPage = () => {
       </div>
 
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="flex-wrap">
-          <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="service">Service Config</TabsTrigger>
-          <TabsTrigger value="sms">SMS</TabsTrigger>
-          <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
-          <TabsTrigger value="email">Email</TabsTrigger>
-          <TabsTrigger value="rcs">RCS</TabsTrigger>
-          <TabsTrigger value="ivrs" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-            <Sparkles className="w-3 h-3 mr-1" />IVRS Webhook
-          </TabsTrigger>
-          <TabsTrigger value="api">API Endpoints</TabsTrigger>
-        </TabsList>
+      {/* Common: Project Details */}
+      <Card className="shadow-card">
+        <CardHeader><CardTitle className="text-base">Project Details</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div><Label className="text-foreground text-sm">Project Name</Label><Input defaultValue="My Bharat" className="mt-1.5" /></div>
+            <div><Label className="text-foreground text-sm">Project Code</Label><Input defaultValue="MYBRT" disabled className="mt-1.5" /></div>
+            <div><Label className="text-foreground text-sm">Project Head</Label><Input defaultValue="Ravi Kumar" className="mt-1.5" /></div>
+            <div><Label className="text-foreground text-sm">Head Email</Label><Input defaultValue="ravi@mybharat.gov.in" className="mt-1.5" /></div>
+            <div><Label className="text-foreground text-sm">Head Mobile</Label><Input defaultValue="+91 98765 43210" className="mt-1.5" /></div>
+            <div><Label className="text-foreground text-sm">Department</Label><Input defaultValue="Youth Affairs" className="mt-1.5" /></div>
+          </div>
+          <Button onClick={() => toast.success("Project details updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
+        </CardContent>
+      </Card>
 
-        <TabsContent value="general">
-          <Card className="shadow-card mt-4">
-            <CardHeader><CardTitle className="text-base">Project Details</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div><Label className="text-foreground text-sm">Project Name</Label><Input defaultValue="My Bharat" className="mt-1.5" /></div>
-                <div><Label className="text-foreground text-sm">Project Code</Label><Input defaultValue="MYBRT" disabled className="mt-1.5" /></div>
-                <div><Label className="text-foreground text-sm">Project Head</Label><Input defaultValue="Ravi Kumar" className="mt-1.5" /></div>
-                <div><Label className="text-foreground text-sm">Head Email</Label><Input defaultValue="ravi@mybharat.gov.in" className="mt-1.5" /></div>
-                <div><Label className="text-foreground text-sm">Head Mobile</Label><Input defaultValue="+91 98765 43210" className="mt-1.5" /></div>
-                <div><Label className="text-foreground text-sm">Department</Label><Input defaultValue="Youth Affairs" className="mt-1.5" /></div>
-              </div>
-              <Button onClick={() => toast.success("Project details updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="service">
-          <Card className="shadow-card mt-4">
-            <CardHeader><CardTitle className="text-base">Communication Service Source</CardTitle></CardHeader>
-            <CardContent className="space-y-5">
-              <p className="text-sm text-muted-foreground">Choose whether to use DIC Notifier's communication infrastructure or your own provider configurations.</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <button
-                  onClick={() => setConfigSource("notifier")}
-                  className={`p-4 rounded-xl border-2 text-left transition-all ${configSource === "notifier" ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"}`}
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <Server className="w-5 h-5 text-primary" />
-                    <span className="font-semibold text-foreground">DIC Notifier Service</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">Use the platform's built-in SMS, WhatsApp, Email, RCS & IVRS services. No configuration needed.</p>
-                </button>
-                <button
-                  onClick={() => setConfigSource("own")}
-                  className={`p-4 rounded-xl border-2 text-left transition-all ${configSource === "own" ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"}`}
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <Key className="w-5 h-5 text-primary" />
-                    <span className="font-semibold text-foreground">Own Configuration</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">Use your own provider APIs and credentials. Configure each channel independently.</p>
-                </button>
-              </div>
-              {configSource === "own" && (
-                <div className="p-3 rounded-lg bg-warning/5 border border-warning/20 text-sm text-muted-foreground">
-                  <Info className="w-4 h-4 inline mr-1 text-warning" />
-                  When using your own configuration, please provide valid API keys in each channel tab. You can also set your own quota limits.
-                </div>
-              )}
-              <Button onClick={() => toast.success("Service configuration updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="sms">
-          <Card className="shadow-card mt-4">
-            <CardHeader><CardTitle className="text-base">SMS Providers & Settings</CardTitle></CardHeader>
-            <CardContent className="space-y-5">
-              {configSource === "own" ? (
-                <ChannelProviderManager
-                  channel="sms"
-                  channelLabel="SMS"
-                  providers={smsProviders}
-                  onProvidersChange={setSmsProviders}
-                  fields={smsProviderFields}
-                />
-              ) : (
-                <div className="p-3 rounded-lg bg-muted/50 border border-border text-sm text-muted-foreground">
-                  <Info className="w-4 h-4 inline mr-1 text-primary" />
-                  Using DIC Notifier's built-in SMS gateway. Switch to "Own Configuration" in Service Config to manage your own providers.
-                </div>
-              )}
-              <div className="flex items-center gap-3">
-                <Switch defaultChecked /><Label className="text-foreground text-sm">Enable Unicode</Label>
-              </div>
-              <Button onClick={() => toast.success("SMS settings updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="whatsapp">
-          <Card className="shadow-card mt-4">
-            <CardHeader><CardTitle className="text-base">WhatsApp Providers & Settings</CardTitle></CardHeader>
-            <CardContent className="space-y-5">
-              {configSource === "own" ? (
-                <ChannelProviderManager
-                  channel="whatsapp"
-                  channelLabel="WhatsApp"
-                  providers={waProviders}
-                  onProvidersChange={setWaProviders}
-                  fields={whatsappProviderFields}
-                />
-              ) : (
-                <div className="p-3 rounded-lg bg-muted/50 border border-border text-sm text-muted-foreground">
-                  <Info className="w-4 h-4 inline mr-1 text-primary" />
-                  Using DIC Notifier's built-in WhatsApp service. Switch to "Own Configuration" in Service Config to manage your own providers.
-                </div>
-              )}
-              <div className="flex items-center gap-3">
-                <Switch defaultChecked /><Label className="text-foreground text-sm">Enable Media Messages</Label>
-              </div>
-              <Button onClick={() => toast.success("WhatsApp settings updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="email">
-          <Card className="shadow-card mt-4">
-            <CardHeader><CardTitle className="text-base">Email Providers & Settings</CardTitle></CardHeader>
-            <CardContent className="space-y-5">
-              {configSource === "own" ? (
-                <ChannelProviderManager
-                  channel="email"
-                  channelLabel="Email"
-                  providers={emailProviders}
-                  onProvidersChange={setEmailProviders}
-                  fields={emailProviderFields}
-                />
-              ) : (
-                <div className="p-3 rounded-lg bg-muted/50 border border-border text-sm text-muted-foreground">
-                  <Info className="w-4 h-4 inline mr-1 text-primary" />
-                  Using DIC Notifier's built-in Email service. Switch to "Own Configuration" in Service Config to manage your own providers.
-                </div>
-              )}
-              <div className="flex items-center gap-3">
-                <Switch defaultChecked /><Label className="text-foreground text-sm">Enable HTML Emails</Label>
-              </div>
-              <Button onClick={() => toast.success("Email settings updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="rcs">
-          <Card className="shadow-card mt-4">
-            <CardHeader><CardTitle className="text-base">RCS Providers & Settings</CardTitle></CardHeader>
-            <CardContent className="space-y-5">
-              {configSource === "own" ? (
-                <ChannelProviderManager
-                  channel="rcs"
-                  channelLabel="RCS"
-                  providers={rcsProviders}
-                  onProvidersChange={setRcsProviders}
-                  fields={rcsProviderFields}
-                />
-              ) : (
-                <div className="p-3 rounded-lg bg-muted/50 border border-border text-sm text-muted-foreground">
-                  <Info className="w-4 h-4 inline mr-1 text-primary" />
-                  Using DIC Notifier's built-in RCS service. Switch to "Own Configuration" in Service Config to manage your own providers.
-                </div>
-              )}
-              <div className="flex items-center gap-3">
-                <Switch defaultChecked /><Label className="text-foreground text-sm">Enable Rich Cards</Label>
-              </div>
-              <Button onClick={() => toast.success("RCS settings updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="ivrs">
-          <IVRSWebhookSection />
-        </TabsContent>
-
-        {/* API Endpoints Tab */}
-        <TabsContent value="api">
-          <div className="space-y-4 mt-4">
-            <Card className="shadow-card">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base">Recipient API Endpoints</CardTitle>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => setShowSample(true)}>
-                      <Code className="w-4 h-4 mr-1" /> Sample Format
-                    </Button>
-                    <Button size="sm" onClick={() => setShowAddApi(true)}>
-                      <Plus className="w-4 h-4 mr-1" /> Add API
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Upload your project's API endpoints to dynamically fetch recipient mobile numbers. The filters defined here will appear in the Send Message screen under "Bulk DB" tab.
-                </p>
-
-                {apis.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Server className="w-10 h-10 mx-auto mb-3 opacity-40" />
-                    <p className="text-sm">No API endpoints configured yet</p>
-                    <p className="text-xs mt-1">Add an API to dynamically fetch recipients</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {apis.map((api) => (
-                      <div key={api.id} className="p-4 rounded-lg border border-border bg-card">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <ExternalLink className="w-4 h-4 text-primary" />
-                            <span className="font-medium text-foreground text-sm">{api.name}</span>
-                            <Badge variant={api.status === "Active" ? "default" : "secondary"} className="text-xs">{api.status}</Badge>
-                          </div>
-                          <div className="flex gap-1">
-                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => toggleApiStatus(api.id)}>
-                              {api.status === "Active" ? <span className="text-xs">⏸</span> : <span className="text-xs">▶</span>}
-                            </Button>
-                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => deleteApi(api.id)}>
-                              <Trash2 className="w-3.5 h-3.5 text-destructive" />
-                            </Button>
-                          </div>
-                        </div>
-                        <div className="text-xs text-muted-foreground space-y-1">
-                          <p><span className="font-medium">Endpoint:</span> <code className="bg-muted px-1 rounded">{api.method} {api.endpoint}</code></p>
-                          <p><span className="font-medium">Auth:</span> {api.authType}</p>
-                          <p><span className="font-medium">Response Field:</span> <code className="bg-muted px-1 rounded">{api.responseField}</code></p>
-                          <p><span className="font-medium">Filters ({api.filters.length}):</span></p>
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {api.filters.map(f => (
-                              <Badge key={f.key} variant="outline" className="text-xs font-normal">
-                                {f.label} <span className="text-muted-foreground ml-1">({f.key})</span>
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+      {/* Three pillars selector */}
+      <div>
+        <p className="text-sm font-semibold text-foreground mb-2">Choose what you want to configure</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {[
+            { key: "out" as ConfigGroup, icon: SendIcon, title: "Message Out", desc: "Outbound channels — SMS, WhatsApp, Email, RCS, recipient APIs" },
+            { key: "ivrs" as ConfigGroup, icon: PhoneCall, title: "IVRS", desc: "Inbound & outbound voice call webhook & analytics" },
+            { key: "in" as ConfigGroup, icon: InboxIcon, title: "Message In", desc: "Inbound channels — Email, WhatsApp, Social, Chatbot, Webhook" },
+          ].map(p => {
+            const Icon = p.icon;
+            const active = group === p.key;
+            return (
+              <button
+                key={p.key}
+                onClick={() => { setGroup(p.key); if (p.key === "out") setActiveTab("service"); if (p.key === "ivrs") setActiveTab("ivrs-webhook"); if (p.key === "in") setActiveTab("connections"); }}
+                className={cn(
+                  "p-4 rounded-xl border-2 text-left transition-all",
+                  active ? "border-primary bg-primary/5 shadow-sm" : "border-border hover:bg-muted/50"
                 )}
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-      </Tabs>
-
-      {/* New Feature Highlight: IVRS Webhook */}
-      <div className="relative overflow-hidden rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-background shadow-card-hover">
-        <div className="absolute top-4 right-4 z-10">
-          <Badge className="bg-primary text-primary-foreground hover:bg-primary text-[10px] gap-1 shadow">
-            <Sparkles className="w-3 h-3" />NEW FEATURE
-          </Badge>
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center p-6 lg:p-8">
-          <div className="space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/15 text-primary text-xs font-semibold">
-              <Webhook className="w-3.5 h-3.5" />IVRS Dashboard Connection
-            </div>
-            <h2 className="text-2xl lg:text-3xl font-bold text-foreground leading-tight">
-              Now get full analytics on your <span className="text-primary">running IVRS system</span>
-            </h2>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Already running an IVRS with another provider? No need to migrate. Just add a webhook endpoint
-              from DIC Notifier into your IVRS platform — we'll capture every inbound and outbound call event
-              in real-time and turn it into rich Call Dashboard analytics, funnels, agent timing & SLA reports.
-            </p>
-            <div className="grid grid-cols-3 gap-2 pt-2">
-              <div className="rounded-lg border border-border bg-card/60 p-3 text-center">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-1.5">
-                  <span className="text-primary font-bold text-sm">1</span>
+              >
+                <div className="flex items-center gap-3 mb-1.5">
+                  <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center", active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground")}>
+                    <Icon className="w-4.5 h-4.5" />
+                  </div>
+                  <span className="font-semibold text-foreground">{p.title}</span>
                 </div>
-                <p className="text-[11px] font-medium text-foreground">Copy Webhook URL</p>
-              </div>
-              <div className="rounded-lg border border-border bg-card/60 p-3 text-center">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-1.5">
-                  <span className="text-primary font-bold text-sm">2</span>
-                </div>
-                <p className="text-[11px] font-medium text-foreground">Paste in your IVRS</p>
-              </div>
-              <div className="rounded-lg border border-border bg-card/60 p-3 text-center">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-1.5">
-                  <span className="text-primary font-bold text-sm">3</span>
-                </div>
-                <p className="text-[11px] font-medium text-foreground">Get Live Analytics</p>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2 pt-2">
-              <Button onClick={() => setActiveTab("ivrs")} className="gap-2">
-                <Webhook className="w-4 h-4" />Configure IVRS Webhook
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-              <Button variant="outline" onClick={() => setActiveTab("ivrs")}>
-                View Payload Format
-              </Button>
-            </div>
-          </div>
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent rounded-xl blur-2xl" />
-            <img
-              src={ivrsWebhookHero}
-              alt="IVRS webhook connecting to DIC Notifier analytics dashboard"
-              width={1024}
-              height={640}
-              loading="lazy"
-              className="relative w-full h-auto rounded-xl border border-border shadow-card"
-            />
-          </div>
+                <p className="text-xs text-muted-foreground">{p.desc}</p>
+              </button>
+            );
+          })}
         </div>
       </div>
+
+      {/* === MESSAGE OUT === */}
+      {group === "out" && (
+        <Tabs value={activeTab} onValueChange={setActiveTab} defaultValue="service">
+          <TabsList className="flex-wrap">
+            <TabsTrigger value="service">Service Source</TabsTrigger>
+            <TabsTrigger value="sms">SMS</TabsTrigger>
+            <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
+            <TabsTrigger value="email">Email</TabsTrigger>
+            <TabsTrigger value="rcs">RCS</TabsTrigger>
+            <TabsTrigger value="api">Recipient API</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="service">
+            <Card className="shadow-card mt-4">
+              <CardHeader><CardTitle className="text-base">Outbound Service Source</CardTitle></CardHeader>
+              <CardContent className="space-y-5">
+                <p className="text-sm text-muted-foreground">Choose whether to use DIC Notifier's communication infrastructure or your own provider configurations for outbound messaging.</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <button
+                    onClick={() => setConfigSource("notifier")}
+                    className={`p-4 rounded-xl border-2 text-left transition-all ${configSource === "notifier" ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"}`}
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <Server className="w-5 h-5 text-primary" />
+                      <span className="font-semibold text-foreground">DIC Notifier Service</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Use the platform's built-in SMS, WhatsApp, Email & RCS services. No configuration needed.</p>
+                  </button>
+                  <button
+                    onClick={() => setConfigSource("own")}
+                    className={`p-4 rounded-xl border-2 text-left transition-all ${configSource === "own" ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"}`}
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <Key className="w-5 h-5 text-primary" />
+                      <span className="font-semibold text-foreground">Own Configuration</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Use your own provider APIs and credentials per channel.</p>
+                  </button>
+                </div>
+                {configSource === "own" && (
+                  <div className="p-3 rounded-lg bg-warning/5 border border-warning/20 text-sm text-muted-foreground">
+                    <Info className="w-4 h-4 inline mr-1 text-warning" />
+                    Provide valid API keys in each channel tab. You can also set your own quota limits.
+                  </div>
+                )}
+                <Button onClick={() => toast.success("Service configuration updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="sms">
+            <Card className="shadow-card mt-4">
+              <CardHeader><CardTitle className="text-base">SMS Providers & Settings</CardTitle></CardHeader>
+              <CardContent className="space-y-5">
+                {configSource === "own" ? (
+                  <ChannelProviderManager channel="sms" channelLabel="SMS" providers={smsProviders} onProvidersChange={setSmsProviders} fields={smsProviderFields} />
+                ) : (
+                  <div className="p-3 rounded-lg bg-muted/50 border border-border text-sm text-muted-foreground">
+                    <Info className="w-4 h-4 inline mr-1 text-primary" />
+                    Using DIC Notifier's built-in SMS gateway. Switch to "Own Configuration" in Service Source to manage your own providers.
+                  </div>
+                )}
+                <div className="flex items-center gap-3">
+                  <Switch defaultChecked /><Label className="text-foreground text-sm">Enable Unicode</Label>
+                </div>
+                <Button onClick={() => toast.success("SMS settings updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="whatsapp">
+            <Card className="shadow-card mt-4">
+              <CardHeader><CardTitle className="text-base">WhatsApp Providers & Settings</CardTitle></CardHeader>
+              <CardContent className="space-y-5">
+                {configSource === "own" ? (
+                  <ChannelProviderManager channel="whatsapp" channelLabel="WhatsApp" providers={waProviders} onProvidersChange={setWaProviders} fields={whatsappProviderFields} />
+                ) : (
+                  <div className="p-3 rounded-lg bg-muted/50 border border-border text-sm text-muted-foreground">
+                    <Info className="w-4 h-4 inline mr-1 text-primary" />
+                    Using DIC Notifier's built-in WhatsApp service. Switch to "Own Configuration" in Service Source to manage your own providers.
+                  </div>
+                )}
+                <div className="flex items-center gap-3">
+                  <Switch defaultChecked /><Label className="text-foreground text-sm">Enable Media Messages</Label>
+                </div>
+                <Button onClick={() => toast.success("WhatsApp settings updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="email">
+            <Card className="shadow-card mt-4">
+              <CardHeader><CardTitle className="text-base">Email Providers & Settings</CardTitle></CardHeader>
+              <CardContent className="space-y-5">
+                {configSource === "own" ? (
+                  <ChannelProviderManager channel="email" channelLabel="Email" providers={emailProviders} onProvidersChange={setEmailProviders} fields={emailProviderFields} />
+                ) : (
+                  <div className="p-3 rounded-lg bg-muted/50 border border-border text-sm text-muted-foreground">
+                    <Info className="w-4 h-4 inline mr-1 text-primary" />
+                    Using DIC Notifier's built-in Email service. Switch to "Own Configuration" in Service Source to manage your own providers.
+                  </div>
+                )}
+                <div className="flex items-center gap-3">
+                  <Switch defaultChecked /><Label className="text-foreground text-sm">Enable HTML Emails</Label>
+                </div>
+                <Button onClick={() => toast.success("Email settings updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="rcs">
+            <Card className="shadow-card mt-4">
+              <CardHeader><CardTitle className="text-base">RCS Providers & Settings</CardTitle></CardHeader>
+              <CardContent className="space-y-5">
+                {configSource === "own" ? (
+                  <ChannelProviderManager channel="rcs" channelLabel="RCS" providers={rcsProviders} onProvidersChange={setRcsProviders} fields={rcsProviderFields} />
+                ) : (
+                  <div className="p-3 rounded-lg bg-muted/50 border border-border text-sm text-muted-foreground">
+                    <Info className="w-4 h-4 inline mr-1 text-primary" />
+                    Using DIC Notifier's built-in RCS service. Switch to "Own Configuration" in Service Source to manage your own providers.
+                  </div>
+                )}
+                <div className="flex items-center gap-3">
+                  <Switch defaultChecked /><Label className="text-foreground text-sm">Enable Rich Cards</Label>
+                </div>
+                <Button onClick={() => toast.success("RCS settings updated")}><Save className="w-4 h-4 mr-2" />Save</Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="api">
+            <div className="space-y-4 mt-4">
+              {/* API Endpoint highlight banner */}
+              <Card className="shadow-card border-primary/30 bg-primary/5">
+                <CardContent className="pt-5 pb-4 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-primary/15 flex items-center justify-center flex-shrink-0">
+                      <ExternalLink className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-base font-semibold text-foreground">Add your User-Base API Endpoint</h3>
+                      <p className="text-xs text-muted-foreground mt-0.5">Plug in your existing user/recipient database API. The endpoint, filters and auth defined here will appear in the Send Message screen under "Bulk DB" — letting you send communication to any segment of your users without re-uploading CSVs.</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Button size="sm" onClick={() => setShowAddApi(true)}>
+                      <Plus className="w-4 h-4 mr-1" /> Add API Endpoint
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => setShowSample(true)}>
+                      <Code className="w-4 h-4 mr-1" /> View Sample Request / Response
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-card">
+                <CardHeader><CardTitle className="text-base">Configured Endpoints</CardTitle></CardHeader>
+                <CardContent>
+                  {apis.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Server className="w-10 h-10 mx-auto mb-3 opacity-40" />
+                      <p className="text-sm">No API endpoints configured yet</p>
+                      <p className="text-xs mt-1">Add an API to dynamically fetch recipients</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {apis.map((api) => (
+                        <div key={api.id} className="p-4 rounded-lg border border-border bg-card">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <ExternalLink className="w-4 h-4 text-primary" />
+                              <span className="font-medium text-foreground text-sm">{api.name}</span>
+                              <Badge variant={api.status === "Active" ? "default" : "secondary"} className="text-xs">{api.status}</Badge>
+                            </div>
+                            <div className="flex gap-1">
+                              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => toggleApiStatus(api.id)}>
+                                {api.status === "Active" ? <span className="text-xs">⏸</span> : <span className="text-xs">▶</span>}
+                              </Button>
+                              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => deleteApi(api.id)}>
+                                <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                              </Button>
+                            </div>
+                          </div>
+                          <div className="text-xs text-muted-foreground space-y-1">
+                            <p><span className="font-medium">Endpoint:</span> <code className="bg-muted px-1 rounded">{api.method} {api.endpoint}</code></p>
+                            <p><span className="font-medium">Auth:</span> {api.authType}</p>
+                            <p><span className="font-medium">Response Field:</span> <code className="bg-muted px-1 rounded">{api.responseField}</code></p>
+                            <p><span className="font-medium">Filters ({api.filters.length}):</span></p>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {api.filters.map(f => (
+                                <Badge key={f.key} variant="outline" className="text-xs font-normal">
+                                  {f.label} <span className="text-muted-foreground ml-1">({f.key})</span>
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
+      )}
+
+      {/* === IVRS === */}
+      {group === "ivrs" && (
+        <Tabs value={activeTab} onValueChange={setActiveTab} defaultValue="ivrs-webhook">
+          <TabsList>
+            <TabsTrigger value="ivrs-webhook">
+              <Sparkles className="w-3 h-3 mr-1" />IVRS Webhook
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="ivrs-webhook">
+            <IVRSWebhookSection />
+          </TabsContent>
+        </Tabs>
+      )}
+
+      {/* === MESSAGE IN === */}
+      {group === "in" && (
+        <Tabs value={activeTab} onValueChange={setActiveTab} defaultValue="connections">
+          <TabsList>
+            <TabsTrigger value="connections">Channel Connections</TabsTrigger>
+          </TabsList>
+          <TabsContent value="connections">
+            <MessageInChannels />
+          </TabsContent>
+        </Tabs>
+      )}
+
 
       {/* Sample API Format Dialog */}
       <Dialog open={showSample} onOpenChange={setShowSample}>

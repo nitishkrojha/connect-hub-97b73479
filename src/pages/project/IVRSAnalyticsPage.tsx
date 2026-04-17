@@ -13,7 +13,6 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, AreaChart, Area, LineChart, Line, Legend,
 } from "recharts";
-// @ts-expect-error - no bundled types for default export shape
 import indiaMap from "@svg-maps/india";
 
 /* ── Inbound mock data ── */

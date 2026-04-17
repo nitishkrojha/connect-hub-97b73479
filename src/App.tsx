@@ -25,6 +25,10 @@ import ProjectConfigPage from "./pages/project/ProjectConfigPage";
 import ProjectQuotaPage from "./pages/project/ProjectQuotaPage";
 import CampaignHistoryPage from "./pages/project/CampaignHistoryPage";
 import DeveloperDocsPage from "./pages/project/DeveloperDocsPage";
+import InboxPage from "./pages/project/InboxPage";
+import InboxConnectionsPage from "./pages/project/InboxConnectionsPage";
+import InboxDashboardPage from "./pages/project/InboxDashboardPage";
+import InboxReportsPage from "./pages/project/InboxReportsPage";
 import ProfilePage from "./pages/ProfilePage";
 import NumberHistoryPage from "./pages/NumberHistoryPage";
 import NotFound from "./pages/NotFound";
@@ -71,6 +75,10 @@ const App = () => (
               <Route index element={<ProjectDashboard />} />
               <Route path="campaigns" element={<CampaignsPage />} />
               <Route path="send" element={<SendMessagePage />} />
+              <Route path="inbox" element={<InboxPage />} />
+              <Route path="inbox/connections" element={<InboxConnectionsPage />} />
+              <Route path="inbox/dashboard" element={<InboxDashboardPage />} />
+              <Route path="inbox/reports" element={<InboxReportsPage />} />
               <Route path="templates" element={<ProjectTemplatesPage />} />
               <Route path="upload" element={<UploadRecipientsPage />} />
               <Route path="reports" element={<ProjectReportsPage />} />

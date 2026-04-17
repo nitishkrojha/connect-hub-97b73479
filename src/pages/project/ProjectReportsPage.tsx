@@ -99,6 +99,27 @@ const inboxChannelPerf = [
   { channel: "Telegram", volume: 140, ticketRate: 10, csat: 90 },
 ];
 
+// Per-channel received with status breakdown
+const inboxVolumeByChannel = [
+  { channel: "WhatsApp", received: 980, open: 142, inProgress: 96, closed: 742 },
+  { channel: "Email", received: 320, open: 58, inProgress: 41, closed: 221 },
+  { channel: "Chatbot", received: 540, open: 64, inProgress: 38, closed: 438 },
+  { channel: "Facebook", received: 180, open: 22, inProgress: 17, closed: 141 },
+  { channel: "Instagram", received: 95, open: 14, inProgress: 9, closed: 72 },
+  { channel: "Telegram", received: 140, open: 18, inProgress: 12, closed: 110 },
+];
+
+// Per-agent handled by channel + pending bucket
+const inboxAgentByChannel = agents.map((a, i) => ({
+  agent: a,
+  WhatsApp: 30 + ((i * 7) % 25),
+  Email: 12 + ((i * 5) % 18),
+  Chatbot: 18 + ((i * 11) % 22),
+  Facebook: 6 + ((i * 3) % 10),
+  Telegram: 4 + ((i * 4) % 9),
+  pending: 3 + ((i * 2) % 8),
+}));
+
 const ProjectReportsPage = () => {
   const [period, setPeriod] = useState("weekly");
   const [direction, setDirection] = useState<"out" | "in">("out");
@@ -466,17 +487,85 @@ const ProjectReportsPage = () => {
       {direction === "in" && (
         <Tabs value={inTab} onValueChange={setInTab}>
           <TabsList className="flex-wrap">
-            <TabsTrigger value="volume">Volume</TabsTrigger>
-            <TabsTrigger value="response">Response Time</TabsTrigger>
+            <TabsTrigger value="volume">Volume & Response Time</TabsTrigger>
             <TabsTrigger value="agents">Agent Performance</TabsTrigger>
             <TabsTrigger value="channels">Channel Performance</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="volume" className="mt-4">
+          <TabsContent value="volume" className="mt-4 space-y-4">
+            {/* KPI strip */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {(() => {
+                const totals = inboxVolumeByChannel.reduce((a, c) => ({
+                  received: a.received + c.received,
+                  open: a.open + c.open,
+                  inProgress: a.inProgress + c.inProgress,
+                  closed: a.closed + c.closed,
+                }), { received: 0, open: 0, inProgress: 0, closed: 0 });
+                return [
+                  { label: "Total Received", value: totals.received.toLocaleString() },
+                  { label: "Open", value: totals.open.toLocaleString() },
+                  { label: "In Progress", value: totals.inProgress.toLocaleString() },
+                  { label: "Closed", value: totals.closed.toLocaleString() },
+                ].map(s => (
+                  <Card key={s.label} className="shadow-card">
+                    <CardContent className="pt-4 pb-3">
+                      <p className="text-xs text-muted-foreground">{s.label}</p>
+                      <p className="text-xl font-bold text-foreground mt-1">{s.value}</p>
+                    </CardContent>
+                  </Card>
+                ));
+              })()}
+            </div>
+
+            {/* Per-channel breakdown */}
             <Card className="shadow-card">
-              <CardHeader><CardTitle className="text-base">Inbound volume by channel</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="text-base">Messages received per channel — by status</CardTitle></CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={340}>
+                <ResponsiveContainer width="100%" height={320}>
+                  <BarChart data={inboxVolumeByChannel}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="channel" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11 }} />
+                    <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
+                    <Legend wrapperStyle={{ fontSize: 11 }} />
+                    <Bar dataKey="open" stackId="a" name="Open" fill="hsl(38 92% 50%)" />
+                    <Bar dataKey="inProgress" stackId="a" name="In Progress" fill="hsl(217 91% 60%)" />
+                    <Bar dataKey="closed" stackId="a" name="Closed" fill="hsl(142 71% 45%)" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+                <div className="overflow-x-auto mt-4">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="text-left text-xs text-muted-foreground border-b border-border">
+                        <th className="py-2 font-medium">Channel</th>
+                        <th className="py-2 font-medium text-right">Received</th>
+                        <th className="py-2 font-medium text-right">Open</th>
+                        <th className="py-2 font-medium text-right">In Progress</th>
+                        <th className="py-2 font-medium text-right">Closed</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {inboxVolumeByChannel.map(c => (
+                        <tr key={c.channel} className="border-b border-border/50">
+                          <td className="py-2.5 font-medium">{c.channel}</td>
+                          <td className="py-2.5 text-right">{c.received}</td>
+                          <td className="py-2.5 text-right text-warning">{c.open}</td>
+                          <td className="py-2.5 text-right text-primary">{c.inProgress}</td>
+                          <td className="py-2.5 text-right text-success">{c.closed}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Trend over time */}
+            <Card className="shadow-card">
+              <CardHeader><CardTitle className="text-base">Inbound volume trend by channel</CardTitle></CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={280}>
                   <LineChart data={inboxDays(n)}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="day" tick={{ fontSize: 11 }} />
@@ -491,13 +580,12 @@ const ProjectReportsPage = () => {
                 </ResponsiveContainer>
               </CardContent>
             </Card>
-          </TabsContent>
 
-          <TabsContent value="response" className="mt-4">
+            {/* Response time */}
             <Card className="shadow-card">
               <CardHeader><CardTitle className="text-base">First response & resolution time (minutes)</CardTitle></CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={340}>
+                <ResponsiveContainer width="100%" height={280}>
                   <LineChart data={inboxResponseTime(n)}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="day" tick={{ fontSize: 11 }} />
@@ -514,45 +602,66 @@ const ProjectReportsPage = () => {
 
           <TabsContent value="agents" className="mt-4 space-y-4">
             <Card className="shadow-card">
-              <CardHeader><CardTitle className="text-base">Conversations handled per agent</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="text-base">Messages handled per agent — by channel (with pending)</CardTitle></CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={inboxAgentData}>
+                <ResponsiveContainer width="100%" height={320}>
+                  <BarChart data={inboxAgentByChannel}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="agent" tick={{ fontSize: 11 }} />
                     <YAxis tick={{ fontSize: 11 }} />
                     <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
-                    <Bar dataKey="handled" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+                    <Legend wrapperStyle={{ fontSize: 11 }} />
+                    <Bar dataKey="WhatsApp" stackId="h" fill="hsl(142 71% 45%)" />
+                    <Bar dataKey="Email" stackId="h" fill="hsl(217 91% 60%)" />
+                    <Bar dataKey="Chatbot" stackId="h" fill="hsl(280 75% 60%)" />
+                    <Bar dataKey="Facebook" stackId="h" fill="hsl(220 91% 50%)" />
+                    <Bar dataKey="Telegram" stackId="h" fill="hsl(199 89% 48%)" />
+                    <Bar dataKey="pending" name="Pending" fill="hsl(38 92% 50%)" radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
+
             <Card className="shadow-card">
-              <CardHeader><CardTitle className="text-base">Agent leaderboard</CardTitle></CardHeader>
-              <CardContent>
+              <CardHeader><CardTitle className="text-base">Agent leaderboard — channel-wise handled & pending</CardTitle></CardHeader>
+              <CardContent className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-left text-xs text-muted-foreground border-b border-border">
                       <th className="py-2 font-medium">Agent</th>
-                      <th className="py-2 font-medium text-right">Handled</th>
-                      <th className="py-2 font-medium text-right">Avg response (m)</th>
-                      <th className="py-2 font-medium text-right">CSAT %</th>
+                      <th className="py-2 font-medium text-right">WhatsApp</th>
+                      <th className="py-2 font-medium text-right">Email</th>
+                      <th className="py-2 font-medium text-right">Chatbot</th>
+                      <th className="py-2 font-medium text-right">Facebook</th>
+                      <th className="py-2 font-medium text-right">Telegram</th>
+                      <th className="py-2 font-medium text-right">Total Handled</th>
+                      <th className="py-2 font-medium text-right">Pending</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {inboxAgentData.map(a => (
-                      <tr key={a.agent} className="border-b border-border/50">
-                        <td className="py-2.5 font-medium">{a.agent}</td>
-                        <td className="py-2.5 text-right">{a.handled}</td>
-                        <td className="py-2.5 text-right">{a.avgResp}</td>
-                        <td className="py-2.5 text-right">{a.csat}</td>
-                      </tr>
-                    ))}
+                    {inboxAgentByChannel.map(a => {
+                      const total = a.WhatsApp + a.Email + a.Chatbot + a.Facebook + a.Telegram;
+                      return (
+                        <tr key={a.agent} className="border-b border-border/50">
+                          <td className="py-2.5 font-medium">{a.agent}</td>
+                          <td className="py-2.5 text-right">{a.WhatsApp}</td>
+                          <td className="py-2.5 text-right">{a.Email}</td>
+                          <td className="py-2.5 text-right">{a.Chatbot}</td>
+                          <td className="py-2.5 text-right">{a.Facebook}</td>
+                          <td className="py-2.5 text-right">{a.Telegram}</td>
+                          <td className="py-2.5 text-right font-semibold">{total}</td>
+                          <td className="py-2.5 text-right">
+                            <Badge variant="secondary" className="bg-warning/10 text-warning">{a.pending}</Badge>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </CardContent>
             </Card>
           </TabsContent>
+
 
           <TabsContent value="channels" className="mt-4 space-y-4">
             <Card className="shadow-card">

@@ -643,8 +643,8 @@ const ProjectConfigPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {[
             { key: "out" as ConfigGroup, icon: SendIcon, title: "Message Out", desc: "Outbound channels — SMS, WhatsApp, Email, RCS, recipient APIs" },
-            { key: "ivrs" as ConfigGroup, icon: PhoneCall, title: "IVRS", desc: "Inbound & outbound voice call webhook & analytics" },
             { key: "in" as ConfigGroup, icon: InboxIcon, title: "Message In", desc: "Inbound channels — Email, WhatsApp, Social, Chatbot, Webhook" },
+            { key: "ivrs" as ConfigGroup, icon: PhoneCall, title: "IVRS", desc: "Inbound & outbound voice call webhook & analytics" },
           ].map(p => {
             const Icon = p.icon;
             const active = group === p.key;

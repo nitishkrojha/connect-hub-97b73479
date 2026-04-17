@@ -602,28 +602,7 @@ const ProjectReportsPage = () => {
 
           <TabsContent value="agents" className="mt-4 space-y-4">
             <Card className="shadow-card">
-              <CardHeader><CardTitle className="text-base">Messages handled per agent — by channel (with pending)</CardTitle></CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={320}>
-                  <BarChart data={inboxAgentByChannel}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="agent" tick={{ fontSize: 11 }} />
-                    <YAxis tick={{ fontSize: 11 }} />
-                    <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
-                    <Legend wrapperStyle={{ fontSize: 11 }} />
-                    <Bar dataKey="WhatsApp" stackId="h" fill="hsl(142 71% 45%)" />
-                    <Bar dataKey="Email" stackId="h" fill="hsl(217 91% 60%)" />
-                    <Bar dataKey="Chatbot" stackId="h" fill="hsl(280 75% 60%)" />
-                    <Bar dataKey="Facebook" stackId="h" fill="hsl(220 91% 50%)" />
-                    <Bar dataKey="Telegram" stackId="h" fill="hsl(199 89% 48%)" />
-                    <Bar dataKey="pending" name="Pending" fill="hsl(38 92% 50%)" radius={[6, 6, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-card">
-              <CardHeader><CardTitle className="text-base">Agent leaderboard — channel-wise handled & pending</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="text-base">Agent leaderboard — channel-wise handled, closed & pending</CardTitle></CardHeader>
               <CardContent className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -635,12 +614,14 @@ const ProjectReportsPage = () => {
                       <th className="py-2 font-medium text-right">Facebook</th>
                       <th className="py-2 font-medium text-right">Telegram</th>
                       <th className="py-2 font-medium text-right">Total Handled</th>
+                      <th className="py-2 font-medium text-right">Closed</th>
                       <th className="py-2 font-medium text-right">Pending</th>
                     </tr>
                   </thead>
                   <tbody>
                     {inboxAgentByChannel.map(a => {
                       const total = a.WhatsApp + a.Email + a.Chatbot + a.Facebook + a.Telegram;
+                      const closed = total - a.pending;
                       return (
                         <tr key={a.agent} className="border-b border-border/50">
                           <td className="py-2.5 font-medium">{a.agent}</td>
@@ -651,12 +632,39 @@ const ProjectReportsPage = () => {
                           <td className="py-2.5 text-right">{a.Telegram}</td>
                           <td className="py-2.5 text-right font-semibold">{total}</td>
                           <td className="py-2.5 text-right">
+                            <Badge variant="secondary" className="bg-success/10 text-success">{closed}</Badge>
+                          </td>
+                          <td className="py-2.5 text-right">
                             <Badge variant="secondary" className="bg-warning/10 text-warning">{a.pending}</Badge>
                           </td>
                         </tr>
                       );
                     })}
                   </tbody>
+                  <tfoot>
+                    {(() => {
+                      const totals = inboxAgentByChannel.reduce((acc, a) => {
+                        const t = a.WhatsApp + a.Email + a.Chatbot + a.Facebook + a.Telegram;
+                        acc.WhatsApp += a.WhatsApp; acc.Email += a.Email; acc.Chatbot += a.Chatbot;
+                        acc.Facebook += a.Facebook; acc.Telegram += a.Telegram;
+                        acc.total += t; acc.pending += a.pending; acc.closed += t - a.pending;
+                        return acc;
+                      }, { WhatsApp: 0, Email: 0, Chatbot: 0, Facebook: 0, Telegram: 0, total: 0, closed: 0, pending: 0 });
+                      return (
+                        <tr className="border-t-2 border-border font-semibold">
+                          <td className="py-2.5">Total</td>
+                          <td className="py-2.5 text-right">{totals.WhatsApp}</td>
+                          <td className="py-2.5 text-right">{totals.Email}</td>
+                          <td className="py-2.5 text-right">{totals.Chatbot}</td>
+                          <td className="py-2.5 text-right">{totals.Facebook}</td>
+                          <td className="py-2.5 text-right">{totals.Telegram}</td>
+                          <td className="py-2.5 text-right">{totals.total}</td>
+                          <td className="py-2.5 text-right text-success">{totals.closed}</td>
+                          <td className="py-2.5 text-right text-warning">{totals.pending}</td>
+                        </tr>
+                      );
+                    })()}
+                  </tfoot>
                 </table>
               </CardContent>
             </Card>

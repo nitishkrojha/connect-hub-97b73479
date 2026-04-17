@@ -4,12 +4,14 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Download, Search, Megaphone, Eye, MousePointerClick, Send as SendIcon } from "lucide-react";
+import { Download, Search, Megaphone, Eye, MousePointerClick, Send as SendIcon, Inbox as InboxIcon } from "lucide-react";
 import { useState } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell,
+  PieChart, Pie, Cell, LineChart, Line, Legend,
 } from "recharts";
+import { agents } from "@/data/inboxMockData";
+import { cn } from "@/lib/utils";
 
 const weeklyData = [
   { day: "Mon", sms: 320, whatsapp: 480, email: 820, rcs: 110 },

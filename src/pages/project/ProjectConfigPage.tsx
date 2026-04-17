@@ -8,9 +8,11 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Save, Server, Plus, Trash2, Copy, ExternalLink, Key, Code, Info, Check, Phone, PlayCircle, PauseCircle, CheckCircle2, XCircle, AlertCircle, Sparkles, ArrowRight, Webhook } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Save, Server, Plus, Trash2, Copy, ExternalLink, Key, Code, Info, Check, Phone, PlayCircle, PauseCircle, CheckCircle2, XCircle, AlertCircle, Sparkles, ArrowRight, Webhook, Send as SendIcon, Inbox as InboxIcon, PhoneCall } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import ChannelProviderManager, { type ChannelProvider, type ProviderField } from "@/components/ChannelProviderManager";
+import { channels as seedChannels, type ChannelMeta } from "@/data/inboxMockData";
+import { cn } from "@/lib/utils";
 
 const smsProviderFields: ProviderField[] = [
   { key: "apiEndpoint", label: "API Endpoint", placeholder: "https://sms-provider.com/api/send" },

@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard, Megaphone, Send, FileText, Upload,
   BarChart3, Settings2, Gauge, History, LogOut, Menu, ChevronLeft, Code2, Search,
-  Inbox, Plug, PieChart, FileBarChart,
+  Inbox,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -14,9 +14,6 @@ const projectNav = [
   { to: "/project/campaigns", icon: Megaphone, label: "Campaigns" },
   { to: "/project/send", icon: Send, label: "Send Message" },
   { to: "/project/inbox", icon: Inbox, label: "Inbox" },
-  { to: "/project/inbox/dashboard", icon: PieChart, label: "Inbox Dashboard" },
-  { to: "/project/inbox/reports", icon: FileBarChart, label: "Inbox Reports" },
-  { to: "/project/inbox/connections", icon: Plug, label: "Inbox Connections" },
   { to: "/project/templates", icon: FileText, label: "Headers & Templates" },
   { to: "/project/upload", icon: Upload, label: "Upload Recipients" },
   { to: "/project/reports", icon: BarChart3, label: "Reports" },

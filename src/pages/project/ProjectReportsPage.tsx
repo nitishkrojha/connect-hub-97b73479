@@ -4,12 +4,14 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Download, Search, Megaphone, Eye, MousePointerClick, Send as SendIcon } from "lucide-react";
+import { Download, Search, Megaphone, Eye, MousePointerClick, Send as SendIcon, Inbox as InboxIcon } from "lucide-react";
 import { useState } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell,
+  PieChart, Pie, Cell, LineChart, Line, Legend,
 } from "recharts";
+import { agents } from "@/data/inboxMockData";
+import { cn } from "@/lib/utils";
 
 const weeklyData = [
   { day: "Mon", sms: 320, whatsapp: 480, email: 820, rcs: 110 },
@@ -70,9 +72,39 @@ const statusStyle: Record<string, string> = {
   Pending: "bg-warning/10 text-warning",
 };
 
+// Inbox / message-in mock data
+const inboxDays = (n: number) => Array.from({ length: n }, (_, i) => ({
+  day: `D${i + 1}`,
+  WhatsApp: Math.round(80 + Math.random() * 60),
+  Email: Math.round(20 + Math.random() * 30),
+  Chatbot: Math.round(40 + Math.random() * 40),
+  Facebook: Math.round(10 + Math.random() * 25),
+}));
+const inboxResponseTime = (n: number) => Array.from({ length: n }, (_, i) => ({
+  day: `D${i + 1}`,
+  first: +(1 + Math.random() * 3).toFixed(1),
+  resolution: +(15 + Math.random() * 30).toFixed(1),
+}));
+const inboxAgentData = agents.map(a => ({
+  agent: a,
+  handled: Math.round(40 + Math.random() * 80),
+  avgResp: +(1 + Math.random() * 4).toFixed(1),
+  csat: Math.round(80 + Math.random() * 18),
+}));
+const inboxChannelPerf = [
+  { channel: "WhatsApp", volume: 980, ticketRate: 12, csat: 92 },
+  { channel: "Email", volume: 320, ticketRate: 28, csat: 85 },
+  { channel: "Chatbot", volume: 540, ticketRate: 8, csat: 78 },
+  { channel: "Facebook", volume: 180, ticketRate: 15, csat: 88 },
+  { channel: "Telegram", volume: 140, ticketRate: 10, csat: 90 },
+];
+
 const ProjectReportsPage = () => {
   const [period, setPeriod] = useState("weekly");
+  const [direction, setDirection] = useState<"out" | "in">("out");
   const [tab, setTab] = useState("overview");
+  const [inTab, setInTab] = useState("volume");
+  const [inRange, setInRange] = useState("30");
   const [directSearch, setDirectSearch] = useState("");
   const [directChannelFilter, setDirectChannelFilter] = useState("all");
 
@@ -82,6 +114,8 @@ const ProjectReportsPage = () => {
     return matchSearch && matchChannel;
   });
 
+  const n = parseInt(inRange);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -90,18 +124,62 @@ const ProjectReportsPage = () => {
           <p className="text-muted-foreground mt-1">Your project's communication analytics</p>
         </div>
         <div className="flex gap-3">
-          <Select value={period} onValueChange={setPeriod}>
-            <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="daily">Daily</SelectItem>
-              <SelectItem value="weekly">Weekly</SelectItem>
-              <SelectItem value="monthly">Monthly</SelectItem>
-            </SelectContent>
-          </Select>
+          {direction === "out" && (
+            <Select value={period} onValueChange={setPeriod}>
+              <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="daily">Daily</SelectItem>
+                <SelectItem value="weekly">Weekly</SelectItem>
+                <SelectItem value="monthly">Monthly</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+          {direction === "in" && (
+            <Select value={inRange} onValueChange={setInRange}>
+              <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="7">Last 7 days</SelectItem>
+                <SelectItem value="30">Last 30 days</SelectItem>
+                <SelectItem value="90">Last 90 days</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
           <Button variant="outline"><Download className="w-4 h-4 mr-2" />Export</Button>
         </div>
       </div>
 
+      {/* Top-level direction switcher */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {[
+          { key: "out" as const, icon: SendIcon, title: "Message Out Reports", desc: "Outbound delivery, campaigns, templates" },
+          { key: "in" as const, icon: InboxIcon, title: "Message In Reports", desc: "Inbound volume, response time, agents" },
+        ].map(p => {
+          const Icon = p.icon;
+          const active = direction === p.key;
+          return (
+            <button
+              key={p.key}
+              onClick={() => setDirection(p.key)}
+              className={cn(
+                "p-4 rounded-xl border-2 text-left transition-all",
+                active ? "border-primary bg-primary/5 shadow-sm" : "border-border hover:bg-muted/50"
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center", active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground")}>
+                  <Icon className="w-4 h-4" />
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground text-sm">{p.title}</p>
+                  <p className="text-xs text-muted-foreground">{p.desc}</p>
+                </div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {direction === "out" && (
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="flex-wrap">
           <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -383,6 +461,142 @@ const ProjectReportsPage = () => {
           </Card>
         </TabsContent>
       </Tabs>
+      )}
+
+      {direction === "in" && (
+        <Tabs value={inTab} onValueChange={setInTab}>
+          <TabsList className="flex-wrap">
+            <TabsTrigger value="volume">Volume</TabsTrigger>
+            <TabsTrigger value="response">Response Time</TabsTrigger>
+            <TabsTrigger value="agents">Agent Performance</TabsTrigger>
+            <TabsTrigger value="channels">Channel Performance</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="volume" className="mt-4">
+            <Card className="shadow-card">
+              <CardHeader><CardTitle className="text-base">Inbound volume by channel</CardTitle></CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={340}>
+                  <LineChart data={inboxDays(n)}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="day" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11 }} />
+                    <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
+                    <Legend wrapperStyle={{ fontSize: 11 }} />
+                    <Line type="monotone" dataKey="WhatsApp" stroke="hsl(142 71% 45%)" strokeWidth={2} dot={false} />
+                    <Line type="monotone" dataKey="Email" stroke="hsl(217 91% 60%)" strokeWidth={2} dot={false} />
+                    <Line type="monotone" dataKey="Chatbot" stroke="hsl(280 75% 60%)" strokeWidth={2} dot={false} />
+                    <Line type="monotone" dataKey="Facebook" stroke="hsl(220 91% 50%)" strokeWidth={2} dot={false} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="response" className="mt-4">
+            <Card className="shadow-card">
+              <CardHeader><CardTitle className="text-base">First response & resolution time (minutes)</CardTitle></CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={340}>
+                  <LineChart data={inboxResponseTime(n)}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="day" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11 }} />
+                    <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
+                    <Legend wrapperStyle={{ fontSize: 11 }} />
+                    <Line type="monotone" dataKey="first" name="Avg first response" stroke="hsl(var(--primary))" strokeWidth={2} />
+                    <Line type="monotone" dataKey="resolution" name="Avg resolution" stroke="hsl(280 75% 60%)" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="agents" className="mt-4 space-y-4">
+            <Card className="shadow-card">
+              <CardHeader><CardTitle className="text-base">Conversations handled per agent</CardTitle></CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={inboxAgentData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="agent" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11 }} />
+                    <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
+                    <Bar dataKey="handled" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+            <Card className="shadow-card">
+              <CardHeader><CardTitle className="text-base">Agent leaderboard</CardTitle></CardHeader>
+              <CardContent>
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-xs text-muted-foreground border-b border-border">
+                      <th className="py-2 font-medium">Agent</th>
+                      <th className="py-2 font-medium text-right">Handled</th>
+                      <th className="py-2 font-medium text-right">Avg response (m)</th>
+                      <th className="py-2 font-medium text-right">CSAT %</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {inboxAgentData.map(a => (
+                      <tr key={a.agent} className="border-b border-border/50">
+                        <td className="py-2.5 font-medium">{a.agent}</td>
+                        <td className="py-2.5 text-right">{a.handled}</td>
+                        <td className="py-2.5 text-right">{a.avgResp}</td>
+                        <td className="py-2.5 text-right">{a.csat}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="channels" className="mt-4 space-y-4">
+            <Card className="shadow-card">
+              <CardHeader><CardTitle className="text-base">Volume by channel</CardTitle></CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={inboxChannelPerf}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="channel" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11 }} />
+                    <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
+                    <Bar dataKey="volume" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+            <Card className="shadow-card">
+              <CardHeader><CardTitle className="text-base">Channel performance</CardTitle></CardHeader>
+              <CardContent>
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-xs text-muted-foreground border-b border-border">
+                      <th className="py-2 font-medium">Channel</th>
+                      <th className="py-2 font-medium text-right">Volume</th>
+                      <th className="py-2 font-medium text-right">Ticket conv. %</th>
+                      <th className="py-2 font-medium text-right">CSAT %</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {inboxChannelPerf.map(c => (
+                      <tr key={c.channel} className="border-b border-border/50">
+                        <td className="py-2.5 font-medium">{c.channel}</td>
+                        <td className="py-2.5 text-right">{c.volume}</td>
+                        <td className="py-2.5 text-right">{c.ticketRate}%</td>
+                        <td className="py-2.5 text-right">{c.csat}%</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   );
 };

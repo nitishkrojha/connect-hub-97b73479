@@ -673,53 +673,30 @@ const IVRSAnalyticsPage = () => {
             </Card>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="shadow-card">
-              <CardHeader><CardTitle className="text-base">Daily Outbound Volume</CardTitle></CardHeader>
-              <CardContent>
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={outboundDaily}>
-                      <defs>
-                        <linearGradient id="ivrsOutGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(173, 58%, 39%)" stopOpacity={0.4} />
-                          <stop offset="95%" stopColor="hsl(173, 58%, 39%)" stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                      <XAxis dataKey="day" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
-                      <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
-                      <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid hsl(var(--border))", fontSize: "13px" }} />
-                      <Area type="monotone" dataKey="answered" name="Answered" stroke="hsl(173, 58%, 39%)" fill="url(#ivrsOutGrad)" strokeWidth={2} />
-                      <Area type="monotone" dataKey="failed" name="Failed" stroke="hsl(0, 84%, 60%)" fill="transparent" strokeWidth={2} strokeDasharray="4 4" />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
+          <Card className="shadow-card">
+            <CardHeader><CardTitle className="text-base">Daily Outbound Volume</CardTitle></CardHeader>
+            <CardContent>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={outboundDaily}>
+                    <defs>
+                      <linearGradient id="ivrsOutGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(173, 58%, 39%)" stopOpacity={0.4} />
+                        <stop offset="95%" stopColor="hsl(173, 58%, 39%)" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="day" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
+                    <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
+                    <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid hsl(var(--border))", fontSize: "13px" }} />
+                    <Area type="monotone" dataKey="answered" name="Answered" stroke="hsl(173, 58%, 39%)" fill="url(#ivrsOutGrad)" strokeWidth={2} />
+                    <Area type="monotone" dataKey="failed" name="Failed" stroke="hsl(0, 84%, 60%)" fill="transparent" strokeWidth={2} strokeDasharray="4 4" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
 
-            <Card className="shadow-card">
-              <CardHeader><CardTitle className="text-base">Recent Outbound Campaigns</CardTitle></CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {outboundCampaigns.map((c) => (
-                    <div key={c.name} className="border-b border-border/50 last:border-0 pb-3 last:pb-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium text-foreground">{c.name}</span>
-                        <span className="text-[10px] text-muted-foreground">{c.time}</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-xs">
-                        <span className="text-muted-foreground">Calls: <span className="font-medium text-foreground">{c.calls.toLocaleString()}</span></span>
-                        <span className="text-muted-foreground">Answered: <span className="font-medium text-foreground">{c.answered.toLocaleString()}</span></span>
-                        <span className="text-muted-foreground">Completed: <span className="font-medium text-success">{c.completed.toLocaleString()}</span></span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
       </Tabs>
     </div>
   );

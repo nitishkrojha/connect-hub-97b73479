@@ -403,6 +403,8 @@ const CallDurationBuckets = ({
     </Card>
   );
 };
+
+const TimingAnalytics = ({
   stats, daily, label,
 }: {
   stats: typeof inboundTimingStats;

@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Phone, PhoneIncoming, PhoneOutgoing, PhoneMissed, Clock,
   CheckCircle2, ArrowDownRight, ArrowUpRight, Download, RefreshCw,
-  Timer, PauseCircle, Headphones,
+  Timer, PauseCircle, Headphones, MapPin, Calendar, Hourglass,
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,

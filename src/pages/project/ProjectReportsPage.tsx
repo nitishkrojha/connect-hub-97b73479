@@ -72,9 +72,39 @@ const statusStyle: Record<string, string> = {
   Pending: "bg-warning/10 text-warning",
 };
 
+// Inbox / message-in mock data
+const inboxDays = (n: number) => Array.from({ length: n }, (_, i) => ({
+  day: `D${i + 1}`,
+  WhatsApp: Math.round(80 + Math.random() * 60),
+  Email: Math.round(20 + Math.random() * 30),
+  Chatbot: Math.round(40 + Math.random() * 40),
+  Facebook: Math.round(10 + Math.random() * 25),
+}));
+const inboxResponseTime = (n: number) => Array.from({ length: n }, (_, i) => ({
+  day: `D${i + 1}`,
+  first: +(1 + Math.random() * 3).toFixed(1),
+  resolution: +(15 + Math.random() * 30).toFixed(1),
+}));
+const inboxAgentData = agents.map(a => ({
+  agent: a,
+  handled: Math.round(40 + Math.random() * 80),
+  avgResp: +(1 + Math.random() * 4).toFixed(1),
+  csat: Math.round(80 + Math.random() * 18),
+}));
+const inboxChannelPerf = [
+  { channel: "WhatsApp", volume: 980, ticketRate: 12, csat: 92 },
+  { channel: "Email", volume: 320, ticketRate: 28, csat: 85 },
+  { channel: "Chatbot", volume: 540, ticketRate: 8, csat: 78 },
+  { channel: "Facebook", volume: 180, ticketRate: 15, csat: 88 },
+  { channel: "Telegram", volume: 140, ticketRate: 10, csat: 90 },
+];
+
 const ProjectReportsPage = () => {
   const [period, setPeriod] = useState("weekly");
+  const [direction, setDirection] = useState<"out" | "in">("out");
   const [tab, setTab] = useState("overview");
+  const [inTab, setInTab] = useState("volume");
+  const [inRange, setInRange] = useState("30");
   const [directSearch, setDirectSearch] = useState("");
   const [directChannelFilter, setDirectChannelFilter] = useState("all");
 
@@ -84,6 +114,8 @@ const ProjectReportsPage = () => {
     return matchSearch && matchChannel;
   });
 
+  const n = parseInt(inRange);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -92,18 +124,62 @@ const ProjectReportsPage = () => {
           <p className="text-muted-foreground mt-1">Your project's communication analytics</p>
         </div>
         <div className="flex gap-3">
-          <Select value={period} onValueChange={setPeriod}>
-            <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="daily">Daily</SelectItem>
-              <SelectItem value="weekly">Weekly</SelectItem>
-              <SelectItem value="monthly">Monthly</SelectItem>
-            </SelectContent>
-          </Select>
+          {direction === "out" && (
+            <Select value={period} onValueChange={setPeriod}>
+              <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="daily">Daily</SelectItem>
+                <SelectItem value="weekly">Weekly</SelectItem>
+                <SelectItem value="monthly">Monthly</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+          {direction === "in" && (
+            <Select value={inRange} onValueChange={setInRange}>
+              <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="7">Last 7 days</SelectItem>
+                <SelectItem value="30">Last 30 days</SelectItem>
+                <SelectItem value="90">Last 90 days</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
           <Button variant="outline"><Download className="w-4 h-4 mr-2" />Export</Button>
         </div>
       </div>
 
+      {/* Top-level direction switcher */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {[
+          { key: "out" as const, icon: SendIcon, title: "Message Out Reports", desc: "Outbound delivery, campaigns, templates" },
+          { key: "in" as const, icon: InboxIcon, title: "Message In Reports", desc: "Inbound volume, response time, agents" },
+        ].map(p => {
+          const Icon = p.icon;
+          const active = direction === p.key;
+          return (
+            <button
+              key={p.key}
+              onClick={() => setDirection(p.key)}
+              className={cn(
+                "p-4 rounded-xl border-2 text-left transition-all",
+                active ? "border-primary bg-primary/5 shadow-sm" : "border-border hover:bg-muted/50"
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center", active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground")}>
+                  <Icon className="w-4 h-4" />
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground text-sm">{p.title}</p>
+                  <p className="text-xs text-muted-foreground">{p.desc}</p>
+                </div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {direction === "out" && (
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="flex-wrap">
           <TabsTrigger value="overview">Overview</TabsTrigger>

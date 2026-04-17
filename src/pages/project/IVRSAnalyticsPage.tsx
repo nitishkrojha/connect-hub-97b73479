@@ -13,6 +13,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, AreaChart, Area, LineChart, Line, Legend,
 } from "recharts";
+import indiaMap from "@svg-maps/india";
 
 /* ── Inbound mock data ── */
 const inboundDaily = [
@@ -123,33 +124,19 @@ const outboundTimingDaily = [
   { day: "Sun", aht: 120, queue: 6, hold: 4 },
 ];
 
-/* ── Geographical (India) call volume ── */
-const inboundGeo = [
-  { state: "Maharashtra", calls: 920, pct: 16.4 },
-  { state: "Tamil Nadu", calls: 760, pct: 13.6 },
-  { state: "Karnataka", calls: 690, pct: 12.3 },
-  { state: "Delhi NCR", calls: 610, pct: 10.9 },
-  { state: "Uttar Pradesh", calls: 540, pct: 9.6 },
-  { state: "Gujarat", calls: 480, pct: 8.6 },
-  { state: "West Bengal", calls: 410, pct: 7.3 },
-  { state: "Telangana", calls: 360, pct: 6.4 },
-  { state: "Rajasthan", calls: 290, pct: 5.2 },
-  { state: "Kerala", calls: 240, pct: 4.3 },
-  { state: "Others", calls: 300, pct: 5.4 },
-];
-const outboundGeo = [
-  { state: "Maharashtra", calls: 1180, pct: 17.2 },
-  { state: "Tamil Nadu", calls: 880, pct: 12.8 },
-  { state: "Karnataka", calls: 820, pct: 11.9 },
-  { state: "Delhi NCR", calls: 740, pct: 10.8 },
-  { state: "Uttar Pradesh", calls: 690, pct: 10.0 },
-  { state: "Gujarat", calls: 580, pct: 8.4 },
-  { state: "West Bengal", calls: 470, pct: 6.8 },
-  { state: "Telangana", calls: 420, pct: 6.1 },
-  { state: "Rajasthan", calls: 360, pct: 5.2 },
-  { state: "Kerala", calls: 290, pct: 4.2 },
-  { state: "Others", calls: 450, pct: 6.6 },
-];
+/* ── Geographical (India) call volume — keyed by state id from @svg-maps/india ── */
+const inboundGeo: Record<string, number> = {
+  mh: 920, tn: 760, ka: 690, dl: 610, up: 540, gj: 480, wb: 410, tg: 360,
+  rj: 290, kl: 240, ap: 210, mp: 195, br: 180, hr: 165, pb: 150, or: 140,
+  jh: 110, ct: 95, as: 85, ut: 70, hp: 55, jk: 45, ga: 40, tr: 25,
+  ml: 18, mn: 16, nl: 14, ar: 12, sk: 10, mz: 9, ch: 22, py: 28, an: 8, dn: 6, dd: 4, ld: 2,
+};
+const outboundGeo: Record<string, number> = {
+  mh: 1180, tn: 880, ka: 820, dl: 740, up: 690, gj: 580, wb: 470, tg: 420,
+  rj: 360, kl: 290, ap: 270, mp: 240, br: 220, hr: 200, pb: 180, or: 170,
+  jh: 140, ct: 120, as: 105, ut: 90, hp: 70, jk: 60, ga: 55, tr: 32,
+  ml: 24, mn: 20, nl: 18, ar: 15, sk: 12, mz: 11, ch: 28, py: 36, an: 10, dn: 8, dd: 5, ld: 3,
+};
 
 /* ── Peak hours day-wise (last 30 days, hourly buckets) ── */
 const HOURS = ["00", "02", "04", "06", "08", "10", "12", "14", "16", "18", "20", "22"];
@@ -182,17 +169,25 @@ const outboundDurationBuckets = [
 const GeographicalAnalysis = ({
   data, label,
 }: {
-  data: { state: string; calls: number; pct: number }[];
+  data: Record<string, number>;
   label: string;
 }) => {
-  const max = Math.max(...data.map((d) => d.calls));
-  const total = data.reduce((s, d) => s + d.calls, 0);
+  const [hover, setHover] = useState<{ id: string; name: string; calls: number; x: number; y: number } | null>(null);
+  const values = Object.values(data);
+  const max = Math.max(...values, 1);
+  const total = values.reduce((s, v) => s + v, 0);
+
   const heat = (calls: number) => {
-    const intensity = calls / max; // 0..1
-    // green → amber → red gradient based on volume
-    const hue = 142 - intensity * 142; // 142 (green) → 0 (red)
+    if (!calls) return "hsl(var(--muted))";
+    const intensity = calls / max;
+    const hue = 142 - intensity * 142; // green → red
     return `hsl(${hue}, 75%, ${65 - intensity * 25}%)`;
   };
+
+  // Sorted leaderboard (top → bottom)
+  const sorted = indiaMap.locations
+    .map((l) => ({ id: l.id, name: l.name, calls: data[l.id] || 0 }))
+    .sort((a, b) => b.calls - a.calls);
 
   return (
     <Card className="shadow-card">
@@ -202,86 +197,103 @@ const GeographicalAnalysis = ({
           Geographical Analysis — {label} (India)
         </CardTitle>
         <p className="text-xs text-muted-foreground mt-1">
-          Call volume by state, derived from caller MSISDN circle in webhook payload
+          Call volume by state, derived from caller MSISDN circle in webhook payload. Hover over a state to see exact call volume.
         </p>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Stylised India heat map */}
-          <div className="relative bg-muted/20 rounded-lg border border-border p-4 flex items-center justify-center min-h-[320px]">
-            <svg viewBox="0 0 400 440" className="w-full h-full max-h-[340px]">
-              {/* Outline of India (simplified) */}
-              <path
-                d="M180 30 L210 25 L245 40 L275 70 L300 110 L320 150 L335 195 L325 235 L300 270 L285 305 L270 340 L245 370 L210 395 L180 410 L155 395 L135 370 L120 340 L110 305 L100 270 L85 235 L75 195 L80 150 L100 110 L130 70 L160 40 Z"
-                fill="hsl(var(--muted))"
-                stroke="hsl(var(--border))"
-                strokeWidth="1.5"
-              />
-              {/* State bubbles */}
-              {[
-                { state: "Delhi NCR", x: 175, y: 110 },
-                { state: "Uttar Pradesh", x: 215, y: 145 },
-                { state: "Rajasthan", x: 135, y: 145 },
-                { state: "Gujarat", x: 100, y: 200 },
-                { state: "Maharashtra", x: 155, y: 240 },
-                { state: "West Bengal", x: 270, y: 180 },
-                { state: "Telangana", x: 195, y: 280 },
-                { state: "Karnataka", x: 165, y: 310 },
-                { state: "Tamil Nadu", x: 200, y: 360 },
-                { state: "Kerala", x: 165, y: 380 },
-              ].map((s) => {
-                const d = data.find((x) => x.state === s.state);
-                if (!d) return null;
-                const r = 8 + (d.calls / max) * 18;
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          {/* Real India SVG map */}
+          <div className="lg:col-span-3 relative bg-muted/20 rounded-lg border border-border p-3 min-h-[420px]">
+            <svg
+              viewBox={indiaMap.viewBox}
+              className="w-full h-full max-h-[440px]"
+              xmlns="http://www.w3.org/2000/svg"
+              onMouseLeave={() => setHover(null)}
+            >
+              {indiaMap.locations.map((loc) => {
+                const calls = data[loc.id] || 0;
                 return (
-                  <g key={s.state}>
-                    <circle
-                      cx={s.x}
-                      cy={s.y}
-                      r={r}
-                      fill={heat(d.calls)}
-                      fillOpacity={0.85}
-                      stroke="hsl(var(--background))"
-                      strokeWidth="1.5"
-                    />
-                    <text
-                      x={s.x}
-                      y={s.y + r + 11}
-                      textAnchor="middle"
-                      className="fill-foreground"
-                      style={{ fontSize: "9px", fontWeight: 600 }}
-                    >
-                      {d.calls}
-                    </text>
-                  </g>
+                  <path
+                    key={loc.id}
+                    d={loc.path}
+                    fill={heat(calls)}
+                    stroke="hsl(var(--background))"
+                    strokeWidth={0.6}
+                    style={{ cursor: "pointer", transition: "fill 0.15s, opacity 0.15s" }}
+                    onMouseEnter={(e) => {
+                      const rect = (e.currentTarget.ownerSVGElement as SVGSVGElement).getBoundingClientRect();
+                      setHover({
+                        id: loc.id,
+                        name: loc.name,
+                        calls,
+                        x: e.clientX - rect.left,
+                        y: e.clientY - rect.top,
+                      });
+                    }}
+                    onMouseMove={(e) => {
+                      const rect = (e.currentTarget.ownerSVGElement as SVGSVGElement).getBoundingClientRect();
+                      setHover((h) => h ? { ...h, x: e.clientX - rect.left, y: e.clientY - rect.top } : h);
+                    }}
+                    onFocus={() => undefined}
+                  >
+                    <title>{`${loc.name}: ${calls.toLocaleString()} calls`}</title>
+                  </path>
                 );
               })}
             </svg>
+
+            {/* Floating tooltip */}
+            {hover && (
+              <div
+                className="pointer-events-none absolute z-10 bg-popover text-popover-foreground border border-border rounded-md shadow-lg px-3 py-2 text-xs"
+                style={{
+                  left: Math.min(hover.x + 12, 360),
+                  top: Math.max(hover.y - 50, 0),
+                }}
+              >
+                <div className="font-semibold text-foreground">{hover.name}</div>
+                <div className="text-muted-foreground">
+                  Calls: <span className="font-semibold text-foreground">{hover.calls.toLocaleString()}</span>
+                </div>
+                {hover.calls > 0 && (
+                  <div className="text-muted-foreground">
+                    Share: <span className="font-medium text-foreground">{((hover.calls / total) * 100).toFixed(1)}%</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Legend */}
             <div className="absolute bottom-3 right-3 flex items-center gap-1.5 text-[10px] text-muted-foreground bg-background/80 px-2 py-1 rounded border border-border">
               <span>Low</span>
-              <div className="w-16 h-2 rounded-full" style={{ background: "linear-gradient(to right, hsl(142,75%,55%), hsl(60,75%,55%), hsl(0,75%,50%))" }} />
+              <div className="w-20 h-2 rounded-full" style={{ background: "linear-gradient(to right, hsl(142,75%,55%), hsl(60,75%,55%), hsl(0,75%,50%))" }} />
               <span>High</span>
             </div>
           </div>
 
           {/* State leaderboard */}
-          <div>
-            <div className="text-xs text-muted-foreground mb-2">Total: <span className="font-semibold text-foreground">{total.toLocaleString()}</span> calls across {data.length} regions</div>
-            <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
-              {data.map((d) => (
-                <div key={d.state}>
-                  <div className="flex items-center justify-between text-xs mb-1">
-                    <span className="font-medium text-foreground">{d.state}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-foreground">{d.calls.toLocaleString()}</span>
-                      <Badge variant="secondary" className="text-[10px]">{d.pct}%</Badge>
+          <div className="lg:col-span-2">
+            <div className="text-xs text-muted-foreground mb-2">
+              Total: <span className="font-semibold text-foreground">{total.toLocaleString()}</span> calls across {sorted.filter((s) => s.calls > 0).length} regions
+            </div>
+            <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1">
+              {sorted.filter((s) => s.calls > 0).map((s) => {
+                const pct = total ? (s.calls / total) * 100 : 0;
+                return (
+                  <div key={s.id} onMouseEnter={() => setHover({ id: s.id, name: s.name, calls: s.calls, x: 20, y: 20 })}>
+                    <div className="flex items-center justify-between text-xs mb-1">
+                      <span className="font-medium text-foreground truncate">{s.name}</span>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className="font-semibold text-foreground">{s.calls.toLocaleString()}</span>
+                        <Badge variant="secondary" className="text-[10px]">{pct.toFixed(1)}%</Badge>
+                      </div>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-2">
+                      <div className="rounded-full h-2 transition-all" style={{ width: `${(s.calls / max) * 100}%`, backgroundColor: heat(s.calls) }} />
                     </div>
                   </div>
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div className="rounded-full h-2 transition-all" style={{ width: `${(d.calls / max) * 100}%`, backgroundColor: heat(d.calls) }} />
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
@@ -661,52 +673,29 @@ const IVRSAnalyticsPage = () => {
             </Card>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="shadow-card">
-              <CardHeader><CardTitle className="text-base">Daily Outbound Volume</CardTitle></CardHeader>
-              <CardContent>
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={outboundDaily}>
-                      <defs>
-                        <linearGradient id="ivrsOutGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(173, 58%, 39%)" stopOpacity={0.4} />
-                          <stop offset="95%" stopColor="hsl(173, 58%, 39%)" stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                      <XAxis dataKey="day" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
-                      <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
-                      <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid hsl(var(--border))", fontSize: "13px" }} />
-                      <Area type="monotone" dataKey="answered" name="Answered" stroke="hsl(173, 58%, 39%)" fill="url(#ivrsOutGrad)" strokeWidth={2} />
-                      <Area type="monotone" dataKey="failed" name="Failed" stroke="hsl(0, 84%, 60%)" fill="transparent" strokeWidth={2} strokeDasharray="4 4" />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-card">
-              <CardHeader><CardTitle className="text-base">Recent Outbound Campaigns</CardTitle></CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {outboundCampaigns.map((c) => (
-                    <div key={c.name} className="border-b border-border/50 last:border-0 pb-3 last:pb-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium text-foreground">{c.name}</span>
-                        <span className="text-[10px] text-muted-foreground">{c.time}</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-xs">
-                        <span className="text-muted-foreground">Calls: <span className="font-medium text-foreground">{c.calls.toLocaleString()}</span></span>
-                        <span className="text-muted-foreground">Answered: <span className="font-medium text-foreground">{c.answered.toLocaleString()}</span></span>
-                        <span className="text-muted-foreground">Completed: <span className="font-medium text-success">{c.completed.toLocaleString()}</span></span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <Card className="shadow-card">
+            <CardHeader><CardTitle className="text-base">Daily Outbound Volume</CardTitle></CardHeader>
+            <CardContent>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={outboundDaily}>
+                    <defs>
+                      <linearGradient id="ivrsOutGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(173, 58%, 39%)" stopOpacity={0.4} />
+                        <stop offset="95%" stopColor="hsl(173, 58%, 39%)" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="day" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
+                    <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
+                    <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid hsl(var(--border))", fontSize: "13px" }} />
+                    <Area type="monotone" dataKey="answered" name="Answered" stroke="hsl(173, 58%, 39%)" fill="url(#ivrsOutGrad)" strokeWidth={2} />
+                    <Area type="monotone" dataKey="failed" name="Failed" stroke="hsl(0, 84%, 60%)" fill="transparent" strokeWidth={2} strokeDasharray="4 4" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

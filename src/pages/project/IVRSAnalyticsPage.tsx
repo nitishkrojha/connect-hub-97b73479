@@ -123,33 +123,19 @@ const outboundTimingDaily = [
   { day: "Sun", aht: 120, queue: 6, hold: 4 },
 ];
 
-/* ── Geographical (India) call volume ── */
-const inboundGeo = [
-  { state: "Maharashtra", calls: 920, pct: 16.4 },
-  { state: "Tamil Nadu", calls: 760, pct: 13.6 },
-  { state: "Karnataka", calls: 690, pct: 12.3 },
-  { state: "Delhi NCR", calls: 610, pct: 10.9 },
-  { state: "Uttar Pradesh", calls: 540, pct: 9.6 },
-  { state: "Gujarat", calls: 480, pct: 8.6 },
-  { state: "West Bengal", calls: 410, pct: 7.3 },
-  { state: "Telangana", calls: 360, pct: 6.4 },
-  { state: "Rajasthan", calls: 290, pct: 5.2 },
-  { state: "Kerala", calls: 240, pct: 4.3 },
-  { state: "Others", calls: 300, pct: 5.4 },
-];
-const outboundGeo = [
-  { state: "Maharashtra", calls: 1180, pct: 17.2 },
-  { state: "Tamil Nadu", calls: 880, pct: 12.8 },
-  { state: "Karnataka", calls: 820, pct: 11.9 },
-  { state: "Delhi NCR", calls: 740, pct: 10.8 },
-  { state: "Uttar Pradesh", calls: 690, pct: 10.0 },
-  { state: "Gujarat", calls: 580, pct: 8.4 },
-  { state: "West Bengal", calls: 470, pct: 6.8 },
-  { state: "Telangana", calls: 420, pct: 6.1 },
-  { state: "Rajasthan", calls: 360, pct: 5.2 },
-  { state: "Kerala", calls: 290, pct: 4.2 },
-  { state: "Others", calls: 450, pct: 6.6 },
-];
+/* ── Geographical (India) call volume — keyed by state id from @svg-maps/india ── */
+const inboundGeo: Record<string, number> = {
+  mh: 920, tn: 760, ka: 690, dl: 610, up: 540, gj: 480, wb: 410, tg: 360,
+  rj: 290, kl: 240, ap: 210, mp: 195, br: 180, hr: 165, pb: 150, or: 140,
+  jh: 110, ct: 95, as: 85, ut: 70, hp: 55, jk: 45, ga: 40, tr: 25,
+  ml: 18, mn: 16, nl: 14, ar: 12, sk: 10, mz: 9, ch: 22, py: 28, an: 8, dn: 6, dd: 4, ld: 2,
+};
+const outboundGeo: Record<string, number> = {
+  mh: 1180, tn: 880, ka: 820, dl: 740, up: 690, gj: 580, wb: 470, tg: 420,
+  rj: 360, kl: 290, ap: 270, mp: 240, br: 220, hr: 200, pb: 180, or: 170,
+  jh: 140, ct: 120, as: 105, ut: 90, hp: 70, jk: 60, ga: 55, tr: 32,
+  ml: 24, mn: 20, nl: 18, ar: 15, sk: 12, mz: 11, ch: 28, py: 36, an: 10, dn: 8, dd: 5, ld: 3,
+};
 
 /* ── Peak hours day-wise (last 30 days, hourly buckets) ── */
 const HOURS = ["00", "02", "04", "06", "08", "10", "12", "14", "16", "18", "20", "22"];

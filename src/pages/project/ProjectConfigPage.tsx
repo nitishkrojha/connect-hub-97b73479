@@ -554,6 +554,7 @@ const MessageInChannels = () => {
 type ConfigGroup = "out" | "ivrs" | "in";
 
 const ProjectConfigPage = () => {
+  const [group, setGroup] = useState<ConfigGroup>("out");
   const [activeTab, setActiveTab] = useState("general");
   const [configSource, setConfigSource] = useState<"notifier" | "own">("notifier");
   const [apis, setApis] = useState<ApiEndpoint[]>(defaultApis);

@@ -461,6 +461,142 @@ const ProjectReportsPage = () => {
           </Card>
         </TabsContent>
       </Tabs>
+      )}
+
+      {direction === "in" && (
+        <Tabs value={inTab} onValueChange={setInTab}>
+          <TabsList className="flex-wrap">
+            <TabsTrigger value="volume">Volume</TabsTrigger>
+            <TabsTrigger value="response">Response Time</TabsTrigger>
+            <TabsTrigger value="agents">Agent Performance</TabsTrigger>
+            <TabsTrigger value="channels">Channel Performance</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="volume" className="mt-4">
+            <Card className="shadow-card">
+              <CardHeader><CardTitle className="text-base">Inbound volume by channel</CardTitle></CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={340}>
+                  <LineChart data={inboxDays(n)}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="day" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11 }} />
+                    <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
+                    <Legend wrapperStyle={{ fontSize: 11 }} />
+                    <Line type="monotone" dataKey="WhatsApp" stroke="hsl(142 71% 45%)" strokeWidth={2} dot={false} />
+                    <Line type="monotone" dataKey="Email" stroke="hsl(217 91% 60%)" strokeWidth={2} dot={false} />
+                    <Line type="monotone" dataKey="Chatbot" stroke="hsl(280 75% 60%)" strokeWidth={2} dot={false} />
+                    <Line type="monotone" dataKey="Facebook" stroke="hsl(220 91% 50%)" strokeWidth={2} dot={false} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="response" className="mt-4">
+            <Card className="shadow-card">
+              <CardHeader><CardTitle className="text-base">First response & resolution time (minutes)</CardTitle></CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={340}>
+                  <LineChart data={inboxResponseTime(n)}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="day" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11 }} />
+                    <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
+                    <Legend wrapperStyle={{ fontSize: 11 }} />
+                    <Line type="monotone" dataKey="first" name="Avg first response" stroke="hsl(var(--primary))" strokeWidth={2} />
+                    <Line type="monotone" dataKey="resolution" name="Avg resolution" stroke="hsl(280 75% 60%)" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="agents" className="mt-4 space-y-4">
+            <Card className="shadow-card">
+              <CardHeader><CardTitle className="text-base">Conversations handled per agent</CardTitle></CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={inboxAgentData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="agent" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11 }} />
+                    <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
+                    <Bar dataKey="handled" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+            <Card className="shadow-card">
+              <CardHeader><CardTitle className="text-base">Agent leaderboard</CardTitle></CardHeader>
+              <CardContent>
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-xs text-muted-foreground border-b border-border">
+                      <th className="py-2 font-medium">Agent</th>
+                      <th className="py-2 font-medium text-right">Handled</th>
+                      <th className="py-2 font-medium text-right">Avg response (m)</th>
+                      <th className="py-2 font-medium text-right">CSAT %</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {inboxAgentData.map(a => (
+                      <tr key={a.agent} className="border-b border-border/50">
+                        <td className="py-2.5 font-medium">{a.agent}</td>
+                        <td className="py-2.5 text-right">{a.handled}</td>
+                        <td className="py-2.5 text-right">{a.avgResp}</td>
+                        <td className="py-2.5 text-right">{a.csat}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="channels" className="mt-4 space-y-4">
+            <Card className="shadow-card">
+              <CardHeader><CardTitle className="text-base">Volume by channel</CardTitle></CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={inboxChannelPerf}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="channel" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11 }} />
+                    <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
+                    <Bar dataKey="volume" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+            <Card className="shadow-card">
+              <CardHeader><CardTitle className="text-base">Channel performance</CardTitle></CardHeader>
+              <CardContent>
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-xs text-muted-foreground border-b border-border">
+                      <th className="py-2 font-medium">Channel</th>
+                      <th className="py-2 font-medium text-right">Volume</th>
+                      <th className="py-2 font-medium text-right">Ticket conv. %</th>
+                      <th className="py-2 font-medium text-right">CSAT %</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {inboxChannelPerf.map(c => (
+                      <tr key={c.channel} className="border-b border-border/50">
+                        <td className="py-2.5 font-medium">{c.channel}</td>
+                        <td className="py-2.5 text-right">{c.volume}</td>
+                        <td className="py-2.5 text-right">{c.ticketRate}%</td>
+                        <td className="py-2.5 text-right">{c.csat}%</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   );
 };

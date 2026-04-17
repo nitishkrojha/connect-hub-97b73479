@@ -662,47 +662,6 @@ const ProjectReportsPage = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="agents" className="mt-4 space-y-4">
-            <Card className="shadow-card">
-              <CardHeader><CardTitle className="text-base">Conversations handled per agent</CardTitle></CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={inboxAgentData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="agent" tick={{ fontSize: 11 }} />
-                    <YAxis tick={{ fontSize: 11 }} />
-                    <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
-                    <Bar dataKey="handled" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-            <Card className="shadow-card">
-              <CardHeader><CardTitle className="text-base">Agent leaderboard</CardTitle></CardHeader>
-              <CardContent>
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-left text-xs text-muted-foreground border-b border-border">
-                      <th className="py-2 font-medium">Agent</th>
-                      <th className="py-2 font-medium text-right">Handled</th>
-                      <th className="py-2 font-medium text-right">Avg response (m)</th>
-                      <th className="py-2 font-medium text-right">CSAT %</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {inboxAgentData.map(a => (
-                      <tr key={a.agent} className="border-b border-border/50">
-                        <td className="py-2.5 font-medium">{a.agent}</td>
-                        <td className="py-2.5 text-right">{a.handled}</td>
-                        <td className="py-2.5 text-right">{a.avgResp}</td>
-                        <td className="py-2.5 text-right">{a.csat}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </CardContent>
-            </Card>
-          </TabsContent>
 
           <TabsContent value="channels" className="mt-4 space-y-4">
             <Card className="shadow-card">

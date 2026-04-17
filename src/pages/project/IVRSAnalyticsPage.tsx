@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Phone, PhoneIncoming, PhoneOutgoing, PhoneMissed, Clock,
   CheckCircle2, ArrowDownRight, ArrowUpRight, Download, RefreshCw,
-  Timer, PauseCircle, Headphones,
+  Timer, PauseCircle, Headphones, MapPin, Calendar, Hourglass,
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -122,6 +122,287 @@ const outboundTimingDaily = [
   { day: "Sat", aht: 128, queue: 7, hold: 5 },
   { day: "Sun", aht: 120, queue: 6, hold: 4 },
 ];
+
+/* ── Geographical (India) call volume ── */
+const inboundGeo = [
+  { state: "Maharashtra", calls: 920, pct: 16.4 },
+  { state: "Tamil Nadu", calls: 760, pct: 13.6 },
+  { state: "Karnataka", calls: 690, pct: 12.3 },
+  { state: "Delhi NCR", calls: 610, pct: 10.9 },
+  { state: "Uttar Pradesh", calls: 540, pct: 9.6 },
+  { state: "Gujarat", calls: 480, pct: 8.6 },
+  { state: "West Bengal", calls: 410, pct: 7.3 },
+  { state: "Telangana", calls: 360, pct: 6.4 },
+  { state: "Rajasthan", calls: 290, pct: 5.2 },
+  { state: "Kerala", calls: 240, pct: 4.3 },
+  { state: "Others", calls: 300, pct: 5.4 },
+];
+const outboundGeo = [
+  { state: "Maharashtra", calls: 1180, pct: 17.2 },
+  { state: "Tamil Nadu", calls: 880, pct: 12.8 },
+  { state: "Karnataka", calls: 820, pct: 11.9 },
+  { state: "Delhi NCR", calls: 740, pct: 10.8 },
+  { state: "Uttar Pradesh", calls: 690, pct: 10.0 },
+  { state: "Gujarat", calls: 580, pct: 8.4 },
+  { state: "West Bengal", calls: 470, pct: 6.8 },
+  { state: "Telangana", calls: 420, pct: 6.1 },
+  { state: "Rajasthan", calls: 360, pct: 5.2 },
+  { state: "Kerala", calls: 290, pct: 4.2 },
+  { state: "Others", calls: 450, pct: 6.6 },
+];
+
+/* ── Peak hours day-wise (last 30 days, hourly buckets) ── */
+const HOURS = ["00", "02", "04", "06", "08", "10", "12", "14", "16", "18", "20", "22"];
+const inboundPeakHours = HOURS.map((h, i) => ({
+  hour: `${h}:00`,
+  weekday: [12, 8, 5, 18, 95, 180, 240, 220, 260, 210, 140, 60][i],
+  weekend: [8, 5, 4, 10, 40, 75, 110, 130, 145, 120, 80, 35][i],
+}));
+const outboundPeakHours = HOURS.map((h, i) => ({
+  hour: `${h}:00`,
+  weekday: [0, 0, 0, 0, 60, 220, 320, 280, 340, 290, 160, 40][i],
+  weekend: [0, 0, 0, 0, 20, 90, 140, 160, 180, 150, 70, 15][i],
+}));
+
+/* ── Call duration buckets ── */
+const inboundDurationBuckets = [
+  { bucket: "< 2 min", calls: 2380, color: "hsl(142, 70%, 45%)" },
+  { bucket: "2 – 5 min", calls: 1820, color: "hsl(199, 89%, 48%)" },
+  { bucket: "5 – 10 min", calls: 980, color: "hsl(38, 92%, 50%)" },
+  { bucket: "> 10 min", calls: 420, color: "hsl(0, 84%, 60%)" },
+];
+const outboundDurationBuckets = [
+  { bucket: "< 2 min", calls: 3560, color: "hsl(142, 70%, 45%)" },
+  { bucket: "2 – 5 min", calls: 2140, color: "hsl(199, 89%, 48%)" },
+  { bucket: "5 – 10 min", calls: 880, color: "hsl(38, 92%, 50%)" },
+  { bucket: "> 10 min", calls: 300, color: "hsl(0, 84%, 60%)" },
+];
+
+/* ── Geographical analysis card (India) ── */
+const GeographicalAnalysis = ({
+  data, label,
+}: {
+  data: { state: string; calls: number; pct: number }[];
+  label: string;
+}) => {
+  const max = Math.max(...data.map((d) => d.calls));
+  const total = data.reduce((s, d) => s + d.calls, 0);
+  const heat = (calls: number) => {
+    const intensity = calls / max; // 0..1
+    // green → amber → red gradient based on volume
+    const hue = 142 - intensity * 142; // 142 (green) → 0 (red)
+    return `hsl(${hue}, 75%, ${65 - intensity * 25}%)`;
+  };
+
+  return (
+    <Card className="shadow-card">
+      <CardHeader>
+        <CardTitle className="text-base flex items-center gap-2">
+          <MapPin className="w-4 h-4 text-primary" />
+          Geographical Analysis — {label} (India)
+        </CardTitle>
+        <p className="text-xs text-muted-foreground mt-1">
+          Call volume by state, derived from caller MSISDN circle in webhook payload
+        </p>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Stylised India heat map */}
+          <div className="relative bg-muted/20 rounded-lg border border-border p-4 flex items-center justify-center min-h-[320px]">
+            <svg viewBox="0 0 400 440" className="w-full h-full max-h-[340px]">
+              {/* Outline of India (simplified) */}
+              <path
+                d="M180 30 L210 25 L245 40 L275 70 L300 110 L320 150 L335 195 L325 235 L300 270 L285 305 L270 340 L245 370 L210 395 L180 410 L155 395 L135 370 L120 340 L110 305 L100 270 L85 235 L75 195 L80 150 L100 110 L130 70 L160 40 Z"
+                fill="hsl(var(--muted))"
+                stroke="hsl(var(--border))"
+                strokeWidth="1.5"
+              />
+              {/* State bubbles */}
+              {[
+                { state: "Delhi NCR", x: 175, y: 110 },
+                { state: "Uttar Pradesh", x: 215, y: 145 },
+                { state: "Rajasthan", x: 135, y: 145 },
+                { state: "Gujarat", x: 100, y: 200 },
+                { state: "Maharashtra", x: 155, y: 240 },
+                { state: "West Bengal", x: 270, y: 180 },
+                { state: "Telangana", x: 195, y: 280 },
+                { state: "Karnataka", x: 165, y: 310 },
+                { state: "Tamil Nadu", x: 200, y: 360 },
+                { state: "Kerala", x: 165, y: 380 },
+              ].map((s) => {
+                const d = data.find((x) => x.state === s.state);
+                if (!d) return null;
+                const r = 8 + (d.calls / max) * 18;
+                return (
+                  <g key={s.state}>
+                    <circle
+                      cx={s.x}
+                      cy={s.y}
+                      r={r}
+                      fill={heat(d.calls)}
+                      fillOpacity={0.85}
+                      stroke="hsl(var(--background))"
+                      strokeWidth="1.5"
+                    />
+                    <text
+                      x={s.x}
+                      y={s.y + r + 11}
+                      textAnchor="middle"
+                      className="fill-foreground"
+                      style={{ fontSize: "9px", fontWeight: 600 }}
+                    >
+                      {d.calls}
+                    </text>
+                  </g>
+                );
+              })}
+            </svg>
+            <div className="absolute bottom-3 right-3 flex items-center gap-1.5 text-[10px] text-muted-foreground bg-background/80 px-2 py-1 rounded border border-border">
+              <span>Low</span>
+              <div className="w-16 h-2 rounded-full" style={{ background: "linear-gradient(to right, hsl(142,75%,55%), hsl(60,75%,55%), hsl(0,75%,50%))" }} />
+              <span>High</span>
+            </div>
+          </div>
+
+          {/* State leaderboard */}
+          <div>
+            <div className="text-xs text-muted-foreground mb-2">Total: <span className="font-semibold text-foreground">{total.toLocaleString()}</span> calls across {data.length} regions</div>
+            <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
+              {data.map((d) => (
+                <div key={d.state}>
+                  <div className="flex items-center justify-between text-xs mb-1">
+                    <span className="font-medium text-foreground">{d.state}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-foreground">{d.calls.toLocaleString()}</span>
+                      <Badge variant="secondary" className="text-[10px]">{d.pct}%</Badge>
+                    </div>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div className="rounded-full h-2 transition-all" style={{ width: `${(d.calls / max) * 100}%`, backgroundColor: heat(d.calls) }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+/* ── Peak hours day-wise card ── */
+const PeakHoursAnalysis = ({
+  data, label,
+}: {
+  data: { hour: string; weekday: number; weekend: number }[];
+  label: string;
+}) => {
+  const peakWeekday = data.reduce((a, b) => (a.weekday > b.weekday ? a : b));
+  const peakWeekend = data.reduce((a, b) => (a.weekend > b.weekend ? a : b));
+  return (
+    <Card className="shadow-card">
+      <CardHeader>
+        <CardTitle className="text-base flex items-center gap-2">
+          <Calendar className="w-4 h-4 text-primary" />
+          Peak Hours Analysis — {label} (Last 30 days)
+        </CardTitle>
+        <p className="text-xs text-muted-foreground mt-1">
+          Average calls per hour, split by weekday vs weekend
+        </p>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="rounded-lg border border-border p-3 bg-muted/20">
+            <p className="text-[11px] text-muted-foreground">Weekday peak</p>
+            <p className="text-lg font-bold text-foreground">{peakWeekday.hour}</p>
+            <p className="text-[11px] text-muted-foreground">{peakWeekday.weekday} avg calls/hr</p>
+          </div>
+          <div className="rounded-lg border border-border p-3 bg-muted/20">
+            <p className="text-[11px] text-muted-foreground">Weekend peak</p>
+            <p className="text-lg font-bold text-foreground">{peakWeekend.hour}</p>
+            <p className="text-[11px] text-muted-foreground">{peakWeekend.weekend} avg calls/hr</p>
+          </div>
+        </div>
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={data}>
+              <defs>
+                <linearGradient id={`peak-wd-${label}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="hsl(217, 91%, 50%)" stopOpacity={0.45} />
+                  <stop offset="95%" stopColor="hsl(217, 91%, 50%)" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id={`peak-we-${label}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="hsl(38, 92%, 50%)" stopOpacity={0.45} />
+                  <stop offset="95%" stopColor="hsl(38, 92%, 50%)" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis dataKey="hour" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+              <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+              <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid hsl(var(--border))", fontSize: "13px" }} />
+              <Legend wrapperStyle={{ fontSize: "12px" }} />
+              <Area type="monotone" dataKey="weekday" name="Weekday avg" stroke="hsl(217, 91%, 50%)" fill={`url(#peak-wd-${label})`} strokeWidth={2} />
+              <Area type="monotone" dataKey="weekend" name="Weekend avg" stroke="hsl(38, 92%, 50%)" fill={`url(#peak-we-${label})`} strokeWidth={2} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+/* ── Call duration buckets card ── */
+const CallDurationBuckets = ({
+  data, label,
+}: {
+  data: { bucket: string; calls: number; color: string }[];
+  label: string;
+}) => {
+  const total = data.reduce((s, d) => s + d.calls, 0);
+  return (
+    <Card className="shadow-card">
+      <CardHeader>
+        <CardTitle className="text-base flex items-center gap-2">
+          <Hourglass className="w-4 h-4 text-primary" />
+          Call Duration Distribution — {label}
+        </CardTitle>
+        <p className="text-xs text-muted-foreground mt-1">
+          How calls are distributed across handling-time buckets
+        </p>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+          {data.map((b) => {
+            const pct = ((b.calls / total) * 100).toFixed(1);
+            return (
+              <div key={b.bucket} className="rounded-lg border border-border p-3 bg-muted/20">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: b.color }} />
+                  <Badge variant="secondary" className="text-[10px]">{pct}%</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground">{b.bucket}</p>
+                <p className="text-lg font-bold text-foreground">{b.calls.toLocaleString()}</p>
+              </div>
+            );
+          })}
+        </div>
+        <div className="h-56">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data} layout="vertical" margin={{ left: 20, right: 20 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
+              <XAxis type="number" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+              <YAxis type="category" dataKey="bucket" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} width={80} />
+              <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid hsl(var(--border))", fontSize: "13px" }} formatter={(v: number) => `${v.toLocaleString()} calls`} />
+              <Bar dataKey="calls" radius={[0, 4, 4, 0]}>
+                {data.map((entry) => <Cell key={entry.bucket} fill={entry.color} />)}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 const TimingAnalytics = ({
   stats, daily, label,
@@ -291,6 +572,13 @@ const IVRSAnalyticsPage = () => {
 
           <TimingAnalytics stats={inboundTimingStats} daily={inboundTimingDaily} label="Inbound" />
 
+          <GeographicalAnalysis data={inboundGeo} label="Inbound" />
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <PeakHoursAnalysis data={inboundPeakHours} label="Inbound" />
+            <CallDurationBuckets data={inboundDurationBuckets} label="Inbound" />
+          </div>
+
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="shadow-card">
@@ -352,6 +640,13 @@ const IVRSAnalyticsPage = () => {
           <StatGrid stats={outboundStats} />
 
           <TimingAnalytics stats={outboundTimingStats} daily={outboundTimingDaily} label="Outbound" />
+
+          <GeographicalAnalysis data={outboundGeo} label="Outbound" />
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <PeakHoursAnalysis data={outboundPeakHours} label="Outbound" />
+            <CallDurationBuckets data={outboundDurationBuckets} label="Outbound" />
+          </div>
 
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

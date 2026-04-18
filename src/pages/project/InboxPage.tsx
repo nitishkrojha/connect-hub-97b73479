@@ -82,65 +82,84 @@ const InboxPage = () => {
 
   const ChannelIcon = channelIcon(active.channel);
 
+  const filterCounts = useMemo(() => ({
+    all: convos.length,
+    mine: convos.filter(c => c.assignee === "Priya Shah").length,
+    unassigned: convos.filter(c => !c.assignee).length,
+    open: convos.filter(c => c.status === "open").length,
+    closed: convos.filter(c => c.status === "closed").length,
+  }), [convos]);
+
   return (
     <div className="space-y-4">
-      <div>
-        <h1 className="text-2xl font-bold">Inbox</h1>
-        <p className="text-sm text-muted-foreground">All inbound conversations across channels</p>
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold">Inbox</h1>
+          <p className="text-sm text-muted-foreground">All inbound conversations across channels</p>
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          {(["all", "mine", "unassigned", "open", "closed"] as const).map(f => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={cn(
+                "text-xs px-3 py-1.5 rounded-full border transition-colors capitalize flex items-center gap-1.5",
+                filter === f ? "bg-primary text-primary-foreground border-primary" : "border-border hover:bg-muted"
+              )}
+            >
+              {f === "mine" ? "Assigned to me" : f}
+              <span className={cn(
+                "text-[10px] px-1.5 py-0 rounded-full",
+                filter === f ? "bg-primary-foreground/20" : "bg-muted"
+              )}>{filterCounts[f]}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
       <Card className="overflow-hidden">
-        <div className="grid grid-cols-1 md:grid-cols-[260px_340px_1fr] h-[calc(100vh-220px)] min-h-[560px]">
-          {/* Left rail */}
-          <div className={cn("border-r border-border bg-muted/30 p-3 space-y-4 overflow-y-auto", showThreadMobile && "hidden md:block")}>
-            <div>
-              <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Filters</p>
-              <div className="flex flex-col gap-1">
-                {(["all", "mine", "unassigned", "open", "closed"] as const).map(f => (
-                  <button
-                    key={f}
-                    onClick={() => setFilter(f)}
-                    className={cn(
-                      "text-sm capitalize px-3 py-1.5 rounded-md text-left transition-colors",
-                      filter === f ? "bg-primary text-primary-foreground" : "hover:bg-muted"
-                    )}
-                  >
-                    {f === "mine" ? "Assigned to me" : f}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Channels</p>
-              <div className="flex flex-wrap gap-1.5">
-                <button
-                  onClick={() => setChannelFilter("all")}
-                  className={cn("text-xs px-2 py-1 rounded-full border", channelFilter === "all" ? "bg-primary text-primary-foreground border-primary" : "border-border hover:bg-muted")}
-                >All</button>
-                {channels.map(ch => {
-                  const Icon = ch.icon;
-                  return (
-                    <button
-                      key={ch.key}
-                      onClick={() => setChannelFilter(ch.key)}
-                      className={cn("text-xs px-2 py-1 rounded-full border flex items-center gap-1", channelFilter === ch.key ? "bg-primary text-primary-foreground border-primary" : "border-border hover:bg-muted")}
-                    >
-                      <Icon className={cn("w-3 h-3", channelFilter === ch.key ? "" : ch.color)} />
-                      {ch.name.split(" ")[0]}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
+        <div className="grid grid-cols-1 md:grid-cols-[360px_1fr] h-[calc(100vh-200px)] min-h-[560px]">
           {/* Conversation list */}
           <div className={cn("border-r border-border flex flex-col", showThreadMobile && "hidden md:flex")}>
-            <div className="p-3 border-b border-border">
+            <div className="p-3 border-b border-border space-y-2">
               <div className="relative">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search…" className="pl-9 h-9" />
+                <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search conversations…" className="pl-9 h-9" />
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <InboxIcon className="w-3.5 h-3.5" />
+                  <span>{filtered.length} conversations</span>
+                </div>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button size="sm" variant="outline" className="h-7 text-xs gap-1">
+                      <Filter className="w-3 h-3" />
+                      {channelFilter === "all" ? "All channels" : channelName(channelFilter)}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-56 p-2" align="end">
+                    <button
+                      onClick={() => setChannelFilter("all")}
+                      className={cn("w-full text-left text-sm px-2 py-1.5 rounded hover:bg-muted", channelFilter === "all" && "bg-muted font-medium")}
+                    >
+                      All channels
+                    </button>
+                    {channels.map(ch => {
+                      const Icon = ch.icon;
+                      return (
+                        <button
+                          key={ch.key}
+                          onClick={() => setChannelFilter(ch.key)}
+                          className={cn("w-full text-left text-sm px-2 py-1.5 rounded hover:bg-muted flex items-center gap-2", channelFilter === ch.key && "bg-muted font-medium")}
+                        >
+                          <Icon className={cn("w-3.5 h-3.5", ch.color)} />
+                          {ch.name}
+                        </button>
+                      );
+                    })}
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
             <ScrollArea className="flex-1">

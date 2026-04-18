@@ -11,8 +11,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import {
-  Search, Send, UserPlus, CheckCircle2, Ticket, StickyNote, ChevronLeft, X,
+  Search, Send, UserPlus, CheckCircle2, Ticket, StickyNote, ChevronLeft, X, Filter, Inbox as InboxIcon,
 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { conversations as seedConvos, channels, agents, channelIcon, channelName, channelColor, type Conversation, type ChannelKey } from "@/data/inboxMockData";
 import { toast } from "sonner";
 

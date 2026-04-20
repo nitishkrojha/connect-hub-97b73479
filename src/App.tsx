@@ -40,12 +40,16 @@ const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children, role }: { children: React.ReactNode; role: "admin" | "project" }) => {
   const { user, isAuthenticated } = useAuth();
-  if (!isAuthenticated) return <Navigate to="/" replace />;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
   if (user?.role !== role) return <Navigate to={`/${user?.role}`} replace />;
   return <>{children}</>;
 };
 
 const LoginRoute = () => {
+  const { user, isAuthenticated } = useAuth();
+  if (isAuthenticated) return <Navigate to={`/${user?.role}`} replace />;
+  return <LoginPage />;
+};
   const { user, isAuthenticated } = useAuth();
   if (isAuthenticated) return <Navigate to={`/${user?.role}`} replace />;
   return <LoginPage />;

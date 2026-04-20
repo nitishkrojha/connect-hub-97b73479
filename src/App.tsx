@@ -59,7 +59,14 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<RootRedirect />} />
+            <Route element={<MarketingLayout />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/solutions" element={<SolutionsPage />} />
+              <Route path="/pricing" element={<PricingPage />} />
+              <Route path="/docs" element={<DocsPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+            </Route>
+            <Route path="/login" element={<LoginRoute />} />
 
             <Route path="/admin" element={<ProtectedRoute role="admin"><AdminLayout /></ProtectedRoute>}>
               <Route index element={<AdminDashboard />} />

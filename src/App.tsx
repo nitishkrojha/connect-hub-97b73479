@@ -5,6 +5,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import LoginPage from "./pages/LoginPage";
+import MarketingLayout from "./marketing/MarketingLayout";
+import HomePage from "./marketing/HomePage";
+import SolutionsPage from "./marketing/SolutionsPage";
+import PricingPage from "./marketing/PricingPage";
+import DocsPage from "./marketing/DocsPage";
+import ContactPage from "./marketing/ContactPage";
 import AdminLayout from "./layouts/AdminLayout";
 import ProjectLayout from "./layouts/ProjectLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -39,7 +45,7 @@ const ProtectedRoute = ({ children, role }: { children: React.ReactNode; role: "
   return <>{children}</>;
 };
 
-const RootRedirect = () => {
+const LoginRoute = () => {
   const { user, isAuthenticated } = useAuth();
   if (isAuthenticated) return <Navigate to={`/${user?.role}`} replace />;
   return <LoginPage />;

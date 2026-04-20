@@ -50,10 +50,7 @@ const LoginRoute = () => {
   if (isAuthenticated) return <Navigate to={`/${user?.role}`} replace />;
   return <LoginPage />;
 };
-  const { user, isAuthenticated } = useAuth();
-  if (isAuthenticated) return <Navigate to={`/${user?.role}`} replace />;
-  return <LoginPage />;
-};
+
 
 const App = () => (
   <QueryClientProvider client={queryClient}>

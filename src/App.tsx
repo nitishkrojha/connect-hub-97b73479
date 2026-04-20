@@ -5,6 +5,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import LoginPage from "./pages/LoginPage";
+import MarketingLayout from "./marketing/MarketingLayout";
+import HomePage from "./marketing/HomePage";
+import SolutionsPage from "./marketing/SolutionsPage";
+import PricingPage from "./marketing/PricingPage";
+import DocsPage from "./marketing/DocsPage";
+import ContactPage from "./marketing/ContactPage";
 import AdminLayout from "./layouts/AdminLayout";
 import ProjectLayout from "./layouts/ProjectLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -34,16 +40,17 @@ const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children, role }: { children: React.ReactNode; role: "admin" | "project" }) => {
   const { user, isAuthenticated } = useAuth();
-  if (!isAuthenticated) return <Navigate to="/" replace />;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
   if (user?.role !== role) return <Navigate to={`/${user?.role}`} replace />;
   return <>{children}</>;
 };
 
-const RootRedirect = () => {
+const LoginRoute = () => {
   const { user, isAuthenticated } = useAuth();
   if (isAuthenticated) return <Navigate to={`/${user?.role}`} replace />;
   return <LoginPage />;
 };
+
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -53,7 +60,14 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<RootRedirect />} />
+            <Route element={<MarketingLayout />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/solutions" element={<SolutionsPage />} />
+              <Route path="/pricing" element={<PricingPage />} />
+              <Route path="/docs" element={<DocsPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+            </Route>
+            <Route path="/login" element={<LoginRoute />} />
 
             <Route path="/admin" element={<ProtectedRoute role="admin"><AdminLayout /></ProtectedRoute>}>
               <Route index element={<AdminDashboard />} />

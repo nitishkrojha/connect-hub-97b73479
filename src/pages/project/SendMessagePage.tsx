@@ -300,7 +300,7 @@ const RecipientDialog = ({
     const count = getRecipientCount();
     if (count === 0) { toast.error("No recipients selected"); return; }
     onConfirm({
-      mode: sendMode === "database" ? "DB Fetch" : sendMode === "csv" ? "CSV Upload" : "Manual Entry",
+      mode: sendMode === "database" ? "API Fetch" : sendMode === "csv" ? "CSV Upload" : "Manual Entry",
       count,
       label: sendMode === "database" ? (activeApi?.name || "API") : sendMode === "csv" ? (csvSource === "existing" ? existingCsvUploads.find(c => c.id === selectedExistingCsv)?.name || "CSV" : csvFile?.name || "CSV") : "Manual",
       details: getDetails(),
@@ -320,7 +320,7 @@ const RecipientDialog = ({
 
         <Tabs value={sendMode} onValueChange={(v) => { setSendMode(v); setFetchedCount(null); setCsvPreview(null); setCsvFile(null); setSelectedExistingCsv(""); }}>
           <TabsList className="grid w-full grid-cols-3 mb-4">
-            <TabsTrigger value="database"><Server className="w-3.5 h-3.5 mr-1.5" />DB Fetch</TabsTrigger>
+            <TabsTrigger value="database"><Server className="w-3.5 h-3.5 mr-1.5" />API Fetch</TabsTrigger>
             <TabsTrigger value="manual"><Phone className="w-3.5 h-3.5 mr-1.5" />Manual</TabsTrigger>
             <TabsTrigger value="csv"><Upload className="w-3.5 h-3.5 mr-1.5" />CSV</TabsTrigger>
           </TabsList>

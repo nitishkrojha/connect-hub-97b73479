@@ -24,9 +24,21 @@ const heroPhrases = [
 ];
 
 const bridges = [
-  { title: "Messaging Bridge", desc: "Reach customers on the channels they prefer.", icons: [MessageCircle, Mail, Radio], items: ["SMS", "WhatsApp", "Email", "RCS"], color: "primary" },
-  { title: "Social Bridge", desc: "Turn DMs and comments into real conversations.", icons: [Instagram, Facebook, Send], items: ["Instagram", "Facebook", "Telegram", "Web chat"], color: "info" },
-  { title: "Voice Bridge", desc: "Connect every call with smart IVRS routing.", icons: [Phone, PhoneCall, Bot], items: ["IVRS menus", "Call routing", "Voice broadcast", "Click-to-call"], color: "success" },
+  {
+    title: "Messaging Bridge", desc: "Reach customers on the channels they prefer.",
+    icons: [MessageCircle, Mail, Radio], items: ["SMS", "WhatsApp", "Email", "RCS"],
+    bar: "from-primary to-primary/40", chip: "bg-primary/10", text: "text-primary",
+  },
+  {
+    title: "Social Bridge", desc: "Turn DMs and comments into real conversations.",
+    icons: [Instagram, Facebook, Send], items: ["Instagram", "Facebook", "Telegram", "Web chat"],
+    bar: "from-info to-info/40", chip: "bg-info/10", text: "text-info",
+  },
+  {
+    title: "Voice Bridge", desc: "Connect every call with smart IVRS routing.",
+    icons: [Phone, PhoneCall, Bot], items: ["IVRS menus", "Call routing", "Voice broadcast", "Click-to-call"],
+    bar: "from-success to-success/40", chip: "bg-success/10", text: "text-success",
+  },
 ];
 
 const channelTabs = {
@@ -172,11 +184,11 @@ const HomePage = () => {
               className="relative p-6 overflow-hidden hover:shadow-card-hover transition-all hover:-translate-y-1 animate-fade-in group"
               style={{ animationDelay: `${i * 100}ms` }}
             >
-              <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-${b.color} to-${b.color}/50`} />
+              <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${b.bar}`} />
               <div className="flex gap-2 mb-4">
                 {b.icons.map((Icon, j) => (
-                  <div key={j} className={`w-10 h-10 rounded-lg bg-${b.color}/10 flex items-center justify-center`}>
-                    <Icon className={`w-5 h-5 text-${b.color}`} />
+                  <div key={j} className={`w-10 h-10 rounded-lg ${b.chip} flex items-center justify-center`}>
+                    <Icon className={`w-5 h-5 ${b.text}`} />
                   </div>
                 ))}
               </div>

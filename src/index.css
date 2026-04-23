@@ -148,6 +148,18 @@
     mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
     -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
   }
+  .dot-field {
+    background-image: radial-gradient(hsl(var(--primary) / 0.35) 1px, transparent 1.4px);
+    background-size: 22px 22px;
+    mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
+    transform: perspective(800px) rotateX(55deg);
+    transform-origin: center top;
+  }
+  .noise {
+    background-image: radial-gradient(hsl(var(--foreground) / 0.04) 1px, transparent 1px);
+    background-size: 3px 3px;
+  }
   @media (prefers-reduced-motion: reduce) {
     .gradient-text,
     .mesh-bg,

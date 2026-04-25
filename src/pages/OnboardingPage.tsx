@@ -165,15 +165,16 @@ const OnboardingPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       {/* Header */}
       <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+          <Link to="/" className="flex items-center gap-2 shrink-0">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-info flex items-center justify-center">
               <Send className="w-4 h-4 text-primary-foreground" />
             </div>
             <span className="font-bold text-lg">Samparq</span>
           </Link>
-          <Link to="/login" className="text-base text-muted-foreground hover:text-foreground">
-            Already have an account? <span className="text-primary font-medium">Sign in</span>
+          <Link to="/login" className="text-sm sm:text-base text-muted-foreground hover:text-foreground text-right">
+            <span className="hidden sm:inline">Already have an account? </span>
+            <span className="text-primary font-medium">Sign in</span>
           </Link>
         </div>
       </header>

@@ -1,6 +1,8 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Github, Twitter, Linkedin } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
+import { MessageSquare, Github, Twitter, Linkedin, Menu } from "lucide-react";
 
 const nav = [
   { to: "/", label: "Home", end: true },
@@ -10,17 +12,18 @@ const nav = [
 ];
 
 const MarketingLayout = () => {
+  const [open, setOpen] = useState(false);
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <header className="sticky top-0 z-40 backdrop-blur bg-background/80 border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 group">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2">
+          <Link to="/" className="flex items-center gap-2 group shrink-0">
             <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-info flex items-center justify-center shadow-card group-hover:scale-105 transition-transform">
               <MessageSquare className="w-5 h-5 text-primary-foreground" />
             </div>
             <div className="leading-tight">
               <div className="font-bold text-foreground text-lg">Samparq</div>
-              <div className="text-[10px] text-muted-foreground -mt-0.5 tracking-wide uppercase">Unified Communications</div>
+              <div className="text-[10px] text-muted-foreground -mt-0.5 tracking-wide uppercase hidden sm:block">Unified Communications</div>
             </div>
           </Link>
 
@@ -42,12 +45,50 @@ const MarketingLayout = () => {
           </nav>
 
           <div className="flex items-center gap-2">
-            <Link to="/login">
+            <Link to="/login" className="hidden sm:inline-flex">
               <Button variant="ghost" size="sm">Sign in</Button>
             </Link>
-            <Link to="/onboarding">
+            <Link to="/onboarding" className="hidden sm:inline-flex">
               <Button size="sm" className="bg-gradient-to-r from-primary to-info">Start free</Button>
             </Link>
+
+            <Sheet open={open} onOpenChange={setOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open menu">
+                  <Menu className="w-5 h-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[280px] sm:w-[320px]">
+                <SheetHeader>
+                  <SheetTitle>Menu</SheetTitle>
+                </SheetHeader>
+                <nav className="flex flex-col gap-1 mt-6">
+                  {nav.map((n) => (
+                    <NavLink
+                      key={n.to}
+                      to={n.to}
+                      end={n.end}
+                      onClick={() => setOpen(false)}
+                      className={({ isActive }) =>
+                        `px-3 py-3 rounded-md text-base font-medium transition-colors ${
+                          isActive ? "text-primary bg-primary/10" : "text-foreground hover:bg-muted"
+                        }`
+                      }
+                    >
+                      {n.label}
+                    </NavLink>
+                  ))}
+                </nav>
+                <div className="flex flex-col gap-2 mt-6 pt-6 border-t border-border">
+                  <Link to="/login" onClick={() => setOpen(false)}>
+                    <Button variant="outline" className="w-full">Sign in</Button>
+                  </Link>
+                  <Link to="/onboarding" onClick={() => setOpen(false)}>
+                    <Button className="w-full bg-gradient-to-r from-primary to-info">Start free</Button>
+                  </Link>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </header>

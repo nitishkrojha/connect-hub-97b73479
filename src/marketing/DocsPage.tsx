@@ -5,168 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Link } from "react-router-dom";
 import {
-  BookOpen, Code, Webhook, Key, Send, Inbox, ArrowRight,
+  BookOpen, Code, Key, Send, Inbox, ArrowRight, Megaphone, PhoneCall,
   MessageSquare, Mail, Phone, Sparkles, Radio, Bot, Copy, Check,
-  ShieldCheck, Zap, GitBranch, FileText,
+  ShieldCheck, Zap, GitBranch, FileText, Instagram, Facebook, Mic,
 } from "lucide-react";
-
-/* ---------------- Send (Outbound) endpoints ---------------- */
-const sendChannels = [
-  {
-    id: "sms",
-    label: "SMS",
-    icon: MessageSquare,
-    endpoint: "POST /v1/send/sms",
-    desc: "Transactional & promotional SMS, OTP, DLT-compliant in India.",
-    body: `{
-  "to": "+919876543210",
-  "sender_id": "SAMPRQ",
-  "template_id": "1107xxxxxxxx",
-  "message": "Your OTP is 482910. Valid for 5 mins.",
-  "type": "transactional"
-}`,
-  },
-  {
-    id: "whatsapp",
-    label: "WhatsApp",
-    icon: Phone,
-    endpoint: "POST /v1/send/whatsapp",
-    desc: "Official WhatsApp Business API — templates, media, buttons, lists.",
-    body: `{
-  "to": "+919876543210",
-  "type": "template",
-  "template": {
-    "name": "order_shipped",
-    "language": "en",
-    "components": [
-      { "type": "body", "parameters": [
-        { "type": "text", "text": "Aman" },
-        { "type": "text", "text": "AWB4821" }
-      ]}
-    ]
-  }
-}`,
-  },
-  {
-    id: "email",
-    label: "Email",
-    icon: Mail,
-    endpoint: "POST /v1/send/email",
-    desc: "SMTP + API delivery, dynamic templates, attachments, tracking pixels.",
-    body: `{
-  "from": "noreply@yourbrand.com",
-  "to": ["customer@example.com"],
-  "subject": "Your invoice #4821",
-  "template_id": "tpl_invoice_v3",
-  "vars": { "name": "Aman", "amount": "₹1,299" },
-  "attachments": [{ "filename": "invoice.pdf", "url": "https://..." }]
-}`,
-  },
-  {
-    id: "rcs",
-    label: "RCS",
-    icon: Sparkles,
-    endpoint: "POST /v1/send/rcs",
-    desc: "Rich Communication Services — carousels, suggested replies, verified sender.",
-    body: `{
-  "to": "+919876543210",
-  "agent_id": "samparq_brand",
-  "rich_card": {
-    "title": "Order shipped 🚚",
-    "description": "AWB4821 · Expected by 24 Apr",
-    "image_url": "https://cdn.samparq.io/ship.png",
-    "suggestions": [
-      { "reply": { "text": "Track order", "postback": "TRACK_4821" }},
-      { "action": { "text": "Call support", "dial": "+918000000000" }}
-    ]
-  }
-}`,
-  },
-];
-
-/* ---------------- Conversation / Inbound endpoints ---------------- */
-const inboundChannels = [
-  {
-    id: "wa-in",
-    label: "WhatsApp",
-    icon: Phone,
-    endpoint: "Webhook · /webhooks/whatsapp",
-    desc: "Inbound WA messages, button clicks, list selections, status callbacks.",
-    body: `{
-  "event": "message.received",
-  "channel": "whatsapp",
-  "from": "+919876543210",
-  "to": "+918000000000",
-  "message": { "type": "text", "text": "Where is my order?" },
-  "contact": { "name": "Aman", "wa_id": "919876543210" },
-  "timestamp": 1730000000
-}`,
-  },
-  {
-    id: "email-in",
-    label: "Email",
-    icon: Mail,
-    endpoint: "Webhook · /webhooks/email",
-    desc: "Inbound email parsing — threading, attachments, auto-ticketing.",
-    body: `{
-  "event": "email.received",
-  "from": "customer@example.com",
-  "to": "support@yourbrand.com",
-  "subject": "Refund request #4821",
-  "text": "Hi team, please process refund...",
-  "thread_id": "th_9k2",
-  "attachments": [{ "filename": "receipt.pdf", "url": "https://..." }]
-}`,
-  },
-  {
-    id: "social-in",
-    label: "Social",
-    icon: Radio,
-    endpoint: "Webhook · /webhooks/social",
-    desc: "Instagram DMs, Facebook Messenger, X mentions — single event schema.",
-    body: `{
-  "event": "message.received",
-  "channel": "instagram",
-  "from": { "id": "ig_8821", "username": "aman.k" },
-  "message": { "type": "text", "text": "Is this still in stock?" },
-  "page_id": "yourbrand_ig"
-}`,
-  },
-  {
-    id: "ivrs-in",
-    label: "IVRS / Voice",
-    icon: Phone,
-    endpoint: "Webhook · /webhooks/voice",
-    desc: "Inbound calls, DTMF input, recording URLs, agent transfer events.",
-    body: `{
-  "event": "call.completed",
-  "from": "+919876543210",
-  "to": "+918000001234",
-  "duration": 142,
-  "dtmf_path": ["1", "3"],
-  "recording_url": "https://cdn.samparq.io/rec/abc.mp3",
-  "transferred_to_agent": "agent_22"
-}`,
-  },
-  {
-    id: "chatbot-in",
-    label: "Chatbot",
-    icon: Bot,
-    endpoint: "Webhook · /webhooks/chatbot",
-    desc: "Web/app chatbot turns, intent + entity payloads, handover events.",
-    body: `{
-  "event": "bot.handover",
-  "session_id": "sess_71x",
-  "user": { "id": "u_882", "email": "aman@x.com" },
-  "intent": "refund.status",
-  "confidence": 0.42,
-  "transcript": [
-    { "role": "user", "text": "Where is my refund?" },
-    { "role": "bot", "text": "Let me connect you to an agent." }
-  ]
-}`,
-  },
-];
 
 /* ---------------- Reusable code block ---------------- */
 const CodeBlock = ({ code }: { code: string }) => {
@@ -192,36 +34,202 @@ const CodeBlock = ({ code }: { code: string }) => {
   );
 };
 
-/* ---------------- Channel card list ---------------- */
-type Channel = {
-  id: string; label: string; icon: typeof MessageSquare;
-  endpoint: string; desc: string; body: string;
+type Endpoint = {
+  id: string;
+  label: string;
+  icon: typeof MessageSquare;
+  color: string;
+  endpoint: string;
+  desc: string;
+  body: string;
 };
 
-const ChannelGroup = ({ channels, mode }: { channels: Channel[]; mode: "send" | "inbound" }) => (
-  <div className="grid lg:grid-cols-2 gap-5">
-    {channels.map((c) => (
-      <Card key={c.id} className="p-5">
-        <div className="flex items-start gap-3 mb-3">
-          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-            <c.icon className="w-5 h-5 text-primary" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="font-semibold text-foreground">{c.label}</h3>
-              <Badge variant="secondary" className="text-[10px]">{mode === "send" ? "Outbound" : "Inbound"}</Badge>
-            </div>
-            <p className="text-xs text-muted-foreground mt-0.5">{c.desc}</p>
-          </div>
+/* ---------------- CAMPAIGNS (Outbound Send Message) ---------------- */
+const campaignEndpoints: Endpoint[] = [
+  {
+    id: "sms", label: "SMS", icon: MessageSquare, color: "text-channel-sms",
+    endpoint: "POST /v1/send/sms",
+    desc: "Transactional & promotional SMS, OTP, DLT-compliant in India.",
+    body: `{
+  "to": "+919876543210",
+  "sender_id": "SAMPRQ",
+  "template_id": "1107xxxxxxxx",
+  "message": "Your OTP is 482910. Valid for 5 mins.",
+  "type": "transactional"
+}`,
+  },
+  {
+    id: "whatsapp", label: "WhatsApp", icon: Phone, color: "text-channel-whatsapp",
+    endpoint: "POST /v1/send/whatsapp",
+    desc: "Official WhatsApp Business API — templates, media, buttons, lists.",
+    body: `{
+  "to": "+919876543210",
+  "type": "template",
+  "template": {
+    "name": "order_shipped",
+    "language": "en",
+    "components": [
+      { "type": "body", "parameters": [
+        { "type": "text", "text": "Aman" },
+        { "type": "text", "text": "AWB4821" }
+      ]}
+    ]
+  }
+}`,
+  },
+  {
+    id: "email", label: "Email", icon: Mail, color: "text-channel-email",
+    endpoint: "POST /v1/send/email",
+    desc: "SMTP + API delivery, dynamic templates, attachments, tracking pixels.",
+    body: `{
+  "from": "noreply@yourbrand.com",
+  "to": ["customer@example.com"],
+  "subject": "Your invoice #4821",
+  "template_id": "tpl_invoice_v3",
+  "vars": { "name": "Aman", "amount": "₹1,299" }
+}`,
+  },
+  {
+    id: "rcs", label: "RCS", icon: Sparkles, color: "text-channel-rcs",
+    endpoint: "POST /v1/send/rcs",
+    desc: "Rich Communication Services — carousels, suggested replies, verified sender.",
+    body: `{
+  "to": "+919876543210",
+  "agent_id": "samparq_brand",
+  "rich_card": {
+    "title": "Order shipped 🚚",
+    "description": "AWB4821 · Expected by 24 Apr",
+    "suggestions": [
+      { "reply": { "text": "Track order", "postback": "TRACK_4821" }}
+    ]
+  }
+}`,
+  },
+];
+
+/* ---------------- CONVERSATION (Inbound webhooks) ---------------- */
+const conversationEndpoints: Endpoint[] = [
+  {
+    id: "wa-in", label: "WhatsApp", icon: Phone, color: "text-channel-whatsapp",
+    endpoint: "Webhook · /webhooks/whatsapp",
+    desc: "Inbound WA messages, button clicks, list selections, status callbacks.",
+    body: `{
+  "event": "message.received",
+  "channel": "whatsapp",
+  "from": "+919876543210",
+  "message": { "type": "text", "text": "Where is my order?" },
+  "contact": { "name": "Aman", "wa_id": "919876543210" },
+  "timestamp": 1730000000
+}`,
+  },
+  {
+    id: "email-in", label: "Email", icon: Mail, color: "text-channel-email",
+    endpoint: "Webhook · /webhooks/email",
+    desc: "Inbound email parsing — threading, attachments, auto-ticketing.",
+    body: `{
+  "event": "email.received",
+  "from": "customer@example.com",
+  "to": "support@yourbrand.com",
+  "subject": "Refund request #4821",
+  "thread_id": "th_9k2"
+}`,
+  },
+  {
+    id: "ig-in", label: "Instagram", icon: Instagram, color: "text-pink-500",
+    endpoint: "Webhook · /webhooks/instagram",
+    desc: "Instagram DMs, story replies, comment mentions — single event schema.",
+    body: `{
+  "event": "message.received",
+  "channel": "instagram",
+  "from": { "id": "ig_8821", "username": "aman.k" },
+  "message": { "type": "text", "text": "Is this still in stock?" }
+}`,
+  },
+  {
+    id: "fb-in", label: "Messenger", icon: Facebook, color: "text-blue-500",
+    endpoint: "Webhook · /webhooks/messenger",
+    desc: "Facebook Messenger inbound, quick replies, postbacks.",
+    body: `{
+  "event": "message.received",
+  "channel": "messenger",
+  "from": { "id": "psid_88x", "name": "Aman" },
+  "message": { "type": "text", "text": "Need help with order" }
+}`,
+  },
+  {
+    id: "bot-in", label: "Web Chat / Bot", icon: Bot, color: "text-amber-500",
+    endpoint: "Webhook · /webhooks/chatbot",
+    desc: "Web/app chatbot turns, intent + entity payloads, handover events.",
+    body: `{
+  "event": "bot.handover",
+  "session_id": "sess_71x",
+  "intent": "refund.status",
+  "confidence": 0.42,
+  "transcript": [
+    { "role": "user", "text": "Where is my refund?" }
+  ]
+}`,
+  },
+];
+
+/* ---------------- VOICE (IVRS, OBD, Click-to-call) ---------------- */
+const voiceEndpoints: Endpoint[] = [
+  {
+    id: "obd", label: "Voice Broadcast (OBD)", icon: Radio, color: "text-purple-500",
+    endpoint: "POST /v1/voice/obd",
+    desc: "Outbound dial campaigns with audio + DTMF capture and retries.",
+    body: `{
+  "campaign_name": "feedback_apr",
+  "caller_id": "+918000001234",
+  "audio_url": "https://cdn.samparq.io/feedback.mp3",
+  "recipients": ["+919876543210", "+919998887776"],
+  "dtmf": { "capture": true, "max_digits": 1 }
+}`,
+  },
+  {
+    id: "c2c", label: "Click-to-call", icon: Mic, color: "text-emerald-500",
+    endpoint: "POST /v1/voice/c2c",
+    desc: "Bridge agent ↔ customer on demand from your app or CRM.",
+    body: `{
+  "agent_number": "+918000004444",
+  "customer_number": "+919876543210",
+  "caller_id": "+918000001234",
+  "record": true
+}`,
+  },
+  {
+    id: "ivrs-in", label: "IVRS Webhook", icon: PhoneCall, color: "text-channel-ivrs",
+    endpoint: "Webhook · /webhooks/voice",
+    desc: "Inbound calls, DTMF input, recording URLs, agent transfer events.",
+    body: `{
+  "event": "call.completed",
+  "from": "+919876543210",
+  "to": "+918000001234",
+  "duration": 142,
+  "dtmf_path": ["1", "3"],
+  "recording_url": "https://cdn.samparq.io/rec/abc.mp3",
+  "transferred_to_agent": "agent_22"
+}`,
+  },
+];
+
+const EndpointCard = ({ ep, badge }: { ep: Endpoint; badge: string }) => (
+  <Card className="p-5">
+    <div className="flex items-start gap-3 mb-3">
+      <div className="w-10 h-10 rounded-lg bg-card border border-border flex items-center justify-center flex-shrink-0">
+        <ep.icon className={`w-5 h-5 ${ep.color}`} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 flex-wrap">
+          <h3 className="font-semibold text-foreground">{ep.label}</h3>
+          <Badge variant="secondary" className="text-[10px]">{badge}</Badge>
         </div>
-        <div className="text-[11px] font-mono text-muted-foreground mb-2 flex items-center gap-1.5">
-          <span className={`w-1.5 h-1.5 rounded-full ${mode === "send" ? "bg-primary" : "bg-success"}`} />
-          {c.endpoint}
-        </div>
-        <CodeBlock code={c.body} />
-      </Card>
-    ))}
-  </div>
+        <p className="text-xs text-muted-foreground mt-0.5">{ep.desc}</p>
+      </div>
+    </div>
+    <div className="text-[11px] font-mono text-muted-foreground mb-2">{ep.endpoint}</div>
+    <CodeBlock code={ep.body} />
+  </Card>
 );
 
 const guides = [
@@ -233,87 +241,160 @@ const guides = [
   { icon: FileText, title: "Recipes", desc: "OTP login, abandoned-cart WA, support inbox, IVRS routing." },
 ];
 
-const DocsPage = () => (
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-    <div className="text-center max-w-2xl mx-auto">
-      <span className="text-xs uppercase tracking-wide font-semibold text-primary">Developer Docs</span>
-      <h1 className="text-4xl sm:text-5xl font-extrabold text-foreground mt-2">Build with Samparq APIs</h1>
-      <p className="text-muted-foreground mt-4">
-        Two clean API surfaces — <strong className="text-foreground">Send Message</strong> for outbound,{" "}
-        <strong className="text-foreground">Conversation API</strong> for inbound. Same auth, same DLR schema, all channels.
-      </p>
-    </div>
+const sections = [
+  {
+    id: "campaigns",
+    icon: Megaphone,
+    tone: "bg-primary/10",
+    fg: "text-primary",
+    eyebrow: "Outbound",
+    title: "Campaigns API",
+    desc: "Send transactional & promotional messages across SMS, WhatsApp, Email and RCS — one auth, one DLR schema.",
+    endpoints: campaignEndpoints,
+    badge: "Send",
+  },
+  {
+    id: "conversation",
+    icon: Inbox,
+    tone: "bg-success/10",
+    fg: "text-success",
+    eyebrow: "Inbound",
+    title: "Conversation API",
+    desc: "Webhook events for every reply across WhatsApp, Email, Instagram, Messenger and chatbots — unified payloads.",
+    endpoints: conversationEndpoints,
+    badge: "Webhook",
+  },
+  {
+    id: "voice",
+    icon: PhoneCall,
+    tone: "bg-channel-ivrs/10",
+    fg: "text-channel-ivrs",
+    eyebrow: "Voice",
+    title: "Voice & IVR API",
+    desc: "Outbound dial broadcasts, click-to-call bridges and inbound IVR webhooks — recordings and DTMF included.",
+    endpoints: voiceEndpoints,
+    badge: "Voice",
+  },
+];
 
-    {/* Auth quick start */}
-    <Card className="mt-10 p-6 bg-sidebar text-sidebar-foreground border-0">
-      <div className="flex items-center gap-2 mb-3 text-xs">
-        <Key className="w-3.5 h-3.5" /> Authentication · Bearer token
+const DocsPage = () => (
+  <div className="bg-background">
+    {/* Hero */}
+    <section className="relative overflow-hidden">
+      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/10 via-background to-info/10" />
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center">
+        <span className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] font-semibold text-primary bg-primary/10 px-3 py-1.5 rounded-full">
+          <BookOpen className="w-3.5 h-3.5" /> Developer Docs
+        </span>
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground mt-5 tracking-tight">
+          Build with Samparq APIs
+        </h1>
+        <p className="text-muted-foreground mt-5 max-w-2xl mx-auto">
+          Three clean API surfaces — <strong className="text-foreground">Campaigns</strong>,{" "}
+          <strong className="text-foreground">Conversation</strong> and{" "}
+          <strong className="text-foreground">Voice</strong>. Same auth, same DLR schema, every channel.
+        </p>
+
+        {/* Quick nav */}
+        <div className="mt-7 flex flex-wrap justify-center gap-2">
+          {sections.map((s) => (
+            <a
+              key={s.id}
+              href={`#${s.id}`}
+              className="text-xs font-semibold px-3 py-1.5 rounded-full border border-border bg-card hover:border-primary/40 hover:text-primary transition-colors"
+            >
+              <s.icon className="inline w-3.5 h-3.5 mr-1 -mt-0.5" />
+              {s.title}
+            </a>
+          ))}
+        </div>
       </div>
-      <CodeBlock
-        code={`# Every request uses your project API key
+    </section>
+
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-20">
+      {/* Auth quick start */}
+      <Card className="p-6 bg-sidebar text-sidebar-foreground border-0">
+        <div className="flex items-center gap-2 mb-3 text-xs">
+          <Key className="w-3.5 h-3.5" /> Authentication · Bearer token (same for all 3 APIs)
+        </div>
+        <CodeBlock
+          code={`# Every request uses your project API key
 curl https://api.samparq.io/v1/ping \\
   -H "Authorization: Bearer sk_live_xxxxxxxxxxxxxxxx"`}
-      />
-    </Card>
+        />
+      </Card>
 
-    {/* Tabs: Send vs Conversation */}
-    <Tabs defaultValue="send" className="mt-12">
-      <TabsList className="grid w-full sm:w-auto sm:inline-grid grid-cols-2 mb-6">
-        <TabsTrigger value="send" className="gap-2">
-          <Send className="w-4 h-4" /> Send Message API
-        </TabsTrigger>
-        <TabsTrigger value="inbound" className="gap-2">
-          <Inbox className="w-4 h-4" /> Conversation API
-        </TabsTrigger>
-      </TabsList>
-
-      <TabsContent value="send">
-        <div className="mb-5">
-          <h2 className="text-2xl font-bold text-foreground">Outbound — Send Message API</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Push messages on SMS, WhatsApp, Email and RCS. Single endpoint family, channel-specific payloads.
-          </p>
-        </div>
-        <ChannelGroup channels={sendChannels} mode="send" />
-      </TabsContent>
-
-      <TabsContent value="inbound">
-        <div className="mb-5">
-          <h2 className="text-2xl font-bold text-foreground">Inbound — Conversation API / Message In</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Subscribe to webhooks for WhatsApp, Email, Social, IVRS / Voice and Chatbot. Every event lands in the unified inbox.
-          </p>
-        </div>
-        <ChannelGroup channels={inboundChannels} mode="inbound" />
-      </TabsContent>
-    </Tabs>
-
-    {/* Guides grid */}
-    <div className="mt-16">
-      <h2 className="text-2xl font-bold text-foreground text-center">Platform guides</h2>
-      <p className="text-muted-foreground text-center mt-2 text-sm">Auth, webhooks, callbacks, SDKs and ready-made recipes.</p>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-8">
-        {guides.map((s) => (
-          <Card key={s.title} className="p-5 hover:shadow-card-hover transition-all hover:-translate-y-0.5 cursor-pointer">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-3">
-              <s.icon className="w-5 h-5 text-primary" />
+      {/* Three sections, separated */}
+      {sections.map((sec, i) => (
+        <section
+          key={sec.id}
+          id={sec.id}
+          className={`scroll-mt-24 pt-16 ${i !== sections.length - 1 ? "pb-16 border-b border-border" : "pt-16"}`}
+        >
+          <div className="flex items-start gap-4 mb-8">
+            <div className={`w-14 h-14 rounded-2xl ${sec.tone} flex items-center justify-center flex-shrink-0`}>
+              <sec.icon className={`w-7 h-7 ${sec.fg}`} />
             </div>
-            <h3 className="font-semibold text-foreground">{s.title}</h3>
-            <p className="text-sm text-muted-foreground mt-1.5">{s.desc}</p>
-            <div className="mt-3 text-xs text-primary font-medium flex items-center gap-1">
-              Read guide <ArrowRight className="w-3 h-3" />
+            <div>
+              <div className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">
+                {sec.eyebrow}
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">{sec.title}</h2>
+              <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl">{sec.desc}</p>
             </div>
-          </Card>
-        ))}
+          </div>
+
+          <Tabs defaultValue={sec.endpoints[0].id} className="w-full">
+            <TabsList className="flex flex-wrap h-auto justify-start gap-1 bg-muted/50 p-1">
+              {sec.endpoints.map((ep) => (
+                <TabsTrigger key={ep.id} value={ep.id} className="gap-1.5 text-xs">
+                  <ep.icon className={`w-3.5 h-3.5 ${ep.color}`} />
+                  {ep.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+
+            {sec.endpoints.map((ep) => (
+              <TabsContent key={ep.id} value={ep.id} className="mt-5">
+                <EndpointCard ep={ep} badge={sec.badge} />
+              </TabsContent>
+            ))}
+          </Tabs>
+        </section>
+      ))}
+
+      {/* Guides */}
+      <section className="pt-16">
+        <div className="text-center mb-10">
+          <div className="text-xs uppercase tracking-[0.2em] text-primary font-semibold mb-3">Platform guides</div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
+            Auth, webhooks, callbacks, SDKs
+          </h2>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {guides.map((g) => (
+            <Card key={g.title} className="p-5 hover:shadow-card-hover transition-all hover:-translate-y-0.5 cursor-pointer">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-3">
+                <g.icon className="w-5 h-5 text-primary" />
+              </div>
+              <h3 className="font-semibold text-foreground">{g.title}</h3>
+              <p className="text-sm text-muted-foreground mt-1.5">{g.desc}</p>
+              <div className="mt-3 text-xs text-primary font-medium flex items-center gap-1">
+                Read guide <ArrowRight className="w-3 h-3" />
+              </div>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <div className="text-center mt-16">
+        <Link to="/login">
+          <Button size="lg" className="rounded-full px-7 font-semibold">
+            <BookOpen className="w-4 h-4 mr-1.5" /> Get an API key
+          </Button>
+        </Link>
       </div>
-    </div>
-
-    <div className="text-center mt-12">
-      <Link to="/login">
-        <Button size="lg" className="bg-gradient-to-r from-primary to-info">
-          <BookOpen className="w-4 h-4" /> Get an API key
-        </Button>
-      </Link>
     </div>
   </div>
 );

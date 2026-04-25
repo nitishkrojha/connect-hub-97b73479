@@ -34,6 +34,15 @@ import ProjectQuotaPage from "./pages/project/ProjectQuotaPage";
 import CampaignHistoryPage from "./pages/project/CampaignHistoryPage";
 import DeveloperDocsPage from "./pages/project/DeveloperDocsPage";
 import InboxPage from "./pages/project/InboxPage";
+import VoiceDashboardPage from "./pages/project/VoiceDashboardPage";
+import ClickToCallPage from "./pages/project/ClickToCallPage";
+import VoiceBroadcastPage from "./pages/project/VoiceBroadcastPage";
+import IVRStudioPage from "./pages/project/IVRStudioPage";
+import CallLogsPage from "./pages/project/CallLogsPage";
+import ContactSyncApiPage from "./pages/project/ContactSyncApiPage";
+import AIAgentStudioPage from "./pages/project/AIAgentStudioPage";
+import UpgradePlanPage from "./pages/project/UpgradePlanPage";
+import { PlanGate } from "./components/PlanGate";
 import ProfilePage from "./pages/ProfilePage";
 import NumberHistoryPage from "./pages/NumberHistoryPage";
 import NotFound from "./pages/NotFound";
@@ -94,6 +103,7 @@ const App = () => (
               <Route path="inbox" element={<InboxPage />} />
               <Route path="templates" element={<ProjectTemplatesPage />} />
               <Route path="upload" element={<UploadRecipientsPage />} />
+              <Route path="campaigns/contacts-api" element={<PlanGate feature="send.contactSyncApi"><ContactSyncApiPage /></PlanGate>} />
               <Route path="reports" element={<ProjectReportsPage />} />
               <Route path="config" element={<ProjectConfigPage />} />
               <Route path="quota" element={<ProjectQuotaPage />} />
@@ -101,6 +111,16 @@ const App = () => (
               <Route path="number-history" element={<NumberHistoryPage />} />
               <Route path="docs" element={<DeveloperDocsPage />} />
               <Route path="profile" element={<ProfilePage />} />
+              {/* Voice */}
+              <Route path="voice/dashboard" element={<VoiceDashboardPage />} />
+              <Route path="voice/click-to-call" element={<ClickToCallPage />} />
+              <Route path="voice/broadcast" element={<VoiceBroadcastPage />} />
+              <Route path="voice/ivr" element={<PlanGate feature="voice.ivrStudio"><IVRStudioPage /></PlanGate>} />
+              <Route path="voice/logs" element={<CallLogsPage />} />
+              {/* AI */}
+              <Route path="ai/agents" element={<PlanGate feature="ai.agent"><AIAgentStudioPage /></PlanGate>} />
+              {/* Billing */}
+              <Route path="billing/upgrade" element={<UpgradePlanPage />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />

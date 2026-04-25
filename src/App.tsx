@@ -70,6 +70,8 @@ const App = () => (
               <Route path="/contact" element={<ContactPage />} />
             </Route>
             <Route path="/login" element={<LoginRoute />} />
+            <Route path="/onboarding" element={<OnboardingPage />} />
+            <Route path="/onboarding/success" element={<OnboardingSuccessPage />} />
 
             <Route path="/admin" element={<ProtectedRoute role="admin"><AdminLayout /></ProtectedRoute>}>
               <Route index element={<AdminDashboard />} />

@@ -13,7 +13,7 @@ const plans = [
     period: "for 14 days",
     tagline: "Explore the full platform — no card required.",
     cta: "Start free trial",
-    href: "/login",
+    href: "/onboarding",
     badge: "14-day trial",
     features: [
       "All channels enabled (SMS, WhatsApp, Email, RCS)",
@@ -32,7 +32,7 @@ const plans = [
     period: "/ month",
     tagline: "For small teams launching their first campaigns.",
     cta: "Choose Starter",
-    href: "/login",
+    href: "/onboarding",
     features: [
       "5 agent seats",
       "10,000 platform messages included*",
@@ -50,7 +50,7 @@ const plans = [
     period: "/ month",
     tagline: "Most loved by growing CX & marketing teams.",
     cta: "Choose Growth",
-    href: "/login",
+    href: "/onboarding",
     popular: true,
     features: [
       "20 agent seats",
@@ -229,7 +229,7 @@ const PricingPage = () => (
           </p>
         </div>
         <div className="flex gap-3">
-          <Link to="/login"><Button size="lg" className="bg-gradient-to-r from-primary to-info">Start free trial</Button></Link>
+          <Link to="/onboarding"><Button size="lg" className="bg-gradient-to-r from-primary to-info">Start free trial</Button></Link>
           <Link to="/contact"><Button size="lg" variant="outline">Talk to sales</Button></Link>
         </div>
       </div>

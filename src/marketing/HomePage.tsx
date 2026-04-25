@@ -126,7 +126,7 @@ const HomePage = () => {
             className="mt-9 flex flex-wrap justify-center gap-3 animate-fade-in"
             style={{ animationDelay: "200ms" }}
           >
-            <Link to="/login">
+            <Link to="/onboarding">
               <Button size="lg" className="rounded-full px-6 font-medium">
                 Start free trial <ArrowRight className="ml-1.5 w-4 h-4" />
               </Button>
@@ -599,7 +599,7 @@ const HomePage = () => {
           Spin up a Samparq workspace in minutes. Connect channels, open the inbox, start conversing.
         </p>
         <div className="mt-9 flex justify-center gap-3 flex-wrap">
-          <Link to="/login">
+          <Link to="/onboarding">
             <Button size="lg" className="rounded-full px-6 font-medium">
               Start free trial <ArrowRight className="ml-1.5 w-4 h-4" />
             </Button>

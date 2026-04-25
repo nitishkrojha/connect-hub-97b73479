@@ -103,7 +103,7 @@ const activityStatuses = ["Attendee", "Successfully Completed"];
 const wizardSteps = [
   { label: "Campaign Info", icon: Megaphone },
   { label: "Channel", icon: MessageSquare },
-  { label: "Recipients", icon: Users },
+  { label: "Contacts", icon: Users },
   { label: "Compose", icon: FileText },
   { label: "Review & Send", icon: Send },
 ];
@@ -295,7 +295,7 @@ const CampaignsPage = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-border">
-                  {["Campaign", "Channel", "Source", "Status", "Recipients", "Delivered", "Failed", "Date"].map((h) => (
+                  {["Campaign", "Channel", "Source", "Status", "Contacts", "Delivered", "Failed", "Date"].map((h) => (
                     <th key={h} className="text-left text-xs font-medium text-muted-foreground p-4">{h}</th>
                   ))}
                 </tr>
@@ -342,7 +342,7 @@ const CampaignsPage = () => {
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div className="p-3 rounded-lg bg-muted/50">
                   <p className="text-lg font-bold text-foreground">{detailCampaign.recipients.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">Recipients</p>
+                  <p className="text-xs text-muted-foreground">Contacts</p>
                 </div>
                 <div className="p-3 rounded-lg bg-success/5">
                   <p className="text-lg font-bold text-success">{detailCampaign.delivered.toLocaleString()}</p>
@@ -443,7 +443,7 @@ const CampaignsPage = () => {
             </div>
           )}
 
-          {/* Step 2: Recipients */}
+          {/* Step 2: Contacts */}
           {step === 2 && (
             <div className="space-y-4">
               <Tabs value={form.recipientMode} onValueChange={(v: any) => setForm({ ...form, recipientMode: v, fetchedCount: null, csvPreview: null })}>
@@ -521,7 +521,7 @@ const CampaignsPage = () => {
                   </div>
 
                   <Button variant="outline" className="w-full" onClick={handleFetchRecipients}>
-                    <Users className="w-4 h-4 mr-2" /> Fetch Recipients
+                    <Users className="w-4 h-4 mr-2" /> Fetch Contacts
                   </Button>
                   {form.fetchedCount !== null && (
                     <div className="p-3 rounded-lg bg-success/5 border border-success/20 flex items-center gap-2">
@@ -650,7 +650,7 @@ const CampaignsPage = () => {
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div><p className="text-muted-foreground text-xs">Channel</p><p className="font-medium text-foreground">{form.channel}</p></div>
                     <div><p className="text-muted-foreground text-xs">Recipient Source</p><p className="font-medium text-foreground">{form.recipientMode === "database" ? "Bulk DB" : form.recipientMode === "csv" ? "CSV Upload" : "Manual Entry"}</p></div>
-                    <div><p className="text-muted-foreground text-xs">Recipients</p><p className="font-medium text-foreground">{recipientCount.toLocaleString()}</p></div>
+                    <div><p className="text-muted-foreground text-xs">Contacts</p><p className="font-medium text-foreground">{recipientCount.toLocaleString()}</p></div>
                     <div><p className="text-muted-foreground text-xs">Delivery</p><p className="font-medium text-foreground">{form.scheduleEnabled ? `Scheduled: ${form.scheduleDate}` : "Send Immediately"}</p></div>
                   </div>
                   <div>

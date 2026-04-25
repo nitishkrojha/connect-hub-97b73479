@@ -8,14 +8,56 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Send, Check, ArrowRight, ArrowLeft, Zap, Rocket, Sparkles, Building2, User, Mail, Phone, KeyRound } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Send, Check, ArrowRight, ArrowLeft, Zap, Rocket, Sparkles, Building2,
+  User, Mail, Phone, KeyRound, CreditCard, Lock, ShieldCheck,
+} from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 
 const PLAN_ORDER: Plan[] = ["starter", "growth", "enterprise"];
 const PLAN_ICONS = { starter: Zap, growth: Rocket, enterprise: Sparkles } as const;
 
-const STEPS = ["Choose Plan", "Business", "Owner", "Review"] as const;
+interface PlanPricing {
+  monthly: number; // INR
+  unit: string;
+  trial: string;
+  cardRequired: boolean;
+}
+const PLAN_PRICING: Record<Plan, PlanPricing> = {
+  starter:    { monthly: 0,     unit: "Free forever", trial: "Includes 1,000 free messages",          cardRequired: false },
+  growth:     { monthly: 4999,  unit: "/month",       trial: "14-day free trial · billed after trial", cardRequired: true  },
+  enterprise: { monthly: 19999, unit: "/month",       trial: "Custom contracts available · billed after trial", cardRequired: true },
+};
+
+const PLAN_FEATURES: Record<Plan, string[]> = {
+  starter: [
+    "SMS, Email & RCS sending",
+    "Email, Web Chat & Webhook inbox",
+    "Voice Dashboard (free)",
+    "Click-to-Call & Voice Broadcast (metered)",
+    "DIC Notifier — trial only",
+    "1 workspace, up to 3 users",
+  ],
+  growth: [
+    "All channels: SMS, WhatsApp, Email, RCS",
+    "Full unified inbox (WhatsApp, Email, Instagram, Facebook, Telegram, Web Chat)",
+    "IVR Studio + Click-to-Call + Voice Broadcast (included)",
+    "Inbound call handling",
+    "Contact Sync API",
+    "DIC Notifier — full self-configuration",
+    "Up to 25 users · audit logs",
+  ],
+  enterprise: [
+    "Everything in Growth",
+    "AI Agents for Voice, WhatsApp, Web Chat, Email",
+    "Advanced analytics & SLAs",
+    "SSO, dedicated support",
+    "Custom data residency",
+    "Unlimited users",
+  ],
+};
 
 const OnboardingPage = () => {
   const [params] = useSearchParams();
@@ -23,8 +65,20 @@ const OnboardingPage = () => {
   const { signup } = useAuth();
 
   const initialPlan = (params.get("plan") as Plan) || "growth";
-  const [step, setStep] = useState(0);
   const [plan, setPlan] = useState<Plan>(PLAN_ORDER.includes(initialPlan) ? initialPlan : "growth");
+
+  // Dynamic step list — payment step inserted only for paid plans
+  const steps = (() => {
+    const base: string[] = ["Choose Plan", "Business", "Owner"];
+    if (PLAN_PRICING[plan].cardRequired) base.push("Payment");
+    base.push("Review");
+    return base;
+  })();
+  const PAYMENT_INDEX = PLAN_PRICING[plan].cardRequired ? 3 : -1;
+  const REVIEW_INDEX = steps.length - 1;
+
+  const [step, setStep] = useState(0);
+  const [featuresOpen, setFeaturesOpen] = useState(false);
 
   const [form, setForm] = useState({
     businessName: "",
@@ -38,6 +92,10 @@ const OnboardingPage = () => {
     password: "",
     confirmPassword: "",
     agreed: false,
+    cardName: "",
+    cardNumber: "",
+    cardExpiry: "",
+    cardCvc: "",
   });
 
   useEffect(() => {
@@ -45,14 +103,20 @@ const OnboardingPage = () => {
     if (p && PLAN_ORDER.includes(p)) setPlan(p);
   }, [params]);
 
+  // If user moves from paid plan to starter mid-flow, clamp step
+  useEffect(() => {
+    if (step > steps.length - 1) setStep(steps.length - 1);
+  }, [steps.length, step]);
+
   const update = (k: keyof typeof form, v: string | boolean) => setForm((f) => ({ ...f, [k]: v }));
 
   const validateStep = (): string | null => {
-    if (step === 1) {
+    const label = steps[step];
+    if (label === "Business") {
       if (!form.businessName.trim()) return "Business name is required";
       if (!form.country.trim()) return "Country is required";
     }
-    if (step === 2) {
+    if (label === "Owner") {
       if (!form.ownerName.trim()) return "Your full name is required";
       if (!/^\S+@\S+\.\S+$/.test(form.email)) return "Valid work email is required";
       if (!form.mobile.trim()) return "Mobile number is required";
@@ -60,13 +124,19 @@ const OnboardingPage = () => {
       if (form.password !== form.confirmPassword) return "Passwords do not match";
       if (!form.agreed) return "Please accept the Terms & Privacy Policy";
     }
+    if (label === "Payment") {
+      if (!form.cardName.trim()) return "Cardholder name is required";
+      if (form.cardNumber.replace(/\s/g, "").length < 13) return "Enter a valid card number";
+      if (!/^\d{2}\/\d{2}$/.test(form.cardExpiry)) return "Expiry must be MM/YY";
+      if (!/^\d{3,4}$/.test(form.cardCvc)) return "Enter a valid CVC";
+    }
     return null;
   };
 
   const next = () => {
     const err = validateStep();
     if (err) { toast.error(err); return; }
-    setStep((s) => Math.min(s + 1, STEPS.length - 1));
+    setStep((s) => Math.min(s + 1, steps.length - 1));
   };
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
@@ -88,6 +158,9 @@ const OnboardingPage = () => {
     navigate(`/onboarding/success?email=${encodeURIComponent(form.email)}&plan=${plan}`);
   };
 
+  const pricing = PLAN_PRICING[plan];
+  const currentLabel = steps[step];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       {/* Header */}
@@ -99,7 +172,7 @@ const OnboardingPage = () => {
             </div>
             <span className="font-bold text-lg">Samparq</span>
           </Link>
-          <Link to="/login" className="text-sm text-muted-foreground hover:text-foreground">
+          <Link to="/login" className="text-base text-muted-foreground hover:text-foreground">
             Already have an account? <span className="text-primary font-medium">Sign in</span>
           </Link>
         </div>
@@ -108,7 +181,7 @@ const OnboardingPage = () => {
       <div className="max-w-3xl mx-auto px-6 py-10">
         {/* Stepper */}
         <div className="flex items-center justify-between mb-10">
-          {STEPS.map((label, i) => (
+          {steps.map((label, i) => (
             <div key={label} className="flex items-center flex-1 last:flex-none">
               <div className={cn(
                 "w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-all",
@@ -119,9 +192,9 @@ const OnboardingPage = () => {
                 {i < step ? <Check className="w-4 h-4" /> : i + 1}
               </div>
               <div className="ml-3 hidden sm:block">
-                <p className={cn("text-xs font-medium", i === step ? "text-foreground" : "text-muted-foreground")}>{label}</p>
+                <p className={cn("text-sm font-medium", i === step ? "text-foreground" : "text-muted-foreground")}>{label}</p>
               </div>
-              {i < STEPS.length - 1 && (
+              {i < steps.length - 1 && (
                 <div className={cn("flex-1 h-0.5 mx-3", i < step ? "bg-primary" : "bg-border")} />
               )}
             </div>
@@ -129,13 +202,14 @@ const OnboardingPage = () => {
         </div>
 
         <Card className="p-8 shadow-card backdrop-blur-sm bg-card/95">
-          {/* Step 0 — Plan */}
-          {step === 0 && (
-            <div className="space-y-5">
+          {/* Step — Choose Plan */}
+          {currentLabel === "Choose Plan" && (
+            <div className="space-y-6">
               <div>
                 <h1 className="text-2xl font-bold text-foreground">Choose your plan</h1>
-                <p className="text-muted-foreground text-sm mt-1">You can change or upgrade anytime.</p>
+                <p className="text-muted-foreground text-base mt-1">You can change or upgrade anytime.</p>
               </div>
+
               <div className="grid sm:grid-cols-3 gap-3">
                 {PLAN_ORDER.map((p) => {
                   const Icon = PLAN_ICONS[p];
@@ -145,6 +219,7 @@ const OnboardingPage = () => {
                       key={p}
                       type="button"
                       onClick={() => setPlan(p)}
+                      aria-pressed={selected}
                       className={cn(
                         "text-left p-4 rounded-xl border-2 transition-all",
                         selected ? "border-primary bg-primary/5 shadow-card" : "border-border hover:border-primary/50"
@@ -154,24 +229,59 @@ const OnboardingPage = () => {
                         <Icon className={cn("w-5 h-5", selected ? "text-primary" : "text-muted-foreground")} />
                         {selected && <Check className="w-4 h-4 text-primary" />}
                       </div>
-                      <p className="font-semibold text-foreground">{PLAN_LABELS[p]}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{PLAN_TAGLINES[p]}</p>
+                      <p className="font-semibold text-foreground text-base">{PLAN_LABELS[p]}</p>
+                      <p className="text-sm text-muted-foreground mt-1">{PLAN_TAGLINES[p]}</p>
                     </button>
                   );
                 })}
               </div>
-              <div className="text-xs text-muted-foreground bg-muted/40 rounded-lg p-3">
-                14-day free trial · No credit card required · Cancel anytime
+
+              {/* Pricing strip for the SELECTED plan */}
+              <div className="rounded-xl border border-primary/20 bg-gradient-to-br from-primary/5 to-info/5 p-5">
+                <div className="flex flex-wrap items-end justify-between gap-4">
+                  <div>
+                    <div className="text-sm text-muted-foreground uppercase tracking-wider font-semibold">
+                      {PLAN_LABELS[plan]} plan
+                    </div>
+                    <div className="flex items-baseline gap-2 mt-1">
+                      {pricing.monthly === 0 ? (
+                        <span className="text-3xl font-bold text-foreground">Free</span>
+                      ) : (
+                        <>
+                          <span className="text-3xl font-bold text-foreground">
+                            ₹{pricing.monthly.toLocaleString("en-IN")}
+                          </span>
+                          <span className="text-base text-muted-foreground">{pricing.unit}</span>
+                        </>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">{pricing.trial}</p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setFeaturesOpen(true)}
+                    aria-label={`See features of ${PLAN_LABELS[plan]} plan`}
+                  >
+                    See full features
+                  </Button>
+                </div>
+              </div>
+
+              <div className="text-sm text-muted-foreground bg-muted/40 rounded-lg p-3">
+                {pricing.cardRequired
+                  ? "We'll ask for card details after the owner step. You won't be charged during the 14-day trial."
+                  : "14-day free trial · No credit card required · Cancel anytime"}
               </div>
             </div>
           )}
 
-          {/* Step 1 — Business */}
-          {step === 1 && (
+          {/* Step — Business */}
+          {currentLabel === "Business" && (
             <div className="space-y-5">
               <div>
                 <h1 className="text-2xl font-bold text-foreground">Tell us about your business</h1>
-                <p className="text-muted-foreground text-sm mt-1">This becomes your workspace.</p>
+                <p className="text-muted-foreground text-base mt-1">This becomes your workspace.</p>
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
                 <Field label="Business name" required icon={Building2}>
@@ -197,12 +307,12 @@ const OnboardingPage = () => {
             </div>
           )}
 
-          {/* Step 2 — Owner */}
-          {step === 2 && (
+          {/* Step — Owner */}
+          {currentLabel === "Owner" && (
             <div className="space-y-5">
               <div>
                 <h1 className="text-2xl font-bold text-foreground">Workspace owner details</h1>
-                <p className="text-muted-foreground text-sm mt-1">This will be your login. We'll send a confirmation email.</p>
+                <p className="text-muted-foreground text-base mt-1">This will be your login. We'll send a confirmation email.</p>
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
                 <Field label="Full name" required icon={User}>
@@ -224,30 +334,97 @@ const OnboardingPage = () => {
                   <Input type="password" value={form.confirmPassword} onChange={(e) => update("confirmPassword", e.target.value)} />
                 </Field>
               </div>
-              <label className="flex items-start gap-2 text-sm text-muted-foreground cursor-pointer">
+              <label className="flex items-start gap-2 text-base text-muted-foreground cursor-pointer">
                 <Checkbox checked={form.agreed} onCheckedChange={(v) => update("agreed", v === true)} />
                 <span>I agree to the <a className="text-primary underline">Terms of Service</a> and <a className="text-primary underline">Privacy Policy</a>.</span>
               </label>
             </div>
           )}
 
-          {/* Step 3 — Review */}
-          {step === 3 && (
+          {/* Step — Payment (only for paid plans) */}
+          {currentLabel === "Payment" && (
+            <div className="space-y-5">
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">Add a payment method</h1>
+                <p className="text-muted-foreground text-base mt-1">
+                  You won't be charged during your 14-day free trial. Cancel anytime before it ends.
+                </p>
+              </div>
+
+              <div className="rounded-lg border border-border bg-muted/30 px-4 py-3 flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">{PLAN_LABELS[plan]} plan</span>
+                <span className="font-semibold text-foreground">
+                  ₹{pricing.monthly.toLocaleString("en-IN")} {pricing.unit} · after trial
+                </span>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                <Field label="Cardholder name" required icon={User}>
+                  <Input value={form.cardName} onChange={(e) => update("cardName", e.target.value)} placeholder="Name on card" />
+                </Field>
+                <Field label="Card number" required icon={CreditCard}>
+                  <Input
+                    inputMode="numeric"
+                    value={form.cardNumber}
+                    onChange={(e) => {
+                      const v = e.target.value.replace(/\D/g, "").slice(0, 19);
+                      update("cardNumber", v.replace(/(.{4})/g, "$1 ").trim());
+                    }}
+                    placeholder="1234 5678 9012 3456"
+                  />
+                </Field>
+                <Field label="Expiry (MM/YY)" required>
+                  <Input
+                    inputMode="numeric"
+                    value={form.cardExpiry}
+                    onChange={(e) => {
+                      let v = e.target.value.replace(/\D/g, "").slice(0, 4);
+                      if (v.length > 2) v = v.slice(0, 2) + "/" + v.slice(2);
+                      update("cardExpiry", v);
+                    }}
+                    placeholder="MM/YY"
+                  />
+                </Field>
+                <Field label="CVC" required icon={Lock}>
+                  <Input
+                    inputMode="numeric"
+                    type="password"
+                    value={form.cardCvc}
+                    onChange={(e) => update("cardCvc", e.target.value.replace(/\D/g, "").slice(0, 4))}
+                    placeholder="•••"
+                  />
+                </Field>
+              </div>
+
+              <div className="flex items-start gap-2 text-sm text-muted-foreground bg-success/10 text-success-foreground rounded-lg p-3 border border-success/20">
+                <ShieldCheck className="w-4 h-4 text-success flex-shrink-0 mt-0.5" />
+                <span className="text-foreground">
+                  Secure & PCI-DSS compliant. Your card is tokenized — we never store full card numbers.
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Step — Review */}
+          {currentLabel === "Review" && (
             <div className="space-y-5">
               <div>
                 <h1 className="text-2xl font-bold text-foreground">Review & confirm</h1>
-                <p className="text-muted-foreground text-sm mt-1">Make sure everything looks right.</p>
+                <p className="text-muted-foreground text-base mt-1">Make sure everything looks right.</p>
               </div>
               <div className="rounded-lg border border-border divide-y">
-                <Row label="Plan" value={PLAN_LABELS[plan]} />
+                <Row label="Plan" value={`${PLAN_LABELS[plan]} · ${pricing.monthly === 0 ? "Free" : `₹${pricing.monthly.toLocaleString("en-IN")}${pricing.unit}`}`} />
                 <Row label="Business" value={form.businessName} />
                 <Row label="Type" value={form.businessType || "—"} />
                 <Row label="Country" value={form.country} />
                 <Row label="Owner" value={`${form.ownerName} · ${form.designation || "—"}`} />
                 <Row label="Email" value={form.email} />
                 <Row label="Mobile" value={form.mobile} />
+                {pricing.cardRequired && (
+                  <Row label="Card" value={`•••• ${form.cardNumber.replace(/\s/g, "").slice(-4) || "----"}`} />
+                )}
               </div>
-              <div className="text-xs text-muted-foreground bg-info/10 text-info rounded-lg p-3">
+              <div className="text-sm text-info bg-info/10 rounded-lg p-3">
                 A confirmation email will be sent to <strong>{form.email}</strong>. Click the link to activate your workspace.
               </div>
             </div>
@@ -258,7 +435,7 @@ const OnboardingPage = () => {
             <Button variant="outline" onClick={back} disabled={step === 0}>
               <ArrowLeft className="w-4 h-4" /> Back
             </Button>
-            {step < STEPS.length - 1 ? (
+            {step < REVIEW_INDEX ? (
               <Button onClick={next}>Continue <ArrowRight className="w-4 h-4" /></Button>
             ) : (
               <Button onClick={submit} className="bg-gradient-to-r from-primary to-info">
@@ -268,6 +445,39 @@ const OnboardingPage = () => {
           </div>
         </Card>
       </div>
+
+      {/* Features dialog */}
+      <Dialog open={featuresOpen} onOpenChange={setFeaturesOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              {(() => { const Icon = PLAN_ICONS[plan]; return <Icon className="w-5 h-5 text-primary" />; })()}
+              {PLAN_LABELS[plan]} plan — what's included
+            </DialogTitle>
+            <DialogDescription className="text-base">
+              {PLAN_TAGLINES[plan]}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="rounded-lg bg-muted/40 px-4 py-3 flex items-baseline justify-between">
+            <span className="text-sm text-muted-foreground">Price</span>
+            <span className="text-lg font-bold text-foreground">
+              {pricing.monthly === 0 ? "Free" : `₹${pricing.monthly.toLocaleString("en-IN")}`}
+              {pricing.monthly > 0 && <span className="text-sm font-normal text-muted-foreground ml-1">{pricing.unit}</span>}
+            </span>
+          </div>
+
+          <ul className="space-y-2.5 mt-2">
+            {PLAN_FEATURES[plan].map((f) => (
+              <li key={f} className="flex items-start gap-2.5 text-base">
+                <Check className="w-4 h-4 text-success flex-shrink-0 mt-1" />
+                <span className="text-foreground">{f}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="text-sm text-muted-foreground mt-2">{pricing.trial}</p>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
@@ -283,9 +493,9 @@ const Field = ({ label, required, icon: Icon, children }: { label: string; requi
 );
 
 const Row = ({ label, value }: { label: string; value: string }) => (
-  <div className="flex justify-between items-center px-4 py-2.5 text-sm">
+  <div className="flex justify-between items-center px-4 py-2.5 text-base">
     <span className="text-muted-foreground">{label}</span>
-    <span className="font-medium text-foreground">{value}</span>
+    <span className="font-medium text-foreground text-right">{value}</span>
   </div>
 );
 

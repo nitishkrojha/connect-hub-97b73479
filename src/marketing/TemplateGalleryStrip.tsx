@@ -45,7 +45,7 @@ const TemplateGalleryStrip = () => {
   };
 
   return (
-    <section className="py-24 bg-background">
+    <section className="py-24 bg-background border-t border-border">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10 animate-fade-in">
           <div>

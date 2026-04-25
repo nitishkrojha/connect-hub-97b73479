@@ -45,7 +45,7 @@ const InlineWordSwap = ({ words, className = "" }: Props) => {
   return (
     <span className={`relative inline-block align-baseline ${className}`}>
       <span
-        className="font-serif italic bg-gradient-to-r from-primary via-info to-primary bg-clip-text text-transparent"
+        className="font-semibold bg-gradient-to-r from-primary via-info to-primary bg-clip-text text-transparent"
         style={{ backgroundSize: "200% auto" }}
       >
         {text}

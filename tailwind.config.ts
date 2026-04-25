@@ -140,6 +140,15 @@ export default {
           "0%": { transform: "scale(0.8)", opacity: "0.6" },
           "100%": { transform: "scale(2)", opacity: "0" },
         },
+        "bubble-float": {
+          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
+          "33%": { transform: "translate(8px, -14px) scale(1.04)" },
+          "66%": { transform: "translate(-10px, 8px) scale(0.97)" },
+        },
+        "ticker-up": {
+          "0%, 18%": { transform: "translateY(0)", opacity: "1" },
+          "22%, 100%": { transform: "translateY(-100%)", opacity: "0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -154,6 +163,7 @@ export default {
         marquee: "marquee 30s linear infinite",
         grow: "grow 3s ease-in-out infinite",
         "pulse-ring": "pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "bubble-float": "bubble-float 8s ease-in-out infinite",
       },
     },
   },

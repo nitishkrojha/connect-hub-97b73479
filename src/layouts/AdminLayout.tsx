@@ -2,7 +2,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard, Building2, Settings2, FileText, BarChart3,
-  Gauge, ScrollText, Users, Send, LogOut, ChevronLeft, Menu, Search, Code,
+  Gauge, ScrollText, Users, Send, LogOut, ChevronLeft, Menu, Code,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";

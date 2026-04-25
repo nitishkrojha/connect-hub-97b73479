@@ -19,7 +19,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import ProjectsPage from "./pages/admin/ProjectsPage";
 import AdminChannelsPage from "./pages/admin/AdminChannelsPage";
 import AdminTemplatesPage from "./pages/admin/AdminTemplatesPage";
-import AdminReportsPage from "./pages/admin/AdminReportsPage";
+
 import AdminQuotaPage from "./pages/admin/AdminQuotaPage";
 import AdminAuditPage from "./pages/admin/AdminAuditPage";
 import AdminUsersPage from "./pages/admin/AdminUsersPage";

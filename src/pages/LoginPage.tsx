@@ -7,20 +7,28 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Shield, Building2, Send } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Shield, Building2, Send, CheckCircle2 } from "lucide-react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
+import { useEffect } from "react";
 
 const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [role, setRole] = useState<UserRole>("admin");
-  const [email, setEmail] = useState("");
+  const [params] = useSearchParams();
+  const [role, setRole] = useState<UserRole>(params.get("email") ? "project" : "admin");
+  const [email, setEmail] = useState(params.get("email") || "");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
+  const justConfirmed = params.get("confirmed") === "1";
+
+  useEffect(() => {
+    if (justConfirmed) toast.success("Email confirmed — please sign in.");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,16 +116,23 @@ const LoginPage = () => {
             <CardContent className="pt-4">
               <Tabs value={role} onValueChange={(v) => setRole(v as UserRole)} className="mb-6">
                 <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="project" className="flex items-center gap-2">
+                    <Building2 className="w-4 h-4" />
+                    Workspace
+                  </TabsTrigger>
                   <TabsTrigger value="admin" className="flex items-center gap-2">
                     <Shield className="w-4 h-4" />
                     Admin
                   </TabsTrigger>
-                  <TabsTrigger value="project" className="flex items-center gap-2">
-                    <Building2 className="w-4 h-4" />
-                    Project
-                  </TabsTrigger>
                 </TabsList>
               </Tabs>
+
+              {justConfirmed && (
+                <div className="mb-4 flex items-start gap-2 p-3 rounded-lg bg-success/10 text-success text-xs">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <span>Your email is confirmed. Sign in to access your workspace.</span>
+                </div>
+              )}
 
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-2">

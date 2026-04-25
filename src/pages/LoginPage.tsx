@@ -74,13 +74,13 @@ const LoginPage = () => {
             <div className="w-14 h-14 rounded-xl bg-primary-foreground/20 flex items-center justify-center backdrop-blur-sm">
               <Send className="w-7 h-7 text-primary-foreground" />
             </div>
-            <h1 className="text-4xl font-bold text-primary-foreground tracking-tight">DIC Notifier</h1>
+            <h1 className="text-4xl font-bold text-primary-foreground tracking-tight">Samparq</h1>
           </div>
           <p className="text-xl text-primary-foreground/90 mb-4 font-medium">
-            Unified Communication Platform
+            One bridge. Every conversation.
           </p>
           <p className="text-primary-foreground/70 leading-relaxed">
-            Centralized SMS, WhatsApp, Email & RCS messaging across all your projects. One platform, every channel.
+            Connect every channel — messaging, social, and voice — in a single unified workspace.
           </p>
           <div className="mt-12 grid grid-cols-4 gap-4">
             {[
@@ -103,7 +103,7 @@ const LoginPage = () => {
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-2 mb-8 justify-center">
             <Send className="w-6 h-6 text-primary" />
-            <h1 className="text-2xl font-bold text-foreground">DIC Notifier</h1>
+            <h1 className="text-2xl font-bold text-foreground">Samparq</h1>
           </div>
 
           <Card className="shadow-card border-border/50">

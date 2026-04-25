@@ -43,7 +43,7 @@ const Connector = ({ label }: { label?: string }) => (
 );
 
 const WorkflowFlowPreview = () => (
-  <section className="py-24 bg-background">
+  <section className="py-24 bg-muted/30 border-y border-border">
     <div className="max-w-6xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-12 items-center">
       {/* Visual */}
       <Card className="p-6 bg-gradient-to-br from-primary/5 via-card to-info/5 border-primary/15 order-2 lg:order-1 animate-fade-in">

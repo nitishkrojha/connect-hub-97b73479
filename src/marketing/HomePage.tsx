@@ -166,7 +166,7 @@ const HomePage = () => {
       <WorkflowFlowPreview />
 
       {/* HOW IT WORKS */}
-      <section className="py-24 bg-background">
+      <section className="py-24 bg-background border-t border-border">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <div className="text-xs uppercase tracking-[0.2em] text-primary mb-3 font-semibold">How it works</div>
@@ -180,7 +180,7 @@ const HomePage = () => {
                 <div className="text-5xl font-bold text-primary/15 absolute top-3 right-4">{s.n}</div>
                 <div className="relative">
                   <h3 className="text-xl font-semibold text-foreground">{s.t}</h3>
-                  <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{s.d}</p>
+                  <p className="text-base text-muted-foreground mt-2 leading-relaxed">{s.d}</p>
                 </div>
               </Card>
             ))}

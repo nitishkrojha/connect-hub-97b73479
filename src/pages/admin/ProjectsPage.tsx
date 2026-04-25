@@ -150,7 +150,7 @@ const ProjectsPage = () => {
     setProjects([newProject, ...projects]);
     setDialogOpen(false);
     resetForm();
-    toast.success("Project onboarded successfully!", {
+    toast.success("Workspace onboarded successfully!", {
       description: `Welcome email with login credentials sent to ${newProject.headEmail}`,
     });
   };
@@ -178,7 +178,7 @@ const ProjectsPage = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Projects</h1>
+          <h1 className="text-2xl font-bold text-foreground">Workspaces</h1>
           <p className="text-muted-foreground mt-1">Manage onboarded projects</p>
         </div>
         <Button onClick={() => { resetForm(); setDialogOpen(true); }}>

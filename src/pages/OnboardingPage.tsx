@@ -85,6 +85,7 @@ const OnboardingPage = () => {
     };
     const result = signup(payload);
     if (!result.ok) { toast.error(result.error); return; }
+    void result;
     navigate(`/onboarding/success?email=${encodeURIComponent(form.email)}&plan=${plan}`);
   };
 

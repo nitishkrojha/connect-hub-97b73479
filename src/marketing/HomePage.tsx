@@ -124,92 +124,58 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* FEATURES — actual product snippets */}
+      {/* FEATURES — clean snippet showcase, minimal text */}
       <section className="py-24 bg-background">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="text-center max-w-2xl mx-auto mb-14">
+          <div className="text-center max-w-xl mx-auto mb-14">
             <div className="text-xs uppercase tracking-[0.2em] text-primary mb-3 font-semibold">What you get</div>
             <h2 className="text-3xl sm:text-5xl font-bold text-foreground tracking-tight">
               Everything you need to scale conversations
             </h2>
-            <p className="text-muted-foreground mt-5">
-              Real product, not screenshots — see the inbox, broadcast and IVR in action.
-            </p>
           </div>
 
-          {/* Snippet 1 — Broadcast (text left, preview right) */}
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center mb-20">
-            <div>
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-2.5 py-1 rounded-full">
-                <Send className="w-3 h-3" /> Bulk Broadcast
-              </span>
-              <h3 className="mt-4 text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
-                Launch multi-channel campaigns in minutes
-              </h3>
-              <p className="mt-3 text-muted-foreground leading-relaxed">
-                Compose once, deliver across SMS, WhatsApp, Email and RCS. Approved templates, smart scheduling and live delivery tracking — built in.
-              </p>
-              <ul className="mt-5 space-y-2 text-sm">
-                {["Approved DLT & WhatsApp templates", "Audience segments + scheduling", "Live DLR + retry on failure"].map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-foreground">
-                    <CheckCircle2 className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />{f}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="lg:pl-6">
-              <MessageOutPreview />
-            </div>
-          </div>
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Broadcast */}
+            <Card className="p-5 hover:shadow-card-hover transition-all flex flex-col">
+              <div className="flex items-center justify-between mb-4">
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-2.5 py-1 rounded-full">
+                  <Send className="w-3 h-3" /> Broadcast
+                </span>
+                <span className="text-[10px] text-muted-foreground">Multi-channel</span>
+              </div>
+              <h3 className="text-lg font-bold text-foreground mb-4">Launch campaigns in minutes</h3>
+              <div className="flex-1 flex items-end">
+                <div className="w-full"><MessageOutPreview /></div>
+              </div>
+            </Card>
 
-          {/* Snippet 2 — Inbox (preview left, text right) */}
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center mb-20">
-            <div className="lg:order-2">
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-success bg-success/10 px-2.5 py-1 rounded-full">
-                <Inbox className="w-3 h-3" /> Unified Inbox
-              </span>
-              <h3 className="mt-4 text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
-                Every channel in one organised inbox
-              </h3>
-              <p className="mt-3 text-muted-foreground leading-relaxed">
-                WhatsApp, Email, Instagram, SMS, web chat and IVRS — assign to agents, convert to tickets, and never lose context across replies.
-              </p>
-              <ul className="mt-5 space-y-2 text-sm">
-                {["Smart routing & assignment rules", "Convert any chat into a ticket", "AI co-pilot for faster replies"].map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-foreground">
-                    <CheckCircle2 className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />{f}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="lg:order-1 lg:pr-6 flex justify-center lg:justify-start">
-              <InboxStreamPreview />
-            </div>
-          </div>
+            {/* Inbox */}
+            <Card className="p-5 hover:shadow-card-hover transition-all flex flex-col">
+              <div className="flex items-center justify-between mb-4">
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-success bg-success/10 px-2.5 py-1 rounded-full">
+                  <Inbox className="w-3 h-3" /> Unified Inbox
+                </span>
+                <span className="text-[10px] text-muted-foreground">All channels</span>
+              </div>
+              <h3 className="text-lg font-bold text-foreground mb-4">One inbox for every reply</h3>
+              <div className="flex-1 flex items-end">
+                <div className="w-full"><InboxStreamPreview /></div>
+              </div>
+            </Card>
 
-          {/* Snippet 3 — Voice / IVR */}
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <div>
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-channel-ivrs bg-channel-ivrs/10 px-2.5 py-1 rounded-full">
-                <PhoneCall className="w-3 h-3" /> IVRS & Voice
-              </span>
-              <h3 className="mt-4 text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
-                Smart call flows, sticky agents, full recordings
-              </h3>
-              <p className="mt-3 text-muted-foreground leading-relaxed">
-                Build IVR menus visually, route by working hours, and run outbound voice broadcasts with DTMF capture and retries.
-              </p>
-              <ul className="mt-5 space-y-2 text-sm">
-                {["Visual IVR builder, no code", "Sticky-agent + working-hours rules", "Outbound OBD with DTMF surveys"].map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-foreground">
-                    <CheckCircle2 className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />{f}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="lg:pl-6 max-w-sm mx-auto lg:mx-0 w-full">
-              <CallIVRSPreview />
-            </div>
+            {/* Voice */}
+            <Card className="p-5 hover:shadow-card-hover transition-all flex flex-col">
+              <div className="flex items-center justify-between mb-4">
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-channel-ivrs bg-channel-ivrs/10 px-2.5 py-1 rounded-full">
+                  <PhoneCall className="w-3 h-3" /> Voice & IVR
+                </span>
+                <span className="text-[10px] text-muted-foreground">Smart routing</span>
+              </div>
+              <h3 className="text-lg font-bold text-foreground mb-4">Visual call flows, no code</h3>
+              <div className="flex-1 flex items-end">
+                <div className="w-full"><CallIVRSPreview /></div>
+              </div>
+            </Card>
           </div>
         </div>
       </section>

@@ -75,7 +75,11 @@ const GROUPS: NavGroup[] = [
     label: "Analytics",
     icon: BarChart3,
     items: [
-      { to: "/project/reports", icon: BarChart3, label: "Analytics" },
+      { to: "/project/analytics", icon: BarChart3, label: "Overview", end: true },
+      { to: "/project/analytics/campaigns", icon: Megaphone, label: "Campaign Analytics" },
+      { to: "/project/analytics/inbox", icon: Inbox, label: "Inbox Analytics" },
+      { to: "/project/analytics/voice", icon: Phone, label: "Voice Analytics" },
+      { to: "/project/analytics/number-lookup", icon: Search, label: "Number Lookup" },
     ],
   },
   {
@@ -85,7 +89,6 @@ const GROUPS: NavGroup[] = [
     items: [
       { to: "/project/config", icon: Building2, label: "Workspace" },
       { to: "/project/quota", icon: Gauge, label: "Usage" },
-      { to: "/project/number-history", icon: Search, label: "Number Lookup" },
       { to: "/project/docs", icon: Code2, label: "Developers" },
     ],
   },

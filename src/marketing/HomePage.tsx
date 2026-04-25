@@ -229,7 +229,7 @@ const HomePage = () => {
 
 
       {/* TRIAL CTA — same card style as PricingPage */}
-      <section className="pb-24 bg-background">
+      <section className="py-24 bg-background border-t border-border">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <Card className="p-8 bg-gradient-to-br from-primary/10 via-info/5 to-transparent border-primary/20">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">

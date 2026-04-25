@@ -1,186 +1,237 @@
 
+# Final Plan — Self-Serve Onboarding, Plan Gating & Market-Standard Labels
 
-## Goal
-Revamp the Samparq marketing **HomePage** with a modern, aesthetic, alive hero and accurate positioning: Samparq is the **bridge / adapter** connecting businesses to customers across messaging channels, social media conversations, and IVRS — all unified in a single inbox. **No "Meta Business Partner" claim. Avoid the literal words "inbound" and "outbound."**
-
----
-
-## Positioning Rules (locked)
-- ✅ Bridge / adapter for customer communication
-- ✅ Messaging channels + social media conversations + IVRS
-- ✅ Single inbox for all channels
-- ❌ NOT Meta Business Partner (remove from trust ribbon and everywhere)
-- ❌ Do NOT use the words "inbound" or "outbound" in user-facing copy
-- ❌ No conversion/outcome guarantees
-
-Replacement vocabulary to use instead of inbound/outbound:
-- "Send messages" / "deliver messages" / "reach customers"
-- "Receive replies" / "customer conversations" / "two-way messaging"
-- "Engage" / "respond" / "connect"
+This consolidates three previously discussed efforts into one execution plan:
+1. Self-serve **onboarding from the marketing site** with email confirmation
+2. **Plan-based feature gating** (Starter / Growth / Enterprise) across the workspace
+3. App-wide **UI label standardization** to match CPaaS / helpdesk industry vocabulary
 
 ---
 
-## Detailed Outline
+## 1. Plan Tiers (final, market-standard names)
 
-### 1. Trust Ribbon (revised — no Meta partner)
-Slim top strip with:
-- "Connecting businesses across 10+ channels"
-- "Single inbox · Messaging · Social · IVRS"
-- "ISO 27001 ready · DLT compliant · 99.9% uptime"
-Auto-marquee on mobile, static centered on desktop.
+| ID | Label | Send (Outbound) | Inbox (Inbound) | Voice | Config | AI |
+|---|---|---|---|---|---|---|
+| `starter` | **Starter** | SMS · Email · RCS | Email · Web Chat · Webhooks | Voice Dashboard (event-webhook); Click-to-Call & Voice Broadcast metered | DIC Notifier — trial only | — |
+| `growth` | **Growth** | All channels (SMS · WhatsApp · Email · RCS) + DIC self-config + Contact Sync API | All inbound integrations (WhatsApp · Email · IG · FB · Telegram · Web Chat · Webhooks) | Full IVR Studio + Click-to-Call + Voice Broadcast + inbound calls (metered, included) | DIC Notifier — full self-configuration | — |
+| `enterprise` | **Enterprise** | Everything in Growth | Everything in Growth | Everything in Growth + advanced analytics | Everything in Growth + SSO/audit | **AI Agent** for Call, WhatsApp, Web Chat, Email |
 
-### 2. Hero Section — **Modern, Alive, Aesthetic**
-
-**Visual direction:**
-- Animated mesh-gradient background (slow drift) + subtle grid overlay + floating glow orbs
-- Glassmorphism cards layered over the gradient
-- Micro-particles / floating channel icons drifting across the hero
-- Soft entrance animations (fade-in + scale-in, staggered)
-
-**Left column — text:**
-- Eyebrow chip (animated dot): "The Bridge for Modern Customer Communication"
-- **Animated H1** — large, bold, gradient sweep:
-  - Static line 1: **"Connect every channel."**
-  - Animated typewriter line 2 cycling:
-    1. "Deliver messages across SMS, WhatsApp, Email, RCS."
-    2. "Engage on Instagram, Facebook, Telegram & web chat."
-    3. "Answer every call with intelligent IVRS."
-    4. "Manage all conversations in one inbox."
-- Tagline: **"Samparq is the bridge that links your business to customers — across messaging, social, and voice — through a single, unified inbox."**
-- Sub-paragraph: "One adapter for every channel. One inbox for every conversation. One platform for every customer interaction."
-- Dual CTA: **Start free trial** + **Book a demo**
-- Micro-row: "No credit card · 10-min setup · Cancel anytime"
-
-**Right column — alive composite:**
-- Central glass-card "Unified Inbox" with live message stream (new items sliding in every ~2s with channel-colored badges: WhatsApp, Insta, Email, Voice)
-- Floating satellite chips around it (animated orbit/float): WhatsApp, SMS, Email, RCS, Instagram, Facebook, Telegram, Web Chat, IVRS, Chatbot — each pulsing & connected to the inbox by faint animated lines
-- A small "Incoming call → IVRS routing" card animating in/out
-- All wrapped in a soft glow + parallax tilt on mouse move
-
-### 3. "What Samparq Bridges" — 3 connector cards
-Each card = a connection metaphor (channel → inbox → team):
-1. **Messaging Bridge** — SMS · WhatsApp · Email · RCS
-2. **Social Bridge** — Instagram · Facebook · Telegram · Web Chat
-3. **Voice Bridge** — IVRS · Call routing · Voice broadcast · Click-to-call
-
-Each card: gradient border, animated connector line on hover, channel mini-icons.
-
-### 4. Three Pillars Section (rewritten — no inbound/outbound words)
-
-**Pillar A — Reach Your Customers (Send & Broadcast)**
-- Send messages across SMS, WhatsApp, Email, RCS
-- Campaigns, templates, scheduling, bulk upload, API push
-- Delivery receipts, link tracking, A/B variants
-- Visual: animated campaign progress card
-
-**Pillar B — Talk With Your Customers (Unified Inbox)**
-- Receive and respond across WhatsApp, Email, Instagram, Facebook, Telegram, web chat
-- Agent routing, tickets, SLA, tags, notes, canned replies
-- AI assist, multilingual, chatbot deflection
-- Visual: live inbox stream with new-message ping
-
-**Pillar C — Voice & IVRS (Call Connect)**
-- IVRS menus, call routing, agent transfer, voicemail, working-hours rules
-- Voice broadcast, OBD, click-to-call, IVR surveys, missed-call solutions
-- Call recording, virtual numbers, sticky agent
-- Real-time call analytics: volume, peak hours, geo, agent performance
-- Visual: phone ringing → IVR tree expanding → analytics chart
-
-### 5. All Channels Grid (animated tiles)
-Tabbed: **Messaging | Social | Voice | Email**
-12+ channel tiles with hover lift, gradient borders, subtle float loop.
-
-### 6. Single Inbox Showcase (new big section)
-Full-width mockup of the unified inbox: left rail of channels, middle conversation list (mixed channels), right reply panel. Animated "new conversation" pings across channels. Caption: "Every channel. One screen. Zero context-switching."
-
-### 7. "Built For Modern Teams" — 9-card grid (refined)
-Shared Inbox · Tickets & SLA · AI Chatbot · Agent Routing · Campaign Manager · Automation · Multilingual (30+) · Reports & Analytics · Enterprise Security (RBAC, audit logs)
-
-### 8. How It Works — 4 steps with animated connector line
-1. Connect channels & numbers
-2. Invite your team & set routing
-3. Launch campaigns or open the inbox
-4. Track everything in real-time
-
-### 9. Use Cases by Industry (horizontal scroll)
-E-commerce · BFSI · Healthcare · Education · Logistics · Travel · Real Estate · D2C
-Each card: 1-line scenario + top channels used.
-
-### 10. Live Stats Band (count-up on scroll)
-- 10B+ messages routed
-- 99.9% delivery rate
-- 180+ countries reached
-- 50M+ calls handled
-- 30+ languages supported
-- 2,400+ businesses connected
-
-### 11. Developer-First Strip
-curl snippet sending a message + side note: REST APIs, Webhooks, SDKs, Sandbox, 99.9% uptime → link to Developer Docs.
-
-### 12. Security & Compliance Band
-ISO 27001 ready · SOC2 ready · GDPR · DLT (India) · RBAC · Audit logs · E2E encryption · Data residency
-
-### 13. Testimonials + Logo Marquee
-Auto-scrolling client logo strip + 3 rotating testimonial cards.
-
-### 14. Pricing Teaser
-3 mini cards (Starter / Growth / Enterprise) → link to full Pricing page.
-
-### 15. FAQ (6–8, accordion)
-Trial, channels supported, IVRS setup, pricing model, onboarding time, data security, India DLT, support SLA.
-
-### 16. Final CTA
-Big gradient panel with animated glow: "One bridge. Every conversation." + Trial + Talk to Sales.
-
-### 17. Footer (light enrichment)
-4 columns + compliance badges (no Meta partner badge).
+**Universal rule:** Voice **Dashboard** (analytics view) is **free for everyone**. Click-to-Call, Voice Broadcast, and inbound call handling are **metered** (included in Growth/Enterprise; pay-as-you-go on Starter).
 
 ---
 
-## Visual / Design System Upgrade
-- Softer, modern aesthetic: more whitespace, larger type scale, generous radii
-- Gradient text on hero H1 (primary → info → success)
-- Glassmorphism on hero cards: `bg-background/60 backdrop-blur border border-border/50`
-- Mesh-gradient background using existing `--primary`, `--info`, `--success` HSL tokens (no hardcoded colors)
-- New keyframes added to `tailwind.config.ts`: `float`, `float-slow`, `orbit`, `blink`, `gradient-shift`, `marquee`, `grow`, `count-up`
-- All animations respect `prefers-reduced-motion`
-- 100% semantic tokens — no raw color classes
+## 2. Final Label Map (applied app-wide)
+
+### Plan tier names
+- `Business` → **Growth**
+- `Agentic` → **Enterprise**
+
+### Sidebar groups (workspace)
+| Old | New |
+|---|---|
+| Overview / project Dashboard | **Dashboard** |
+| Send (group) | **Campaigns** (group) |
+| Send Message | **Broadcast** (single send) |
+| Campaigns | **Campaigns** |
+| Campaign History / History | **Campaign History** |
+| Headers & Templates | **Templates** |
+| Upload Recipients | **Contacts** |
+| API Fetch Recipients | **Contact Sync API** |
+| (group) Conversations | **Inbox** (group) |
+| Inbox | **All Conversations** |
+| Voice & Call (group) | **Voice** (group) |
+| Voice analytics | **Voice Dashboard** |
+| Click-to-Call | **Click-to-Call** (kept) |
+| Bulk Call | **Voice Broadcast** |
+| IVRS Builder | **IVR Studio** |
+| Call History & Recordings | **Call Logs** |
+| AI Agent (group) | **AI Studio** (group) |
+| Reports | **Analytics** |
+| Configuration (group) | **Settings** (group) |
+| Project Config | **Workspace** |
+| DIC Notifier | **DLT & Sender IDs** (DIC Notifier kept as product name within) |
+| Quota | **Usage** |
+| Number History / Number Lookup | **Number Lookup** (kept) |
+| Developer Docs | **Developers** |
+| Profile | moved into **Account** menu (top-right) |
+
+### Other term swaps (everywhere in copy, toasts, tables, dialogs)
+- "Recipients" → **Contacts**
+- "Quota" → **Usage**
+- "Project" (user-facing) → **Workspace**
+- "Project Head" → **Workspace Owner**
+- "Onboard New Project" → **Onboard New Workspace**
+- "Assign to Project(s)" → **Assign to Workspace(s)**
+- "Project-wise" → **By Workspace**
+- "Project Code" → **Workspace Code**
+- "Add Project" → **Add Workspace**
+
+### Preserved (DO NOT change — proper nouns / industry terms)
+- "WhatsApp **Business** API" / "Business Account ID" / `senderId || "Business"` placeholders
+- "Businesses connected" stat label on marketing
+- Internal types (`interface Project`, `projectId`, `projectName` in code), route prefix `/project/...` (kept to avoid churn; visible labels say Workspace)
+- "DIC Notifier" as the product name inside the DLT & Sender IDs page
 
 ---
 
-## Animation System
-- **Hero typewriter**: custom React component, 4 phrases, blinking caret, reduced-motion fallback shows phrase 1 statically
-- **Floating channel chips**: CSS `@keyframes float` with random per-chip delays
-- **Mesh gradient drift**: slow `gradient-shift` animation on background
-- **Connector lines**: SVG paths with `stroke-dasharray` animation
-- **On-scroll reveals**: existing `animate-fade-in` + staggered delays
-- **Stats count-up**: IntersectionObserver-driven counter
-- **Inbox stream**: items prepend every ~2s with `animate-fade-in`
-- **Marquee**: pure CSS keyframe loop for trust ribbon + logos
+## 3. Marketing — Self-Serve Onboarding
+
+### A. PricingPage revamp (`src/marketing/PricingPage.tsx`)
+- Three cards: **Starter · Growth · Enterprise** with the entitlement bullets above
+- Each card CTA: **"Start with Starter / Growth / Enterprise"** → `/onboarding?plan=starter|growth|enterprise`
+- Feature comparison matrix below the cards (Send / Inbox / Voice / Settings / AI)
+- Concrete prices shown (with placeholder ₹ values + "Talk to sales" on Enterprise) — Monthly / Annual toggle (annual = "2 months free")
+
+### B. New `/onboarding` (multi-step wizard)
+4 steps with animated stepper, dark Seezo-aesthetic, glass-card forms, zod validation:
+
+1. **Choose Plan** — pre-selected from `?plan=`; Monthly/Annual toggle
+2. **Business Details** — Business name*, Type, Website, Country*/State/City, GSTIN, Expected monthly volume
+3. **Workspace Owner Details** — Full name*, Work email* (login), Mobile*, Designation, Password* + Confirm*, T&C checkbox*
+4. **Review & Confirm** — summary + **Create my workspace** CTA
+
+On submit (Phase 1, mock):
+- Persist to `localStorage` (`samparq_signups`) and seed user in `AuthContext` with chosen plan's entitlements
+- Show success page; simulated "confirmation email" toast + dev "Mark as confirmed" button
+- "Continue to login" → `/login?email=<email>&confirmed=1`
+
+### C. New `/onboarding/success`
+Animated checkmark, "You're in." headline, next-steps bullets.
+
+### D. `MarketingLayout` header
+Primary CTA changes to **"Start free"** → `/onboarding`. Final CTA on HomePage also routes to `/onboarding`.
+
+### E. Email confirmation
+- **Phase 1 (this round):** simulated, dev "Mark as confirmed" button
+- **Phase 2 (separate):** real Lovable Cloud (Supabase Auth) signup + transactional welcome email. Clean swap point at `AuthContext.signup`.
 
 ---
 
-## Files to create
-- `src/marketing/TypewriterHeading.tsx` — rotating animated headline
-- `src/marketing/HeroStage.tsx` — alive hero composite (inbox + floating channel chips + connector lines)
-- `src/marketing/CallIVRSPreview.tsx` — IVRS animated visual for Pillar C
-- `src/marketing/UnifiedInboxShowcase.tsx` — section 6 mockup
-- `src/marketing/LogoMarquee.tsx` — scrolling logos
-- `src/marketing/CountUp.tsx` — viewport-triggered counter
-- `src/marketing/FAQAccordion.tsx` — homepage FAQ block
-- `src/marketing/MeshGradient.tsx` — animated mesh background
+## 4. Auth + Entitlement System
 
-## Files to edit
-- `src/marketing/HomePage.tsx` — full rebuild around the outline
-- `tailwind.config.ts` — add `float`, `float-slow`, `orbit`, `blink`, `gradient-shift`, `marquee`, `grow` keyframes/animations
-- `src/index.css` — utility classes for gradient-text, glass-card, mesh-bg
+### `src/contexts/AuthContext.tsx` (edit)
+- Add `Plan = "starter" | "growth" | "enterprise"`
+- Add `User.plan`, `User.businessName`, `User.businessType`, `User.emailVerified`
+- New `signup(payload)` method (Phase 1 = localStorage mock)
+- Seed demo users to plans: `project@dicnotifier.io` → `growth`
 
-## Files removed/avoided
-- Any "Meta Business Partner" mention is stripped from the trust ribbon and entire homepage
-- Words "inbound" / "outbound" replaced with reach/send/engage/respond vocabulary throughout
+### `src/config/planEntitlements.ts` (new)
+Single source of truth — maps `Plan → { send, inbox, voice, settings, ai, navVisibility }`. Drives sidebar, route guards, and lock badges.
 
-## Out of scope (this round)
-- No backend wiring, no new routes, no auth changes
-- Pricing/Solutions/Docs/Contact pages untouched
-- MarketingLayout header unchanged; footer only minor label tweaks (no Meta badge)
+### `src/hooks/usePlan.ts` (new)
+Returns `{ plan, planLabel, can(featureKey), entitlements }`.
 
+---
+
+## 5. Workspace Restructure & Plan Gating
+
+### `src/layouts/ProjectLayout.tsx` (rewritten)
+Grouped sidebar with collapsible sections (each item filtered/locked by plan):
+
+- **Dashboard**
+- **Campaigns** ▾ Broadcast · Campaigns · Campaign History · Templates · Contacts · Contact Sync API *(Growth+ — locked on Starter)*
+- **Inbox** ▾ All Conversations · Channels
+- **Voice** ▾ Voice Dashboard *(free)* · Click-to-Call *(metered)* · Voice Broadcast *(Growth+ included)* · IVR Studio *(Growth+; Starter shows event-webhook view)* · Call Logs
+- **AI Studio** *(Enterprise only — locked teaser on others)* ▾ Agents · Conversations
+- **Analytics**
+- **Settings** ▾ Workspace · DLT & Sender IDs · Number Lookup · Usage · Developers
+- **Account** (in user menu) — Profile, Sign out
+
+Sidebar footer:
+- **Plan badge** pill (Starter / Growth / Enterprise)
+- **Upgrade →** link to `/project/billing/upgrade`
+
+### New shared components
+- `src/components/PlanGate.tsx` — wraps a route/section; unentitled → renders "Upgrade to unlock" card
+- `src/components/FeatureLockBadge.tsx` — inline lock icon + tooltip
+- `src/components/PlanBadge.tsx` — pill used in sidebar + profile
+
+### New pages
+- `src/pages/project/VoiceDashboardPage.tsx` (free analytics — mocked)
+- `src/pages/project/ClickToCallPage.tsx` (metered)
+- `src/pages/project/VoiceBroadcastPage.tsx` (Growth+, gated)
+- `src/pages/project/IVRStudioPage.tsx` (Growth+; Starter shows event-webhook variant)
+- `src/pages/project/CallLogsPage.tsx`
+- `src/pages/project/ContactSyncApiPage.tsx` (Growth+, gated)
+- `src/pages/project/AIAgentStudioPage.tsx` (Enterprise; teaser on others) — basic UI, mock conversations
+- `src/pages/project/AIAgentConversationsPage.tsx` (Enterprise)
+- `src/pages/project/UpgradePlanPage.tsx` (in-app plan switcher mirroring marketing pricing)
+
+### Updated pages (label + plan-gating swaps)
+- `ProjectDashboard.tsx` — plan-aware widget; quick links grouped Campaigns / Inbox / Voice; "Workspace" terminology
+- `SendMessagePage.tsx` → renamed nav as **Broadcast**; channel selector hides/locks WhatsApp on Starter; "Recipients" → "Contacts"
+- `UploadRecipientsPage.tsx` → page title **Contacts**; all "Recipients" → "Contacts"
+- `InboxPage.tsx` — channel filter shows only entitled inbound channels; disabled ones rendered with lock icon
+- `ProjectConfigPage.tsx` → **Workspace** + DLT & Sender IDs sections; DIC Notifier "Trial" banner on Starter
+- `ProjectQuotaPage.tsx` → page title **Usage**; "Quota" → "Usage" everywhere
+- `ProjectReportsPage.tsx` → page title **Analytics**
+- `DeveloperDocsPage.tsx` → page title **Developers**
+- `CampaignHistoryPage.tsx` → keep title; minor copy
+- `IVRSAnalyticsPage.tsx` → folded into **Voice Dashboard** as a tab
+- `ProfilePage.tsx` → moved out of sidebar into Account menu
+
+### Admin label updates
+- `AdminLayout.tsx` — "Developer Docs" → **Developers**, "Quotas" → **Usage**, "Projects" → **Workspaces**
+- `pages/admin/ProjectsPage.tsx` → page title **Workspaces**, "Add Project" → **Add Workspace**, "Onboard New Project" → **Onboard New Workspace**, "Project Head" → **Workspace Owner**, "Project Code" → **Workspace Code**, success toast updated
+- `pages/admin/AdminQuotaPage.tsx` → page title **Usage Management**, "Project Quota Usage" → **Workspace Usage**, "Edit Project Quota" → **Edit Workspace Limits**, "Select Project" → **Select Workspace**
+- `pages/admin/AdminTemplatesPage.tsx` → "Project" column → **Workspace**, "Assign to Project(s)" → **Assign to Workspace(s)**
+- `pages/admin/AdminChannelsPage.tsx` → "Channel Configuration" stays (industry standard term)
+
+---
+
+## 6. Routing & Guards
+
+### `src/App.tsx` (edit)
+- New public routes: `/onboarding`, `/onboarding/success`
+- New project routes (under `ProtectedRoute role="project"`):
+  - `voice/dashboard`, `voice/click-to-call`, `voice/broadcast`, `voice/ivr`, `voice/logs`
+  - `campaigns/contacts-api`
+  - `ai/agents`, `ai/conversations`
+  - `billing/upgrade`
+- Extend `ProtectedRoute` with optional `feature?: string` prop → uses `usePlan().can(feature)`; if false renders `<PlanGate>` instead of the page
+- Existing routes kept; layout grouping changes only
+
+### `src/pages/LoginPage.tsx`
+- Pre-fill email from `?email=`
+- Banner if `?confirmed=1`: "Email confirmed — please log in"
+- Add link: **"New here? Create your workspace"** → `/onboarding`
+- Keep small "Admin login" link
+
+---
+
+## 7. Files Touched (summary)
+
+### Create
+- `src/config/planEntitlements.ts`
+- `src/hooks/usePlan.ts`
+- `src/components/PlanGate.tsx`, `FeatureLockBadge.tsx`, `PlanBadge.tsx`
+- `src/pages/OnboardingPage.tsx`, `OnboardingSuccessPage.tsx`
+- `src/components/onboarding/Stepper.tsx`, `PlanStep.tsx`, `BusinessStep.tsx`, `OwnerStep.tsx`, `ReviewStep.tsx`
+- `src/pages/project/VoiceDashboardPage.tsx`, `ClickToCallPage.tsx`, `VoiceBroadcastPage.tsx`, `IVRStudioPage.tsx`, `CallLogsPage.tsx`, `ContactSyncApiPage.tsx`, `AIAgentStudioPage.tsx`, `AIAgentConversationsPage.tsx`, `UpgradePlanPage.tsx`
+
+### Edit
+- `src/contexts/AuthContext.tsx`
+- `src/App.tsx`
+- `src/layouts/ProjectLayout.tsx`, `src/layouts/AdminLayout.tsx`
+- `src/marketing/PricingPage.tsx`, `MarketingLayout.tsx`, `HomePage.tsx`
+- `src/pages/LoginPage.tsx`
+- `src/pages/project/*` (label swaps + plan gating: ProjectDashboard, SendMessagePage, UploadRecipientsPage, InboxPage, ProjectConfigPage, ProjectQuotaPage, ProjectReportsPage, DeveloperDocsPage, CampaignHistoryPage, IVRSAnalyticsPage, ProfilePage, NumberHistoryPage)
+- `src/pages/admin/*` (ProjectsPage, AdminQuotaPage, AdminTemplatesPage, AdminChannelsPage, AdminDashboard, AdminUsersPage, AdminAuditPage, AdminReportsPage)
+
+---
+
+## 8. Out of Scope (this round)
+
+- Real backend (Supabase Auth, DB, real welcome email) — deferred to **Phase 2** once Lovable Cloud is enabled. Frontend wired with clean swap point at `AuthContext.signup`.
+- Real billing / payments — placeholder "Start trial, add payment later"
+- Channel verification flows — kept as existing placeholders
+- Renaming code-level `interface Project`, `projectId`, `projectName`, or `/project/` route prefix — kept to avoid churn (only **visible** labels switch to Workspace)
+
+---
+
+## 9. Phase 2 (separate plan, post-approval of this one)
+1. Enable Lovable Cloud
+2. `profiles` + `workspaces` + `user_roles` + `subscriptions` tables with RLS
+3. Replace mock `signup` with `supabase.auth.signUp` + workspace insert via Edge Function
+4. Branded transactional welcome email via `send-transactional-email`
+5. (Optional) Stripe-powered upgrades on `UpgradePlanPage`

@@ -7,7 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Shield, Building2, Send, CheckCircle2 } from "lucide-react";
+import { Shield, Building2, Send, CheckCircle2, ArrowLeft } from "lucide-react";
+import ChannelBubbles from "@/marketing/ChannelBubbles";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useEffect } from "react";
@@ -64,42 +65,47 @@ const LoginPage = () => {
     <div className="min-h-screen flex">
       {/* Left Panel - Branding */}
       <div className="hidden lg:flex lg:w-1/2 gradient-primary items-center justify-center p-12 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
+        {/* Back to website */}
+        <Link
+          to="/"
+          className="absolute top-6 left-6 z-20 flex items-center gap-1.5 text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" /> Back to website
+        </Link>
+
+        <div className="absolute inset-0 opacity-20">
           <div className="absolute top-20 left-20 w-64 h-64 border border-primary-foreground/30 rounded-full" />
           <div className="absolute bottom-32 right-16 w-48 h-48 border border-primary-foreground/30 rounded-full" />
-          <div className="absolute top-1/2 left-1/3 w-32 h-32 border border-primary-foreground/30 rounded-full" />
         </div>
-        <div className="relative z-10 max-w-lg text-center">
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <div className="w-14 h-14 rounded-xl bg-primary-foreground/20 flex items-center justify-center backdrop-blur-sm">
-              <Send className="w-7 h-7 text-primary-foreground" />
+
+        <div className="relative z-10 max-w-lg w-full text-center">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-xl bg-primary-foreground/20 flex items-center justify-center backdrop-blur-sm">
+              <Send className="w-6 h-6 text-primary-foreground" />
             </div>
-            <h1 className="text-4xl font-bold text-primary-foreground tracking-tight">Samparq</h1>
+            <h1 className="text-3xl font-bold text-primary-foreground tracking-tight">Samparq</h1>
           </div>
-          <p className="text-xl text-primary-foreground/90 mb-4 font-medium">
+          <p className="text-lg text-primary-foreground/90 mb-2 font-medium">
             One bridge. Every conversation.
           </p>
-          <p className="text-primary-foreground/70 leading-relaxed">
-            Connect every channel — messaging, social, and voice — in a single unified workspace.
+          <p className="text-sm text-primary-foreground/70 leading-relaxed mb-10">
+            Unified messaging, social and voice — all in one workspace.
           </p>
-          <div className="mt-12 grid grid-cols-4 gap-4">
-            {[
-              { icon: "💬", label: "SMS" },
-              { icon: "📱", label: "WhatsApp" },
-              { icon: "📧", label: "Email" },
-              { icon: "✨", label: "RCS" },
-            ].map((ch) => (
-              <div key={ch.label} className="bg-primary-foreground/10 backdrop-blur-sm rounded-lg p-3 text-center">
-                <div className="text-2xl mb-1">{ch.icon}</div>
-                <div className="text-xs text-primary-foreground/80 font-medium">{ch.label}</div>
-              </div>
-            ))}
-          </div>
+
+          <ChannelBubbles />
         </div>
       </div>
 
       {/* Right Panel - Login Form */}
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-background">
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-background relative">
+        {/* Mobile back-to-website */}
+        <Link
+          to="/"
+          className="lg:hidden absolute top-4 left-4 flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" /> Back to website
+        </Link>
+
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-2 mb-8 justify-center">
             <Send className="w-6 h-6 text-primary" />

@@ -14,7 +14,7 @@ import CallIVRSPreview from "./CallIVRSPreview";
 import AIAgentShowcase from "./AIAgentShowcase";
 import TemplateGalleryStrip from "./TemplateGalleryStrip";
 import WorkflowFlowPreview from "./WorkflowFlowPreview";
-import IntegrationsStrip from "./IntegrationsStrip";
+
 
 const swapWords = ["WhatsApp", "SMS", "Email", "RCS", "voice", "social"];
 

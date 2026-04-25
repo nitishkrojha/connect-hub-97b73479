@@ -44,7 +44,7 @@ const UploadRecipientsPage = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Upload Recipients</h1>
+        <h1 className="text-2xl font-bold text-foreground">Contacts</h1>
         <p className="text-muted-foreground mt-1">Upload CSV files with recipient data for campaigns</p>
       </div>
 
@@ -101,7 +101,7 @@ const UploadRecipientsPage = () => {
                 </table>
               </div>
               <div className="flex gap-3 mt-4">
-                <Button onClick={() => toast.success("Recipients imported successfully!")}>Import Valid Records</Button>
+                <Button onClick={() => toast.success("Contacts imported successfully!")}>Import Valid Records</Button>
                 <Button variant="outline"><Download className="w-4 h-4 mr-2" />Download Error Report</Button>
               </div>
             </CardContent>

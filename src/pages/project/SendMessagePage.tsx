@@ -298,7 +298,7 @@ const RecipientDialog = ({
 
   const handleConfirm = () => {
     const count = getRecipientCount();
-    if (count === 0) { toast.error("No recipients selected"); return; }
+    if (count === 0) { toast.error("No contacts selected"); return; }
     onConfirm({
       mode: sendMode === "database" ? "API Fetch" : sendMode === "csv" ? "CSV Upload" : "Manual Entry",
       count,
@@ -314,7 +314,7 @@ const RecipientDialog = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Users className="w-5 h-5 text-primary" />
-            Select Recipients
+            Select Contacts
           </DialogTitle>
         </DialogHeader>
 
@@ -373,7 +373,7 @@ const RecipientDialog = ({
                   </div>
                 )}
                 <Button className="w-full" onClick={handleFetch} disabled={!activeApi}>
-                  <Users className="w-4 h-4 mr-2" /> Fetch Recipients
+                  <Users className="w-4 h-4 mr-2" /> Fetch Contacts
                 </Button>
                 {fetchedCount !== null && (
                   <div className="p-3 rounded-lg bg-success/10 border border-success/30 flex items-center gap-2">
@@ -601,14 +601,14 @@ const SendMessagePage = () => {
               {recipientData ? (
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold text-foreground">{recipientData.count.toLocaleString()} Recipients</p>
+                    <p className="text-sm font-semibold text-foreground">{recipientData.count.toLocaleString()} Contacts</p>
                     <Badge variant="secondary" className="text-[10px]">{recipientData.mode}</Badge>
                   </div>
                   <p className="text-xs text-muted-foreground">{recipientData.details}</p>
                 </div>
               ) : (
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">No recipients selected</p>
+                  <p className="text-sm font-medium text-muted-foreground">No contacts selected</p>
                   <p className="text-xs text-muted-foreground">Click to add recipients via API, CSV, or manual entry</p>
                 </div>
               )}
@@ -620,7 +620,7 @@ const SendMessagePage = () => {
                 </Button>
               )}
               <Button variant="outline" onClick={() => setRecipientDialogOpen(true)}>
-                <Users className="w-4 h-4 mr-1" /> {recipientData ? "Change" : "Select Recipients"}
+                <Users className="w-4 h-4 mr-1" /> {recipientData ? "Change" : "Select Contacts"}
               </Button>
             </div>
           </div>
@@ -782,7 +782,7 @@ const SendMessagePage = () => {
                   <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mt-1">
                     <span>Channel: <strong className="text-foreground">{channel.toUpperCase()}</strong></span>
                     <span>·</span>
-                    <span>Recipients: <strong className="text-foreground">{recipientCount.toLocaleString()}</strong></span>
+                    <span>Contacts: <strong className="text-foreground">{recipientCount.toLocaleString()}</strong></span>
                     {mediaFile && <><span>·</span><span>📎 Attachment</span></>}
                     {actionButtons.filter(b => b.label).length > 0 && <><span>·</span><span>🔘 {actionButtons.filter(b => b.label).length} Button(s)</span></>}
                     {currentProviders.length > 1 && <><span>·</span><span>Via: <strong className="text-foreground">{currentProviders.find(p => p.id === selectedProvider)?.name || "Default"}</strong></span></>}
@@ -799,7 +799,7 @@ const SendMessagePage = () => {
               {recipientCount === 0 && messageBody.trim() && (
                 <div className="flex items-center gap-2 text-xs text-destructive mt-3">
                   <AlertCircle className="w-3.5 h-3.5" />
-                  <span>No recipients selected. Click "Select Recipients" above.</span>
+                  <span>No contacts selected. Click "Select Contacts" above.</span>
                 </div>
               )}
             </CardContent>

@@ -627,8 +627,8 @@ const ProjectConfigPage = () => {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div><Label className="text-foreground text-sm">Project Name</Label><Input defaultValue="My Bharat" className="mt-1.5" /></div>
-            <div><Label className="text-foreground text-sm">Project Code</Label><Input defaultValue="MYBRT" disabled className="mt-1.5" /></div>
-            <div><Label className="text-foreground text-sm">Project Head</Label><Input defaultValue="Ravi Kumar" className="mt-1.5" /></div>
+            <div><Label className="text-foreground text-sm">Workspace Code</Label><Input defaultValue="MYBRT" disabled className="mt-1.5" /></div>
+            <div><Label className="text-foreground text-sm">Workspace Owner</Label><Input defaultValue="Ravi Kumar" className="mt-1.5" /></div>
             <div><Label className="text-foreground text-sm">Head Email</Label><Input defaultValue="ravi@mybharat.gov.in" className="mt-1.5" /></div>
             <div><Label className="text-foreground text-sm">Head Mobile</Label><Input defaultValue="+91 98765 43210" className="mt-1.5" /></div>
             <div><Label className="text-foreground text-sm">Department</Label><Input defaultValue="Youth Affairs" className="mt-1.5" /></div>

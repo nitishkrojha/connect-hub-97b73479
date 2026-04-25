@@ -27,7 +27,7 @@ const AdminQuotaPage = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Quota Management</h1>
+        <h1 className="text-2xl font-bold text-foreground">Usage Management</h1>
         <p className="text-muted-foreground mt-1">Set and manage project-wise communication quotas</p>
       </div>
 
@@ -49,7 +49,7 @@ const AdminQuotaPage = () => {
 
       {/* All projects usage */}
       <Card className="shadow-card">
-        <CardHeader><CardTitle className="text-base">Project Quota Usage</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-base">Workspace Usage</CardTitle></CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -95,10 +95,10 @@ const AdminQuotaPage = () => {
 
       {/* Edit Quota */}
       <Card className="shadow-card">
-        <CardHeader><CardTitle className="text-base">Edit Project Quota</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-base">Edit Workspace Limits</CardTitle></CardHeader>
         <CardContent className="space-y-5">
           <div>
-            <Label className="text-foreground mb-1.5 block">Select Project</Label>
+            <Label className="text-foreground mb-1.5 block">Select Workspace</Label>
             <Select value={selectedProject} onValueChange={setSelectedProject}>
               <SelectTrigger className="max-w-xs"><SelectValue /></SelectTrigger>
               <SelectContent>

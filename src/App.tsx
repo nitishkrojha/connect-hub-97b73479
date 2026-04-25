@@ -19,7 +19,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import ProjectsPage from "./pages/admin/ProjectsPage";
 import AdminChannelsPage from "./pages/admin/AdminChannelsPage";
 import AdminTemplatesPage from "./pages/admin/AdminTemplatesPage";
-import AdminReportsPage from "./pages/admin/AdminReportsPage";
+
 import AdminQuotaPage from "./pages/admin/AdminQuotaPage";
 import AdminAuditPage from "./pages/admin/AdminAuditPage";
 import AdminUsersPage from "./pages/admin/AdminUsersPage";
@@ -28,7 +28,14 @@ import CampaignsPage from "./pages/project/CampaignsPage";
 import SendMessagePage from "./pages/project/SendMessagePage";
 import ProjectTemplatesPage from "./pages/project/ProjectTemplatesPage";
 import UploadRecipientsPage from "./pages/project/UploadRecipientsPage";
-import ProjectReportsPage from "./pages/project/ProjectReportsPage";
+import AnalyticsHubPage from "./pages/project/analytics/AnalyticsHubPage";
+import CampaignAnalyticsPage from "./pages/project/analytics/CampaignAnalyticsPage";
+import InboxAnalyticsPage from "./pages/project/analytics/InboxAnalyticsPage";
+import VoiceAnalyticsPage from "./pages/project/analytics/VoiceAnalyticsPage";
+import AdminAnalyticsHubPage from "./pages/admin/analytics/AdminAnalyticsHubPage";
+import AdminCampaignAnalyticsPage from "./pages/admin/analytics/AdminCampaignAnalyticsPage";
+import AdminInboxAnalyticsPage from "./pages/admin/analytics/AdminInboxAnalyticsPage";
+import AdminVoiceAnalyticsPage from "./pages/admin/analytics/AdminVoiceAnalyticsPage";
 import ProjectConfigPage from "./pages/project/ProjectConfigPage";
 import ProjectQuotaPage from "./pages/project/ProjectQuotaPage";
 import CampaignHistoryPage from "./pages/project/CampaignHistoryPage";
@@ -87,11 +94,16 @@ const App = () => (
               <Route path="projects" element={<ProjectsPage />} />
               <Route path="channels" element={<AdminChannelsPage />} />
               <Route path="templates" element={<AdminTemplatesPage />} />
-              <Route path="reports" element={<AdminReportsPage />} />
+              <Route path="reports" element={<Navigate to="/admin/analytics" replace />} />
+              <Route path="analytics" element={<AdminAnalyticsHubPage />} />
+              <Route path="analytics/campaigns" element={<AdminCampaignAnalyticsPage />} />
+              <Route path="analytics/inbox" element={<AdminInboxAnalyticsPage />} />
+              <Route path="analytics/voice" element={<AdminVoiceAnalyticsPage />} />
+              <Route path="analytics/number-lookup" element={<NumberHistoryPage />} />
               <Route path="quota" element={<AdminQuotaPage />} />
               <Route path="audit" element={<AdminAuditPage />} />
               <Route path="users" element={<AdminUsersPage />} />
-              <Route path="number-history" element={<NumberHistoryPage />} />
+              <Route path="number-history" element={<Navigate to="/admin/analytics/number-lookup" replace />} />
               <Route path="docs" element={<DeveloperDocsPage />} />
               <Route path="profile" element={<ProfilePage />} />
             </Route>
@@ -104,11 +116,16 @@ const App = () => (
               <Route path="templates" element={<ProjectTemplatesPage />} />
               <Route path="upload" element={<UploadRecipientsPage />} />
               <Route path="campaigns/contacts-api" element={<PlanGate feature="send.contactSyncApi"><ContactSyncApiPage /></PlanGate>} />
-              <Route path="reports" element={<ProjectReportsPage />} />
+              <Route path="reports" element={<Navigate to="/project/analytics" replace />} />
+              <Route path="analytics" element={<AnalyticsHubPage />} />
+              <Route path="analytics/campaigns" element={<CampaignAnalyticsPage />} />
+              <Route path="analytics/inbox" element={<InboxAnalyticsPage />} />
+              <Route path="analytics/voice" element={<VoiceAnalyticsPage />} />
+              <Route path="analytics/number-lookup" element={<NumberHistoryPage />} />
               <Route path="config" element={<ProjectConfigPage />} />
               <Route path="quota" element={<ProjectQuotaPage />} />
               <Route path="history" element={<CampaignHistoryPage />} />
-              <Route path="number-history" element={<NumberHistoryPage />} />
+              <Route path="number-history" element={<Navigate to="/project/analytics/number-lookup" replace />} />
               <Route path="docs" element={<DeveloperDocsPage />} />
               <Route path="profile" element={<ProfilePage />} />
               {/* Voice */}

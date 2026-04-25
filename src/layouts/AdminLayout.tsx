@@ -2,7 +2,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard, Building2, Settings2, FileText, BarChart3,
-  Gauge, ScrollText, Users, Send, LogOut, ChevronLeft, Menu, Search, Code,
+  Gauge, ScrollText, Users, Send, LogOut, ChevronLeft, Menu, Code,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -13,11 +13,10 @@ const adminNav = [
   { to: "/admin/projects", icon: Building2, label: "Workspaces" },
   { to: "/admin/channels", icon: Settings2, label: "Channels" },
   { to: "/admin/templates", icon: FileText, label: "Templates" },
-  { to: "/admin/reports", icon: BarChart3, label: "Analytics" },
+  { to: "/admin/analytics", icon: BarChart3, label: "Analytics" },
   { to: "/admin/quota", icon: Gauge, label: "Usage" },
   { to: "/admin/audit", icon: ScrollText, label: "Audit Logs" },
   { to: "/admin/users", icon: Users, label: "Users" },
-  { to: "/admin/number-history", icon: Search, label: "Number Lookup" },
   { to: "/admin/docs", icon: Code, label: "Developers" },
 ];
 

@@ -227,8 +227,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* INTEGRATIONS */}
-      <IntegrationsStrip />
 
       {/* TRIAL CTA — same card style as PricingPage */}
       <section className="pb-24 bg-background">

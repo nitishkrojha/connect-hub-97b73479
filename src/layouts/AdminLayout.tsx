@@ -10,15 +10,15 @@ import { cn } from "@/lib/utils";
 
 const adminNav = [
   { to: "/admin", icon: LayoutDashboard, label: "Dashboard", end: true },
-  { to: "/admin/projects", icon: Building2, label: "Projects" },
+  { to: "/admin/projects", icon: Building2, label: "Workspaces" },
   { to: "/admin/channels", icon: Settings2, label: "Channels" },
-  { to: "/admin/templates", icon: FileText, label: "Headers & Templates" },
-  { to: "/admin/reports", icon: BarChart3, label: "Reports" },
-  { to: "/admin/quota", icon: Gauge, label: "Quotas" },
+  { to: "/admin/templates", icon: FileText, label: "Templates" },
+  { to: "/admin/reports", icon: BarChart3, label: "Analytics" },
+  { to: "/admin/quota", icon: Gauge, label: "Usage" },
   { to: "/admin/audit", icon: ScrollText, label: "Audit Logs" },
   { to: "/admin/users", icon: Users, label: "Users" },
   { to: "/admin/number-history", icon: Search, label: "Number Lookup" },
-  { to: "/admin/docs", icon: Code, label: "Developer Docs" },
+  { to: "/admin/docs", icon: Code, label: "Developers" },
 ];
 
 const AdminLayout = () => {
@@ -38,7 +38,7 @@ const AdminLayout = () => {
         <div className="w-9 h-9 rounded-lg gradient-primary flex items-center justify-center flex-shrink-0">
           <Send className="w-5 h-5 text-primary-foreground" />
         </div>
-        {!collapsed && <span className="text-lg font-bold text-sidebar-foreground tracking-tight">DIC Notifier</span>}
+        {!collapsed && <span className="text-lg font-bold text-sidebar-foreground tracking-tight">Samparq Admin</span>}
       </div>
 
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">

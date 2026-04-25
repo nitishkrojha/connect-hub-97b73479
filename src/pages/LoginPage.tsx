@@ -7,20 +7,28 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Shield, Building2, Send } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Shield, Building2, Send, CheckCircle2 } from "lucide-react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
+import { useEffect } from "react";
 
 const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [role, setRole] = useState<UserRole>("admin");
-  const [email, setEmail] = useState("");
+  const [params] = useSearchParams();
+  const [role, setRole] = useState<UserRole>(params.get("email") ? "project" : "admin");
+  const [email, setEmail] = useState(params.get("email") || "");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
+  const justConfirmed = params.get("confirmed") === "1";
+
+  useEffect(() => {
+    if (justConfirmed) toast.success("Email confirmed — please sign in.");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,13 +74,13 @@ const LoginPage = () => {
             <div className="w-14 h-14 rounded-xl bg-primary-foreground/20 flex items-center justify-center backdrop-blur-sm">
               <Send className="w-7 h-7 text-primary-foreground" />
             </div>
-            <h1 className="text-4xl font-bold text-primary-foreground tracking-tight">DIC Notifier</h1>
+            <h1 className="text-4xl font-bold text-primary-foreground tracking-tight">Samparq</h1>
           </div>
           <p className="text-xl text-primary-foreground/90 mb-4 font-medium">
-            Unified Communication Platform
+            One bridge. Every conversation.
           </p>
           <p className="text-primary-foreground/70 leading-relaxed">
-            Centralized SMS, WhatsApp, Email & RCS messaging across all your projects. One platform, every channel.
+            Connect every channel — messaging, social, and voice — in a single unified workspace.
           </p>
           <div className="mt-12 grid grid-cols-4 gap-4">
             {[
@@ -95,7 +103,7 @@ const LoginPage = () => {
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-2 mb-8 justify-center">
             <Send className="w-6 h-6 text-primary" />
-            <h1 className="text-2xl font-bold text-foreground">DIC Notifier</h1>
+            <h1 className="text-2xl font-bold text-foreground">Samparq</h1>
           </div>
 
           <Card className="shadow-card border-border/50">
@@ -108,16 +116,23 @@ const LoginPage = () => {
             <CardContent className="pt-4">
               <Tabs value={role} onValueChange={(v) => setRole(v as UserRole)} className="mb-6">
                 <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="project" className="flex items-center gap-2">
+                    <Building2 className="w-4 h-4" />
+                    Workspace
+                  </TabsTrigger>
                   <TabsTrigger value="admin" className="flex items-center gap-2">
                     <Shield className="w-4 h-4" />
                     Admin
                   </TabsTrigger>
-                  <TabsTrigger value="project" className="flex items-center gap-2">
-                    <Building2 className="w-4 h-4" />
-                    Project
-                  </TabsTrigger>
                 </TabsList>
               </Tabs>
+
+              {justConfirmed && (
+                <div className="mb-4 flex items-start gap-2 p-3 rounded-lg bg-success/10 text-success text-xs">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <span>Your email is confirmed. Sign in to access your workspace.</span>
+                </div>
+              )}
 
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-2">
@@ -176,8 +191,15 @@ const LoginPage = () => {
               <div className="mt-6 p-3 rounded-lg bg-muted text-xs text-muted-foreground space-y-1">
                 <p className="font-medium text-foreground text-sm mb-2">Demo Credentials</p>
                 <p><span className="font-medium">Admin:</span> admin@dicnotifier.io / admin123</p>
-                <p><span className="font-medium">Project:</span> project@dicnotifier.io / project123</p>
+                <p><span className="font-medium">Workspace:</span> project@dicnotifier.io / project123</p>
               </div>
+
+              <p className="text-center text-sm text-muted-foreground mt-4">
+                New here?{" "}
+                <Link to="/onboarding" className="text-primary font-medium hover:underline">
+                  Create your workspace
+                </Link>
+              </p>
             </CardContent>
           </Card>
         </div>

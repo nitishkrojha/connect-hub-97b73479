@@ -26,7 +26,7 @@ const ProfilePage = () => {
   const [email] = useState(user?.email || "");
   const [phone, setPhone] = useState(isAdmin ? "+91 99999 00000" : "+91 98765 43210");
   const [department, setDepartment] = useState(isAdmin ? "Platform Administration" : "Youth Affairs");
-  const [designation, setDesignation] = useState(isAdmin ? "System Administrator" : "Project Head");
+  const [designation, setDesignation] = useState(isAdmin ? "System Administrator" : "Workspace Owner");
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");

@@ -99,7 +99,7 @@ const AdminReportsPage = () => {
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="campaigns">Campaign-wise</TabsTrigger>
-          <TabsTrigger value="projects">Project-wise</TabsTrigger>
+          <TabsTrigger value="projects">By Workspace</TabsTrigger>
           <TabsTrigger value="templates">Template Usage</TabsTrigger>
         </TabsList>
 
@@ -247,10 +247,10 @@ const AdminReportsPage = () => {
           </Card>
         </TabsContent>
 
-        {/* === Project-wise Tab === */}
+        {/* === By Workspace Tab === */}
         <TabsContent value="projects" className="space-y-6 mt-4">
           <Card className="shadow-card">
-            <CardHeader><CardTitle className="text-base">Project-wise Usage</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-base">By Workspace Usage</CardTitle></CardHeader>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">

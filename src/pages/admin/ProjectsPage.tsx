@@ -150,7 +150,7 @@ const ProjectsPage = () => {
     setProjects([newProject, ...projects]);
     setDialogOpen(false);
     resetForm();
-    toast.success("Project onboarded successfully!", {
+    toast.success("Workspace onboarded successfully!", {
       description: `Welcome email with login credentials sent to ${newProject.headEmail}`,
     });
   };
@@ -178,7 +178,7 @@ const ProjectsPage = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Projects</h1>
+          <h1 className="text-2xl font-bold text-foreground">Workspaces</h1>
           <p className="text-muted-foreground mt-1">Manage onboarded projects</p>
         </div>
         <Button onClick={() => { resetForm(); setDialogOpen(true); }}>
@@ -255,14 +255,14 @@ const ProjectsPage = () => {
           {viewProject && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3 text-sm">
-                <div><p className="text-muted-foreground text-xs">Project Code</p><p className="font-medium text-foreground">{viewProject.code}</p></div>
+                <div><p className="text-muted-foreground text-xs">Workspace Code</p><p className="font-medium text-foreground">{viewProject.code}</p></div>
                 <div><p className="text-muted-foreground text-xs">Department</p><p className="font-medium text-foreground">{viewProject.dept}</p></div>
                 <div><p className="text-muted-foreground text-xs">Status</p><Badge variant={viewProject.status === "Active" ? "default" : "secondary"}>{viewProject.status}</Badge></div>
                 <div><p className="text-muted-foreground text-xs">Comm. Partner</p><Badge variant="secondary">{viewProject.commPartner === "own" ? "Own" : "DIC Notifier"}</Badge></div>
               </div>
               <hr className="border-border" />
               <div>
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Project Head</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Workspace Owner</p>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div><p className="text-muted-foreground text-xs">Name</p><p className="font-medium text-foreground">{viewProject.headName || viewProject.contact}</p></div>
                   <div><p className="text-muted-foreground text-xs">Designation</p><p className="font-medium text-foreground">{viewProject.headDesignation || "—"}</p></div>
@@ -302,7 +302,7 @@ const ProjectsPage = () => {
       <Dialog open={dialogOpen} onOpenChange={(o) => { setDialogOpen(o); if (!o) resetForm(); }}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden">
           <DialogHeader>
-            <DialogTitle>Onboard New Project</DialogTitle>
+            <DialogTitle>Onboard New Workspace</DialogTitle>
             <DialogDescription>Complete all steps to add a new project</DialogDescription>
           </DialogHeader>
 
@@ -366,7 +366,7 @@ const ProjectsPage = () => {
             <div className="space-y-4">
               <div className="p-3 rounded-lg bg-info/5 border border-info/20 text-sm text-foreground">
                 <p className="font-medium mb-1">📧 Auto-generated Login Credentials</p>
-                <p className="text-muted-foreground text-xs">A welcome onboarding email with auto-generated password will be sent to the Project Head's email.</p>
+                <p className="text-muted-foreground text-xs">A welcome onboarding email with auto-generated password will be sent to the Workspace Owner's email.</p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
@@ -541,7 +541,7 @@ const ProjectsPage = () => {
                   </div>
                   <hr className="border-border" />
                   <div>
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Project Head</p>
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Workspace Owner</p>
                     <div className="grid grid-cols-2 gap-3 text-sm">
                       <div><p className="text-muted-foreground text-xs">Name</p><p className="text-foreground font-medium">{form.headName}</p></div>
                       <div><p className="text-muted-foreground text-xs">Designation</p><p className="text-foreground font-medium">{form.headDesignation}</p></div>

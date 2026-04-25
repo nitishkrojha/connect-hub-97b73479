@@ -2,9 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
-  ArrowRight, CheckCircle2, Shield, Code2, Globe2, Zap, Inbox,
-  ShoppingBag, Landmark, Stethoscope, GraduationCap, Truck, Plane, Home as HomeIcon, Sparkle,
-  MessageCircle, Mail, Phone, Radio, PhoneCall, Bot, Send, Instagram, Facebook,
+  ArrowRight, CheckCircle2, Shield, Code2, Globe2, Zap, Inbox, PhoneCall, Send,
 } from "lucide-react";
 import InlineWordSwap from "./InlineWordSwap";
 import LogoMarquee from "./LogoMarquee";
@@ -13,39 +11,17 @@ import HeroChannelOrbit from "./HeroChannelOrbit";
 import MessageOutPreview from "./MessageOutPreview";
 import InboxStreamPreview from "./InboxStreamPreview";
 import CallIVRSPreview from "./CallIVRSPreview";
+import AIAgentShowcase from "./AIAgentShowcase";
+import TemplateGalleryStrip from "./TemplateGalleryStrip";
+import WorkflowFlowPreview from "./WorkflowFlowPreview";
+import IntegrationsStrip from "./IntegrationsStrip";
 
 const swapWords = ["WhatsApp", "SMS", "Email", "RCS", "voice", "social"];
-
-const channels = [
-  { name: "WhatsApp", icon: MessageCircle, tone: "bg-channel-whatsapp/10 text-channel-whatsapp" },
-  { name: "SMS", icon: MessageCircle, tone: "bg-channel-sms/10 text-channel-sms" },
-  { name: "RCS", icon: Radio, tone: "bg-channel-rcs/10 text-channel-rcs" },
-  { name: "Email", icon: Mail, tone: "bg-channel-email/10 text-channel-email" },
-  { name: "Instagram", icon: Instagram, tone: "bg-pink-500/10 text-pink-500" },
-  { name: "Facebook", icon: Facebook, tone: "bg-blue-500/10 text-blue-500" },
-  { name: "Telegram", icon: Send, tone: "bg-sky-500/10 text-sky-500" },
-  { name: "Web Chat", icon: MessageCircle, tone: "bg-primary/10 text-primary" },
-  { name: "IVRS", icon: Phone, tone: "bg-channel-ivrs/10 text-channel-ivrs" },
-  { name: "Voice OBD", icon: Radio, tone: "bg-purple-500/10 text-purple-500" },
-  { name: "Click-to-call", icon: PhoneCall, tone: "bg-emerald-500/10 text-emerald-500" },
-  { name: "Chatbot", icon: Bot, tone: "bg-amber-500/10 text-amber-500" },
-];
 
 const steps = [
   { n: "01", t: "Connect channels", d: "Link WhatsApp, SMS, Email, social and voice via guided setup." },
   { n: "02", t: "Build campaigns & agents", d: "Templates, segments, automations and AI agents — no code required." },
   { n: "03", t: "Measure & iterate", d: "Live dashboards for delivery, replies, calls and CSAT." },
-];
-
-const useCases = [
-  { icon: ShoppingBag, name: "E-commerce" },
-  { icon: Landmark, name: "BFSI" },
-  { icon: Stethoscope, name: "Healthcare" },
-  { icon: GraduationCap, name: "Education" },
-  { icon: Truck, name: "Logistics" },
-  { icon: Plane, name: "Travel" },
-  { icon: HomeIcon, name: "Real Estate" },
-  { icon: Sparkle, name: "D2C" },
 ];
 
 const stats = [

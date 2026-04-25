@@ -191,8 +191,15 @@ const LoginPage = () => {
               <div className="mt-6 p-3 rounded-lg bg-muted text-xs text-muted-foreground space-y-1">
                 <p className="font-medium text-foreground text-sm mb-2">Demo Credentials</p>
                 <p><span className="font-medium">Admin:</span> admin@dicnotifier.io / admin123</p>
-                <p><span className="font-medium">Project:</span> project@dicnotifier.io / project123</p>
+                <p><span className="font-medium">Workspace:</span> project@dicnotifier.io / project123</p>
               </div>
+
+              <p className="text-center text-sm text-muted-foreground mt-4">
+                New here?{" "}
+                <Link to="/onboarding" className="text-primary font-medium hover:underline">
+                  Create your workspace
+                </Link>
+              </p>
             </CardContent>
           </Card>
         </div>

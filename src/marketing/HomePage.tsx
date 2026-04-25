@@ -227,25 +227,8 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* INDUSTRIES */}
-      <section className="py-24 bg-background">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <div className="text-xs uppercase tracking-[0.2em] text-primary mb-3 font-semibold">Industries we serve</div>
-            <h2 className="text-3xl sm:text-5xl font-bold text-foreground tracking-tight">
-              Trusted across every sector
-            </h2>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {useCases.map((u) => (
-              <Card key={u.name} className="p-5 text-center hover:shadow-card-hover hover:border-primary/40 transition-all">
-                <u.icon className="w-7 h-7 text-primary mx-auto mb-2" />
-                <p className="text-sm font-semibold text-foreground">{u.name}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* INTEGRATIONS */}
+      <IntegrationsStrip />
 
       {/* TRIAL CTA — same card style as PricingPage */}
       <section className="pb-24 bg-background">

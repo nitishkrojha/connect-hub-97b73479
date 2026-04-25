@@ -156,30 +156,14 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* CHANNEL GRID */}
-      <section className="py-24 bg-gradient-to-b from-primary/5 to-background border-y border-border">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <div className="text-xs uppercase tracking-[0.2em] text-primary mb-3 font-semibold">One platform, every channel</div>
-            <h2 className="text-3xl sm:text-5xl font-bold text-foreground tracking-tight">
-              Meet customers where they are
-            </h2>
-            <p className="text-muted-foreground mt-5">
-              Bring messaging, social and voice into a single, organised inbox — no more tab switching.
-            </p>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {channels.map((c) => (
-              <Card key={c.name} className="p-4 hover:shadow-card-hover hover:-translate-y-0.5 transition-all text-center bg-card">
-                <div className={`w-12 h-12 rounded-xl ${c.tone} flex items-center justify-center mx-auto mb-2`}>
-                  <c.icon className="w-6 h-6" />
-                </div>
-                <p className="text-sm font-semibold text-foreground">{c.name}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* AI AGENT SHOWCASE */}
+      <AIAgentShowcase />
+
+      {/* TEMPLATE GALLERY */}
+      <TemplateGalleryStrip />
+
+      {/* WORKFLOW AUTOMATION */}
+      <WorkflowFlowPreview />
 
       {/* HOW IT WORKS */}
       <section className="py-24 bg-background">

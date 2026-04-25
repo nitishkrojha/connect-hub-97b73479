@@ -114,11 +114,11 @@ const TemplateGalleryStrip = () => {
                     <Check className="w-3 h-3" aria-hidden /> Approved
                   </span>
                 </div>
-                <div className="text-sm font-semibold text-foreground mb-2">{t.title}</div>
-                <div className="rounded-lg bg-channel-whatsapp/5 border border-channel-whatsapp/15 p-3 text-sm text-foreground leading-relaxed min-h-[80px]">
+                <div className="text-base font-semibold text-foreground mb-2">{t.title}</div>
+                <div className="rounded-lg bg-channel-whatsapp/5 border border-channel-whatsapp/15 p-3 text-base text-foreground leading-relaxed min-h-[88px]">
                   {t.body}
                 </div>
-                <div className="mt-3 flex items-center justify-between text-xs">
+                <div className="mt-3 flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">{t.category}</span>
                   <span className="text-primary font-semibold">Use template →</span>
                 </div>

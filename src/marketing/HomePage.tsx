@@ -91,12 +91,12 @@ const stats = [
 
 const HomePage = () => {
   return (
-    <div className="dark bg-background text-foreground">
-      {/* HERO — Seezo-inspired: dark, centered, serif accent, dot grid */}
+    <div className="bg-background text-foreground">
+      {/* HERO — light, brand gradient */}
       <section className="relative overflow-hidden">
-        {/* Soft glow */}
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background via-background to-background" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-primary/10 blur-3xl -z-10" />
+        {/* Brand gradient backdrop (matches login left panel) */}
+        <div className="absolute inset-0 -z-10 gradient-primary opacity-[0.08]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-primary/15 blur-3xl -z-10" />
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-24 sm:pt-32 pb-16 text-center relative z-10">
           {/* Eyebrow chip */}

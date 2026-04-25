@@ -6,7 +6,6 @@ const nav = [
   { to: "/", label: "Home", end: true },
   { to: "/solutions", label: "Solutions" },
   { to: "/pricing", label: "Pricing" },
-  { to: "/docs", label: "Docs" },
   { to: "/contact", label: "Contact" },
 ];
 
@@ -75,7 +74,7 @@ const MarketingLayout = () => {
               <a className="text-muted-foreground hover:text-foreground" href="#"><Github className="w-4 h-4" /></a>
             </div>
           </div>
-          <FooterCol title="Product" links={[["Solutions","/solutions"],["Pricing","/pricing"],["Docs","/docs"]]} />
+          <FooterCol title="Product" links={[["Solutions","/solutions"],["Pricing","/pricing"]]} />
           <FooterCol title="Company" links={[["Contact","/contact"],["About","/contact"],["Careers","/contact"]]} />
           <FooterCol title="Legal" links={[["Privacy","#"],["Terms","#"],["Security","#"]]} />
         </div>

@@ -11,7 +11,7 @@ import MarketingLayout from "./marketing/MarketingLayout";
 import HomePage from "./marketing/HomePage";
 import SolutionsPage from "./marketing/SolutionsPage";
 import PricingPage from "./marketing/PricingPage";
-import DocsPage from "./marketing/DocsPage";
+
 import ContactPage from "./marketing/ContactPage";
 import AdminLayout from "./layouts/AdminLayout";
 import ProjectLayout from "./layouts/ProjectLayout";
@@ -82,7 +82,6 @@ const App = () => (
               <Route path="/" element={<HomePage />} />
               <Route path="/solutions" element={<SolutionsPage />} />
               <Route path="/pricing" element={<PricingPage />} />
-              <Route path="/docs" element={<DocsPage />} />
               <Route path="/contact" element={<ContactPage />} />
             </Route>
             <Route path="/login" element={<LoginRoute />} />

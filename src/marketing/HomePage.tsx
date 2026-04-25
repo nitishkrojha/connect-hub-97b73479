@@ -2,9 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
-  ArrowRight, CheckCircle2, Shield, Code2, Globe2, Zap, Inbox,
-  ShoppingBag, Landmark, Stethoscope, GraduationCap, Truck, Plane, Home as HomeIcon, Sparkle,
-  MessageCircle, Mail, Phone, Radio, PhoneCall, Bot, Send, Instagram, Facebook,
+  ArrowRight, CheckCircle2, Shield, Code2, Globe2, Zap, Inbox, PhoneCall, Send,
 } from "lucide-react";
 import InlineWordSwap from "./InlineWordSwap";
 import LogoMarquee from "./LogoMarquee";
@@ -13,39 +11,17 @@ import HeroChannelOrbit from "./HeroChannelOrbit";
 import MessageOutPreview from "./MessageOutPreview";
 import InboxStreamPreview from "./InboxStreamPreview";
 import CallIVRSPreview from "./CallIVRSPreview";
+import AIAgentShowcase from "./AIAgentShowcase";
+import TemplateGalleryStrip from "./TemplateGalleryStrip";
+import WorkflowFlowPreview from "./WorkflowFlowPreview";
+import IntegrationsStrip from "./IntegrationsStrip";
 
 const swapWords = ["WhatsApp", "SMS", "Email", "RCS", "voice", "social"];
-
-const channels = [
-  { name: "WhatsApp", icon: MessageCircle, tone: "bg-channel-whatsapp/10 text-channel-whatsapp" },
-  { name: "SMS", icon: MessageCircle, tone: "bg-channel-sms/10 text-channel-sms" },
-  { name: "RCS", icon: Radio, tone: "bg-channel-rcs/10 text-channel-rcs" },
-  { name: "Email", icon: Mail, tone: "bg-channel-email/10 text-channel-email" },
-  { name: "Instagram", icon: Instagram, tone: "bg-pink-500/10 text-pink-500" },
-  { name: "Facebook", icon: Facebook, tone: "bg-blue-500/10 text-blue-500" },
-  { name: "Telegram", icon: Send, tone: "bg-sky-500/10 text-sky-500" },
-  { name: "Web Chat", icon: MessageCircle, tone: "bg-primary/10 text-primary" },
-  { name: "IVRS", icon: Phone, tone: "bg-channel-ivrs/10 text-channel-ivrs" },
-  { name: "Voice OBD", icon: Radio, tone: "bg-purple-500/10 text-purple-500" },
-  { name: "Click-to-call", icon: PhoneCall, tone: "bg-emerald-500/10 text-emerald-500" },
-  { name: "Chatbot", icon: Bot, tone: "bg-amber-500/10 text-amber-500" },
-];
 
 const steps = [
   { n: "01", t: "Connect channels", d: "Link WhatsApp, SMS, Email, social and voice via guided setup." },
   { n: "02", t: "Build campaigns & agents", d: "Templates, segments, automations and AI agents — no code required." },
   { n: "03", t: "Measure & iterate", d: "Live dashboards for delivery, replies, calls and CSAT." },
-];
-
-const useCases = [
-  { icon: ShoppingBag, name: "E-commerce" },
-  { icon: Landmark, name: "BFSI" },
-  { icon: Stethoscope, name: "Healthcare" },
-  { icon: GraduationCap, name: "Education" },
-  { icon: Truck, name: "Logistics" },
-  { icon: Plane, name: "Travel" },
-  { icon: HomeIcon, name: "Real Estate" },
-  { icon: Sparkle, name: "D2C" },
 ];
 
 const stats = [
@@ -180,30 +156,14 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* CHANNEL GRID */}
-      <section className="py-24 bg-gradient-to-b from-primary/5 to-background border-y border-border">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <div className="text-xs uppercase tracking-[0.2em] text-primary mb-3 font-semibold">One platform, every channel</div>
-            <h2 className="text-3xl sm:text-5xl font-bold text-foreground tracking-tight">
-              Meet customers where they are
-            </h2>
-            <p className="text-muted-foreground mt-5">
-              Bring messaging, social and voice into a single, organised inbox — no more tab switching.
-            </p>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {channels.map((c) => (
-              <Card key={c.name} className="p-4 hover:shadow-card-hover hover:-translate-y-0.5 transition-all text-center bg-card">
-                <div className={`w-12 h-12 rounded-xl ${c.tone} flex items-center justify-center mx-auto mb-2`}>
-                  <c.icon className="w-6 h-6" />
-                </div>
-                <p className="text-sm font-semibold text-foreground">{c.name}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* AI AGENT SHOWCASE */}
+      <AIAgentShowcase />
+
+      {/* TEMPLATE GALLERY */}
+      <TemplateGalleryStrip />
+
+      {/* WORKFLOW AUTOMATION */}
+      <WorkflowFlowPreview />
 
       {/* HOW IT WORKS */}
       <section className="py-24 bg-background">
@@ -267,25 +227,8 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* INDUSTRIES */}
-      <section className="py-24 bg-background">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <div className="text-xs uppercase tracking-[0.2em] text-primary mb-3 font-semibold">Industries we serve</div>
-            <h2 className="text-3xl sm:text-5xl font-bold text-foreground tracking-tight">
-              Trusted across every sector
-            </h2>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {useCases.map((u) => (
-              <Card key={u.name} className="p-5 text-center hover:shadow-card-hover hover:border-primary/40 transition-all">
-                <u.icon className="w-7 h-7 text-primary mx-auto mb-2" />
-                <p className="text-sm font-semibold text-foreground">{u.name}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* INTEGRATIONS */}
+      <IntegrationsStrip />
 
       {/* TRIAL CTA — same card style as PricingPage */}
       <section className="pb-24 bg-background">

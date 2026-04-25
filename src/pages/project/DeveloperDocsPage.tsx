@@ -413,7 +413,7 @@ const DeveloperDocsPage = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Developer Documentation</h1>
+        <h1 className="text-2xl font-bold text-foreground">Developers</h1>
         <p className="text-muted-foreground mt-1">
           Two clean API surfaces — <strong className="text-foreground">Send Message</strong> for outbound and{" "}
           <strong className="text-foreground">Conversation API</strong> for inbound. Same auth, same DLR schema, all channels.

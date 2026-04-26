@@ -40,7 +40,7 @@ const HomePage = () => {
         <div className="absolute top-32 -left-32 w-[500px] h-[500px] rounded-full bg-primary/15 blur-3xl -z-10" />
         <div className="absolute top-40 -right-32 w-[500px] h-[500px] rounded-full bg-info/15 blur-3xl -z-10" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-28 pb-24 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 sm:pt-10 pb-24 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
             {/* LEFT — copy */}
             <div className="text-center lg:text-left">

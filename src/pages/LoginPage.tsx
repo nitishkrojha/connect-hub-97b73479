@@ -63,32 +63,42 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 gradient-primary items-center justify-center p-12 relative overflow-hidden">
+      {/* Left Panel - Branding (soft light backdrop so colorful icons pop) */}
+      <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-12 relative overflow-hidden bg-gradient-to-br from-sky-50 via-indigo-50 to-violet-50">
+        {/* Ambient blurred color blobs */}
+        <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-primary/20 blur-3xl" />
+        <div className="absolute -bottom-24 -right-16 w-[28rem] h-[28rem] rounded-full bg-info/20 blur-3xl" />
+        <div className="absolute top-1/3 right-1/4 w-72 h-72 rounded-full bg-pink-300/20 blur-3xl" />
+
+        {/* Subtle dot grid */}
+        <div
+          className="absolute inset-0 opacity-[0.25]"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle, hsl(var(--foreground) / 0.12) 1px, transparent 1px)",
+            backgroundSize: "22px 22px",
+          }}
+        />
+
         {/* Back to website */}
         <Link
           to="/"
-          className="absolute top-6 left-6 z-20 flex items-center gap-1.5 text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors"
+          className="absolute top-6 left-6 z-20 flex items-center gap-1.5 text-sm text-foreground/70 hover:text-foreground transition-colors"
         >
           <ArrowLeft className="w-4 h-4" /> Back to website
         </Link>
 
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-20 left-20 w-64 h-64 border border-primary-foreground/30 rounded-full" />
-          <div className="absolute bottom-32 right-16 w-48 h-48 border border-primary-foreground/30 rounded-full" />
-        </div>
-
         <div className="relative z-10 max-w-lg w-full text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-xl bg-primary-foreground/20 flex items-center justify-center backdrop-blur-sm">
+            <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center shadow-card-hover">
               <Send className="w-6 h-6 text-primary-foreground" />
             </div>
-            <h1 className="text-3xl font-bold text-primary-foreground tracking-tight">Samparq</h1>
+            <h1 className="text-3xl font-bold text-foreground tracking-tight">Samparq</h1>
           </div>
-          <p className="text-lg text-primary-foreground/90 mb-2 font-medium">
+          <p className="text-lg text-foreground/90 mb-2 font-medium">
             One bridge. Every conversation.
           </p>
-          <p className="text-sm text-primary-foreground/70 leading-relaxed mb-16">
+          <p className="text-sm text-muted-foreground leading-relaxed mb-16">
             Unified messaging, social and voice — all in one workspace.
           </p>
 

@@ -39,7 +39,7 @@ const statusStyle: Record<string, string> = {
 };
 
 const CampaignAnalyticsPage = () => (
-  <AnalyticsShell title="Campaign Analytics" subtitle="Outbound performance across SMS, WhatsApp, Email and RCS.">
+  <AnalyticsShell title="Broadcast Analytics" subtitle="Broadcast performance across SMS, WhatsApp, Email and RCS.">
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <KpiCard label="Total sent" value="17,300" icon={Send} trend="+12.4%" />
       <KpiCard label="Delivered" value="16,802" icon={CheckCircle2} trend="+0.3% rate" />

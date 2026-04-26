@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { ArrowRight, Megaphone, Inbox, Phone, Search, MessageSquare, CheckCircle2, BarChart3 } from "lucide-react";
 
 const tiles = [
-  { to: "/project/analytics/campaigns", icon: Megaphone, title: "Campaign Analytics", desc: "Outbound delivery, opens, clicks across SMS, WhatsApp, Email, RCS." },
+  { to: "/project/analytics/campaigns", icon: Megaphone, title: "Broadcast Analytics", desc: "Broadcast delivery, opens and clicks across SMS, WhatsApp, Email and RCS." },
   { to: "/project/analytics/inbox", icon: Inbox, title: "Inbox Analytics", desc: "Conversation volume, response time, agent performance, CSAT." },
   { to: "/project/analytics/voice", icon: Phone, title: "Voice Analytics", desc: "Call volume, IVRS funnels, answer rates, agent productivity." },
   { to: "/project/analytics/number-lookup", icon: Search, title: "Number Lookup", desc: "Validate, profile, and audit numbers used in your campaigns." },

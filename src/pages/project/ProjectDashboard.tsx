@@ -3,10 +3,11 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Megaphone, MessageSquare, CheckCircle2, XCircle, TrendingUp,
-  FileText, Phone, BarChart3,
+  FileText, Phone, BarChart3, Inbox,
 } from "lucide-react";
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
 import IVRSAnalyticsPage from "./IVRSAnalyticsPage";
+import InboxAnalyticsPage from "./analytics/InboxAnalyticsPage";
 
 const weeklyData = [
   { day: "Mon", sent: 1240, delivered: 1198 },
@@ -65,6 +66,7 @@ const ProjectDashboard = () => {
       <Tabs defaultValue="overview">
         <TabsList>
           <TabsTrigger value="overview"><BarChart3 className="w-4 h-4 mr-1.5" />Message Dashboard</TabsTrigger>
+          <TabsTrigger value="inbox"><Inbox className="w-4 h-4 mr-1.5" />Inbox Dashboard</TabsTrigger>
           <TabsTrigger value="ivrs"><Phone className="w-4 h-4 mr-1.5" />Call Dashboard</TabsTrigger>
         </TabsList>
 
@@ -231,6 +233,10 @@ const ProjectDashboard = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="inbox" className="mt-4">
+          <InboxAnalyticsPage />
         </TabsContent>
 
         <TabsContent value="ivrs" className="mt-4">

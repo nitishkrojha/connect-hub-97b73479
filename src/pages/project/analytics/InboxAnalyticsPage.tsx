@@ -2,7 +2,7 @@ import AnalyticsShell from "@/components/analytics/AnalyticsShell";
 import KpiCard from "@/components/analytics/KpiCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Inbox, Clock, CheckCircle2, MessageSquare } from "lucide-react";
+import { Inbox, Clock, CheckCircle2, MessageSquare, Loader2 } from "lucide-react";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
@@ -31,10 +31,11 @@ const agents = [
 
 const InboxAnalyticsPage = () => (
   <AnalyticsShell title="Inbox Analytics" subtitle="Conversation volume, response time and agent performance.">
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
       <KpiCard label="Conversations" value="2,855" icon={Inbox} trend="+8.1%" />
-      <KpiCard label="Avg first response" value="1m 28s" icon={Clock} trend="-12s" trendDir="down" />
       <KpiCard label="Resolved" value="2,224" icon={CheckCircle2} trend="+6.4%" />
+      <KpiCard label="In progress" value="631" icon={Loader2} trend="+3.2%" />
+      <KpiCard label="Avg first response" value="1m 28s" icon={Clock} trend="-12s" trendDir="down" />
       <KpiCard label="CSAT" value="91%" icon={MessageSquare} trend="+1.2%" />
     </div>
 

@@ -1,108 +1,99 @@
 import AnalyticsShell from "@/components/analytics/AnalyticsShell";
-import KpiCard from "@/components/analytics/KpiCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Phone, PhoneIncoming, PhoneOutgoing, PhoneMissed } from "lucide-react";
-import {
-  AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
-} from "recharts";
+import { Button } from "@/components/ui/button";
+import { Phone, PhoneIncoming, PhoneOutgoing, PhoneMissed, Clock, TrendingUp, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
-const trend = Array.from({ length: 14 }).map((_, i) => ({
-  day: `D${i + 1}`,
-  inbound: 60 + Math.round(Math.sin(i / 2) * 20 + Math.random() * 30),
-  outbound: 45 + Math.round(Math.cos(i / 2) * 15 + Math.random() * 25),
-}));
-
-const ivrsMenu = [
-  { option: "1 — Order status", picks: 540 },
-  { option: "2 — Sales", picks: 320 },
-  { option: "3 — Support", picks: 280 },
-  { option: "0 — Talk to agent", picks: 144 },
+const kpis = [
+  { label: "Total calls today", value: "1,284", icon: Phone, tone: "text-primary bg-primary/10" },
+  { label: "Inbound", value: "742", icon: PhoneIncoming, tone: "text-success bg-success/10" },
+  { label: "Outbound", value: "498", icon: PhoneOutgoing, tone: "text-info bg-info/10" },
+  { label: "Missed", value: "44", icon: PhoneMissed, tone: "text-destructive bg-destructive/10" },
+  { label: "Avg duration", value: "2m 38s", icon: Clock, tone: "text-warning bg-warning/10" },
+  { label: "Answer rate", value: "94.2%", icon: TrendingUp, tone: "text-success bg-success/10" },
 ];
 
-const recent = [
-  { no: "+91 98•••432", dir: "Inbound", agent: "Anita Sharma", dur: "3m 12s", status: "Completed" },
-  { no: "+91 90•••118", dir: "Outbound", agent: "Rahul Verma", dur: "1m 48s", status: "Completed" },
-  { no: "+91 99•••772", dir: "Inbound", agent: "—", dur: "—", status: "Missed" },
-  { no: "+91 88•••005", dir: "Outbound", agent: "Priya Iyer", dur: "4m 06s", status: "Completed" },
-  { no: "+91 70•••559", dir: "Inbound", agent: "Karan Mehta", dur: "2m 22s", status: "Completed" },
+const recentCalls = [
+  { no: "+91 98•••432", dir: "Inbound", agent: "Anita Sharma", dur: "3m 12s", status: "Completed", time: "2m ago" },
+  { no: "+91 90•••118", dir: "Outbound", agent: "Rahul Verma", dur: "1m 48s", status: "Completed", time: "8m ago" },
+  { no: "+91 99•••772", dir: "Inbound", agent: "—", dur: "—", status: "Missed", time: "14m ago" },
+  { no: "+91 88•••005", dir: "Outbound", agent: "Priya Iyer", dur: "4m 06s", status: "Completed", time: "21m ago" },
+  { no: "+91 70•••559", dir: "Inbound", agent: "Karan Mehta", dur: "2m 22s", status: "Completed", time: "32m ago" },
 ];
 
 const statusTone: Record<string, string> = {
-  Completed: "bg-success/10 text-success",
-  Missed: "bg-destructive/10 text-destructive",
+  Completed: "bg-success/10 text-success border-success/20",
+  Missed: "bg-destructive/10 text-destructive border-destructive/20",
 };
 
 const VoiceAnalyticsPage = () => (
-  <AnalyticsShell title="Voice Analytics" subtitle="Call volume, IVRS funnels and agent productivity.">
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <KpiCard label="Total calls" value="1,284" icon={Phone} trend="+5.2%" />
-      <KpiCard label="Inbound" value="742" icon={PhoneIncoming} trend="+3.8%" />
-      <KpiCard label="Outbound" value="498" icon={PhoneOutgoing} trend="+8.1%" />
-      <KpiCard label="Missed" value="44" icon={PhoneMissed} trend="-12 vs yesterday" trendDir="down" />
+  <AnalyticsShell
+    title="Voice Analytics"
+    subtitle="Real-time view across every voice channel."
+    rightSlot={
+      <Link to="/project/voice/logs">
+        <Button variant="outline" size="sm" className="h-9">
+          View call logs <ArrowRight className="w-4 h-4 ml-1" />
+        </Button>
+      </Link>
+    }
+  >
+    {/* KPI strip */}
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      {kpis.map((s) => (
+        <Card key={s.label} className="shadow-card">
+          <CardContent className="pt-4 pb-3">
+            <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-2 ${s.tone}`}>
+              <s.icon className="w-4 h-4" />
+            </div>
+            <p className="text-xs text-muted-foreground">{s.label}</p>
+            <p className="text-lg font-semibold text-foreground mt-0.5">{s.value}</p>
+          </CardContent>
+        </Card>
+      ))}
     </div>
 
-    <Card className="shadow-card">
-      <CardHeader><CardTitle className="text-sm font-semibold">Call volume</CardTitle></CardHeader>
-      <CardContent>
-        <div className="h-72">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={trend}>
-              <defs>
-                <linearGradient id="vIn" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(var(--success))" stopOpacity={0.25} />
-                  <stop offset="95%" stopColor="hsl(var(--success))" stopOpacity={0} />
-                </linearGradient>
-                <linearGradient id="vOut" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(var(--info))" stopOpacity={0.25} />
-                  <stop offset="95%" stopColor="hsl(var(--info))" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-              <XAxis dataKey="day" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
-              <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
-              <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid hsl(var(--border))", fontSize: "13px" }} />
-              <Legend />
-              <Area type="monotone" dataKey="inbound" stroke="hsl(var(--success))" fill="url(#vIn)" strokeWidth={2} />
-              <Area type="monotone" dataKey="outbound" stroke="hsl(var(--info))" fill="url(#vOut)" strokeWidth={2} />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      </CardContent>
-    </Card>
-
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <Card className="shadow-card">
-        <CardHeader><CardTitle className="text-sm font-semibold">IVRS menu funnel</CardTitle></CardHeader>
+    <div className="grid lg:grid-cols-3 gap-4">
+      <Card className="shadow-card lg:col-span-2">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-semibold">Hourly call volume</CardTitle>
+          <p className="text-xs text-muted-foreground">Last 24 hours</p>
+        </CardHeader>
         <CardContent>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={ivrsMenu} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis type="number" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
-                <YAxis type="category" dataKey="option" width={140} tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
-                <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid hsl(var(--border))", fontSize: "13px" }} />
-                <Bar dataKey="picks" fill="hsl(var(--primary))" radius={[0,4,4,0]} />
-              </BarChart>
-            </ResponsiveContainer>
+          <div className="h-44 flex items-end gap-1.5">
+            {Array.from({ length: 24 }).map((_, i) => (
+              <div
+                key={i}
+                className="flex-1 bg-primary/70 rounded-t hover:bg-primary transition-colors"
+                style={{ height: `${20 + Math.sin(i / 3) * 30 + Math.random() * 40}%` }}
+              />
+            ))}
+          </div>
+          <div className="flex justify-between text-[10px] text-muted-foreground mt-2">
+            <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>23:00</span>
           </div>
         </CardContent>
       </Card>
+
       <Card className="shadow-card">
-        <CardHeader><CardTitle className="text-sm font-semibold">Top agents</CardTitle></CardHeader>
-        <CardContent className="space-y-3">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-semibold">Top agents</CardTitle>
+          <p className="text-xs text-muted-foreground">By calls handled</p>
+        </CardHeader>
+        <CardContent className="space-y-2">
           {[
             { name: "Anita Sharma", calls: 142, rate: "98%" },
             { name: "Rahul Verma", calls: 128, rate: "96%" },
             { name: "Priya Iyer", calls: 119, rate: "94%" },
             { name: "Karan Mehta", calls: 102, rate: "91%" },
           ].map((a) => (
-            <div key={a.name} className="flex items-center justify-between">
+            <div key={a.name} className="flex items-center justify-between p-2 rounded-md hover:bg-muted/40">
               <div>
                 <p className="text-sm font-medium text-foreground">{a.name}</p>
                 <p className="text-xs text-muted-foreground">{a.calls} calls</p>
               </div>
-              <Badge variant="secondary" className="text-xs">{a.rate}</Badge>
+              <span className="text-sm font-semibold text-success">{a.rate}</span>
             </div>
           ))}
         </CardContent>
@@ -110,27 +101,36 @@ const VoiceAnalyticsPage = () => (
     </div>
 
     <Card className="shadow-card">
-      <CardHeader><CardTitle className="text-sm font-semibold">Recent calls</CardTitle></CardHeader>
-      <CardContent>
+      <CardHeader className="pb-2 flex flex-row items-center justify-between">
+        <div>
+          <CardTitle className="text-sm font-semibold">Recent calls</CardTitle>
+          <p className="text-xs text-muted-foreground">Latest activity across inbound and outbound</p>
+        </div>
+        <Link to="/project/voice/logs" className="text-xs font-medium text-primary hover:underline">
+          See all
+        </Link>
+      </CardHeader>
+      <CardContent className="p-0">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border">
-                {["Number", "Direction", "Agent", "Duration", "Status"].map((h) => (
+                {["Number", "Direction", "Agent", "Duration", "Status", "Time"].map((h) => (
                   <th key={h} className="text-left text-xs font-medium text-muted-foreground p-3">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {recent.map((c, i) => (
+              {recentCalls.map((c, i) => (
                 <tr key={i} className="border-b border-border/40 last:border-0 hover:bg-muted/30">
                   <td className="p-3 font-medium text-foreground">{c.no}</td>
                   <td className="p-3 text-muted-foreground">{c.dir}</td>
                   <td className="p-3 text-muted-foreground">{c.agent}</td>
                   <td className="p-3 text-muted-foreground">{c.dur}</td>
                   <td className="p-3">
-                    <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${statusTone[c.status]}`}>{c.status}</span>
+                    <Badge variant="outline" className={statusTone[c.status]}>{c.status}</Badge>
                   </td>
+                  <td className="p-3 text-xs text-muted-foreground">{c.time}</td>
                 </tr>
               ))}
             </tbody>

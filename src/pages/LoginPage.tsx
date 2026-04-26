@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Shield, Building2, Send, CheckCircle2, ArrowLeft } from "lucide-react";
-import ChannelBubbles from "@/marketing/ChannelBubbles";
+import HeroChannelOrbit from "@/marketing/HeroChannelOrbit";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useEffect } from "react";
@@ -88,11 +88,11 @@ const LoginPage = () => {
           <p className="text-lg text-primary-foreground/90 mb-2 font-medium">
             One bridge. Every conversation.
           </p>
-          <p className="text-sm text-primary-foreground/70 leading-relaxed mb-10">
+          <p className="text-sm text-primary-foreground/70 leading-relaxed mb-16">
             Unified messaging, social and voice — all in one workspace.
           </p>
 
-          <ChannelBubbles />
+          <HeroChannelOrbit />
         </div>
       </div>
 

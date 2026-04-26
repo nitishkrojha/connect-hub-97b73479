@@ -1,40 +1,64 @@
-# Final Plan — Approve to Build
+## 1. Login Page — Use the colorful floating bubbles from marketing hero
 
-## 1. Homepage — Product Depth Pack (4 new sections, subtle fade-ins)
-- **AI Agent Showcase** — left copy + right 3-step auto-cycling card (Train → Configure → Deploy)
-- **Template Gallery Strip** — horizontal row of 6 WhatsApp template cards with fade edges, "200+ templates" counter
-- **Workflow Automation Preview** — left copy + right SVG node graph (Trigger → Send → Wait → Branch)
-- **Integrations Strip** — 12 logos (Shopify, Zoho, Salesforce, HubSpot, Razorpay, Shiprocket, Sheets, Zapier, Make, Stripe, Freshdesk, WooCommerce), grayscale → color on hover
+**File:** `src/pages/LoginPage.tsx`
 
-## 2. Voice/IVR Revamp (`CallIVRSPreview.tsx`)
-4-scene auto-cycling preview (4s each) with dot indicators:
-1. Inbound IVR menu tree
-2. Click-to-Call (web button → connecting → connected)
-3. Bulk Voice OBD progress bar
-4. Outbound Agent call with live transcript
+- Replace the current `<ChannelBubbles />` widget on the left brand panel with `<HeroChannelOrbit />` (the same vibrant, multi-color floating bubbles used on the marketing homepage hero — WhatsApp, SMS, Email, IVRS, AI Agent, Instagram, Facebook, Telegram, RCS bubbles orbiting a glowing Samparq logo).
+- Keep the existing left-panel copy ("One bridge. Every conversation.") above the bubbles, with a touch more vertical breathing room so the orbit halo isn't clipped.
+- The bubble component already supports `prefers-reduced-motion`, so no a11y regression.
 
-## 3. Cleanup
-- Remove "Meet customers where they are" from HomePage
-- Remove "Trusted across every sector" from HomePage
-- Remove API Docs link from header nav + footer
-- Remove `/docs` route from App.tsx
-- Delete `src/marketing/DocsPage.tsx`
+## 2. Project Dashboard — Add Inbox Analytics tab + rename Voice tab
 
-## 4. Final Homepage Order
-1. Hero (channel orbit)
-2. Trust ribbon
-3. Everything you need (3 feature snippets)
-4. **AI Agent Showcase** ← new
-5. **Template Gallery Strip** ← new
-6. **Workflow Automation Preview** ← new
-7. How it works
-8. **Integrations Strip** ← new
-9. Stats band (light blue gradient)
-10. Trial CTA card
+**File:** `src/pages/project/ProjectDashboard.tsx`
 
-## 5. GIGW / A11y
-- aria-labels on icon-only buttons
-- `prefers-reduced-motion` respected on all new animations
-- WCAG AA contrast, visible focus rings, 14px+ body text
+Currently the Dashboard has two tabs: **Message Dashboard** and **Call Dashboard**.
 
-**Approve to build.**
+Update the tab strip to three tabs in this order:
+1. **Message Dashboard** (unchanged — existing Broadcast/Templates view)
+2. **Inbox Dashboard** *(new)* — render `<InboxAnalyticsPage />` (already shows Conversations, Resolved, Avg first response, CSAT KPIs + conversation trend + by-channel + top agents). This satisfies the requested "conversation, resolved, in progress, avg first response" KPIs. We will also add an **In Progress** KPI tile (e.g., 631) to the Inbox Analytics KPI strip so all four asked-for metrics appear.
+3. **Call Dashboard** (unchanged — keeps current `IVRSAnalyticsPage` content)
+
+Tab icons: `BarChart3` for Message, `Inbox` for Inbox, `Phone` for Call.
+
+## 3. Rename "Campaign Analytics" → "Broadcast Analytics" everywhere
+
+Routes/URLs stay the same to avoid breaking links. Only labels & page titles change.
+
+**Files:**
+- `src/layouts/ProjectLayout.tsx` — sidebar Analytics group: change label `"Campaign Analytics"` → `"Broadcast Analytics"`.
+- `src/pages/project/analytics/AnalyticsHubPage.tsx` — tile `title: "Campaign Analytics"` → `"Broadcast Analytics"`, and update its description to use "broadcast" wording.
+- `src/pages/project/analytics/CampaignAnalyticsPage.tsx` — `<AnalyticsShell title="Campaign Analytics" …>` → `title="Broadcast Analytics"`, update subtitle accordingly.
+- The Dashboard's existing "Message Dashboard" tab (which shows broadcast stats) — leave the tab name as-is per your instruction; the rename specifically applies to the Analytics section. (If you also want the dashboard tab renamed to "Broadcast Dashboard", say the word and I'll include that too.)
+
+## 4. Voice Analytics — Use Voice Dashboard analysis under Analytics
+
+Currently `VoiceAnalyticsPage` shows: KPIs (Total/Inbound/Outbound/Missed) → Call volume area chart → IVRS menu funnel → Recent calls.
+
+`VoiceDashboardPage` (richer, used in the Call Dashboard tab) shows: 6-KPI strip (Total, Inbound, Outbound, Missed, **Avg duration**, **Answer rate**) → Hourly call volume bars → Top agents → Recent calls.
+
+**File:** `src/pages/project/analytics/VoiceAnalyticsPage.tsx`
+
+- Replace its body to render the same content as `VoiceDashboardPage` (KPIs, hourly bars, top agents, recent calls table) wrapped inside `<AnalyticsShell title="Voice Analytics" subtitle="Real-time view across every voice channel.">` so the date-range + export controls stay consistent with other Analytics pages.
+- Label stays **"Voice Analytics"** in the sidebar (`ProjectLayout.tsx`) and in `AnalyticsHubPage.tsx` tile — same wording used in the Dashboard's Call Dashboard tab area for consistency.
+- This means the Analytics → Voice page and the Dashboard → Call Dashboard tab now show the *same* analysis (single source of truth).
+
+## 5. Admin parity (light touch)
+
+`src/pages/admin/analytics/AdminCampaignAnalyticsPage.tsx` re-uses `CampaignAnalyticsPage`, so it will automatically pick up the "Broadcast Analytics" rename. Same for the voice admin wrapper. No code changes needed in admin wrappers.
+
+---
+
+### Files touched
+1. `src/pages/LoginPage.tsx` — swap bubble component
+2. `src/pages/project/ProjectDashboard.tsx` — add Inbox tab
+3. `src/pages/project/analytics/InboxAnalyticsPage.tsx` — add "In Progress" KPI tile
+4. `src/layouts/ProjectLayout.tsx` — rename sidebar label
+5. `src/pages/project/analytics/AnalyticsHubPage.tsx` — rename tile
+6. `src/pages/project/analytics/CampaignAnalyticsPage.tsx` — rename page title
+7. `src/pages/project/analytics/VoiceAnalyticsPage.tsx` — replace content with Voice Dashboard analysis
+
+### Out of scope
+- No route URL changes (backwards compatible).
+- No data-model or backend changes.
+- Marketing site untouched.
+
+Approve to build.

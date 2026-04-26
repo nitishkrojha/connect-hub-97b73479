@@ -64,11 +64,11 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex">
       {/* Left Panel - Branding (soft light backdrop so colorful icons pop) */}
-      <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-12 relative overflow-hidden bg-gradient-to-br from-sky-50 via-indigo-50 to-violet-50">
+      <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-12 relative overflow-hidden bg-gradient-to-br from-primary/5 via-info/5 to-primary/10">
         {/* Ambient blurred color blobs */}
-        <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-primary/20 blur-3xl" />
-        <div className="absolute -bottom-24 -right-16 w-[28rem] h-[28rem] rounded-full bg-info/20 blur-3xl" />
-        <div className="absolute top-1/3 right-1/4 w-72 h-72 rounded-full bg-pink-300/20 blur-3xl" />
+        <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-primary/25 blur-3xl" />
+        <div className="absolute -bottom-24 -right-16 w-[28rem] h-[28rem] rounded-full bg-info/25 blur-3xl" />
+        <div className="absolute top-1/3 right-1/4 w-72 h-72 rounded-full bg-channel-whatsapp/15 blur-3xl" />
 
         {/* Subtle dot grid */}
         <div

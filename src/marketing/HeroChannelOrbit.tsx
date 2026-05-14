@@ -16,7 +16,7 @@ const bubbles = [
   { icon: Facebook,      label: "Facebook", x: "62%", y: "72%", delay: 1.6, size: 52, bg: "bg-blue-500",         glow: "bg-blue-500/40" },
   { icon: Send,          label: "Telegram", x: "18%", y: "82%", delay: 0.9, size: 50, bg: "bg-sky-500",          glow: "bg-sky-500/40" },
   { icon: PhoneCall,     label: "IVRS",     x: "44%", y: "26%", delay: 2.4, size: 56, bg: "bg-channel-ivrs",     glow: "bg-channel-ivrs/40" },
-  { icon: Bot,           label: "AI Agent", x: "44%", y: "78%", delay: 1.4, size: 54, bg: "bg-amber-500",        glow: "bg-amber-500/40" },
+  { icon: Bot,           label: "AI Agent", x: "44%", y: "78%", delay: 1.4, size: 54, bg: "bg-violet-500",       glow: "bg-violet-500/40" },
   { icon: Radio,         label: "RCS",      x: "84%", y: "78%", delay: 0.3, size: 48, bg: "bg-channel-rcs",      glow: "bg-channel-rcs/40" },
 ];
 

@@ -90,7 +90,7 @@ const A11yToolbar = () => {
         <div
           role="dialog"
           aria-label="Accessibility settings"
-          className="fixed bottom-20 right-5 z-50 w-72 rounded-lg border border-border bg-card shadow-card-hover p-4 space-y-4"
+          className="fixed right-14 top-1/2 -translate-y-1/2 z-50 w-72 rounded-lg border border-border bg-card shadow-card-hover p-4 space-y-4"
         >
           <div className="flex items-center justify-between">
             <div className="font-semibold text-sm text-foreground">Accessibility</div>

@@ -115,9 +115,11 @@ const MarketingLayout = () => {
         </div>
       </header>
 
-      <main className="flex-1">
+      <main id="main-content" tabIndex={-1} className="flex-1">
         <Outlet />
       </main>
+
+      <A11yToolbar />
 
       <footer className="border-t border-border bg-muted/30 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid grid-cols-2 md:grid-cols-5 gap-8">

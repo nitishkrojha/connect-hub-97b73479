@@ -29,8 +29,12 @@
     --muted: 40 20% 94%;
     --muted-foreground: 222 15% 35%;
 
-    --accent: 28 95% 53%;
-    --accent-foreground: 0 0% 100%;
+    /* Hover/accent kept neutral — saffron reserved for the tricolour strip
+       and focus ring only (per user request: no saffron on button hover). */
+    --accent: 40 25% 92%;
+    --accent-foreground: 222 47% 11%;
+    --saffron: 28 95% 53%;
+    --saffron-foreground: 0 0% 100%;
 
     --destructive: 0 72% 45%;
     --destructive-foreground: 0 0% 100%;

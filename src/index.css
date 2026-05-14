@@ -107,6 +107,51 @@
     @apply bg-background text-foreground font-sans antialiased;
     font-family: 'Inter', system-ui, sans-serif;
   }
+
+  /* Visible focus ring for keyboard users (GIGW / WCAG 2.4.7) */
+  :focus-visible {
+    outline: 3px solid hsl(var(--accent));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Skip-to-main link (GIGW mandatory) */
+  .skip-link {
+    position: absolute;
+    top: -48px;
+    left: 8px;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    padding: 10px 16px;
+    z-index: 100;
+    font-weight: 600;
+    border-radius: 0 0 6px 6px;
+    transition: top 0.2s;
+  }
+  .skip-link:focus {
+    top: 0;
+  }
+
+  /* Accessibility toggles applied by A11yToolbar */
+  html.a11y-high-contrast {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+    --primary: 0 0% 0%;
+    --primary-foreground: 0 0% 100%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 15%;
+    --border: 0 0% 0%;
+    --accent: 50 100% 40%;
+    --accent-foreground: 0 0% 0%;
+  }
+  html.a11y-grayscale {
+    filter: grayscale(1);
+  }
+  html.a11y-underline-links a {
+    text-decoration: underline !important;
+  }
 }
 
 @layer utilities {

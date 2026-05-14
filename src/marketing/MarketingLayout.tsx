@@ -30,13 +30,6 @@ const MarketingLayout = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <a href="#main-content" className="skip-link">Skip to main content</a>
 
-      {/* Tricolour accent strip — GIGW visual identity */}
-      <div className="h-1 w-full flex" aria-hidden="true">
-        <div className="flex-1 bg-[hsl(28,95%,53%)]" />
-        <div className="flex-1 bg-white border-y border-border" />
-        <div className="flex-1 bg-[hsl(130,60%,28%)]" />
-      </div>
-
       <header className="sticky top-0 z-40 backdrop-blur bg-background/80 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2">
           <Link to="/" className="flex items-center gap-2 group shrink-0">

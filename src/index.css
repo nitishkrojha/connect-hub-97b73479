@@ -5,43 +5,48 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap');
 
 @layer base {
+  /* GIGW / STQC aligned palette — Indian Government inspired
+     Primary: deep navy (Ashoka blue family, 4.5:1+ on white)
+     Accent : saffron (kesari) for CTAs / highlights
+     Success: india green
+     Background: paper-white for high readability (WCAG AA) */
   :root {
-    --background: 210 20% 98%;
-    --foreground: 220 25% 10%;
+    --background: 40 30% 98%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 25% 10%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 25% 10%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 217 91% 50%;
+    --primary: 222 60% 22%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 215 20% 95%;
-    --secondary-foreground: 220 25% 10%;
+    --secondary: 40 25% 94%;
+    --secondary-foreground: 222 47% 11%;
 
-    --muted: 215 20% 95%;
-    --muted-foreground: 215 15% 47%;
+    --muted: 40 20% 94%;
+    --muted-foreground: 222 15% 35%;
 
-    --accent: 215 20% 95%;
-    --accent-foreground: 220 25% 10%;
+    --accent: 28 95% 53%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 72% 45%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 142 71% 45%;
+    --success: 130 60% 28%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 50%;
+    --warning: 38 92% 45%;
     --warning-foreground: 0 0% 100%;
 
-    --info: 199 89% 48%;
+    --info: 210 80% 38%;
     --info-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 217 91% 50%;
+    --border: 40 15% 86%;
+    --input: 40 15% 86%;
+    --ring: 28 95% 53%;
 
     --radius: 0.5rem;
 

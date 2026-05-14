@@ -77,13 +77,9 @@ const A11yToolbar = () => {
         title="Accessibility Tools"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="fixed right-0 top-1/2 -translate-y-1/2 z-50 h-12 w-12 rounded-l-full bg-[#0b5394] text-white shadow-card-hover flex items-center justify-center hover:bg-[#0a4680] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+        className="fixed right-3 top-1/2 -translate-y-1/2 z-50 h-12 w-12 rounded-full bg-[#0b5394] text-white shadow-card-hover flex items-center justify-center hover:bg-[#0a4680] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ring-2 ring-white/70"
       >
-        {/* Universal accessibility (person) icon — same visual as mygov.in */}
-        <svg viewBox="0 0 24 24" className="w-7 h-7" fill="currentColor" aria-hidden="true">
-          <circle cx="12" cy="3.5" r="2" />
-          <path d="M21 8.5a1 1 0 0 0-1-1h-5.2c-.2 0-.4 0-.6-.1l-1.5-.6a2 2 0 0 0-1.4 0l-1.5.6c-.2.1-.4.1-.6.1H4a1 1 0 1 0 0 2h5l.7 3.4-2.4 7a1.1 1.1 0 0 0 2.1.7l1.9-5.5h1.4l1.9 5.5a1.1 1.1 0 0 0 2.1-.7l-2.4-7L15 9.5h5a1 1 0 0 0 1-1Z" />
-        </svg>
+        <Accessibility className="w-7 h-7" aria-hidden="true" />
       </button>
 
       {open && (
